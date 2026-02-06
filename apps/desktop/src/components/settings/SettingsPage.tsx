@@ -11,11 +11,11 @@ import {
   LogoutOutlined,
   MicOutlined,
   MoreVertOutlined,
-  PaymentOutlined,
   PersonRemoveOutlined,
   PrivacyTipOutlined,
   RocketLaunchOutlined,
   SwapHorizOutlined,
+  TranslateOutlined,
   VolumeUpOutlined,
   WarningAmberOutlined,
 } from "@mui/icons-material";
@@ -24,6 +24,7 @@ import {
   Chip,
   Link,
   MenuItem,
+  Paper,
   Select,
   SelectChangeEvent,
   Stack,
@@ -31,24 +32,23 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { invokeHandler } from "@repo/functions";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { showErrorSnackbar } from "../../actions/app.actions";
 import { setAutoLaunchEnabled } from "../../actions/settings.actions";
 import { loadTones } from "../../actions/tone.actions";
 import {
   setPreferredLanguage,
   setSecondaryDictationLanguage,
 } from "../../actions/user.actions";
+import { detectLocale, setStoredLocale } from "../../i18n";
+import type { Locale } from "../../i18n";
 import { getAuthRepo } from "../../repos";
 import { produceAppState, useAppStore } from "../../store";
 import {
   DICTATION_LANGUAGE_OPTIONS,
   WHISPER_LANGUAGES,
 } from "../../utils/language.utils";
-import { getIsPaying } from "../../utils/member.utils";
 import {
   getDetectedSystemLocale,
   getHasEmailProvider,
@@ -61,9 +61,6 @@ import { DashboardEntryLayout } from "../dashboard/DashboardEntryLayout";
 
 export default function SettingsPage() {
   const hasEmailProvider = useAppStore(getHasEmailProvider);
-  const isPaying = useAppStore(getIsPaying);
-  const [manageSubscriptionLoading, setManageSubscriptionLoading] =
-    useState(false);
   const isSignedIn = useAppStore(getIsSignedIn);
   const [autoLaunchEnabled, autoLaunchStatus] = useAppStore((state) => [
     state.settings.autoLaunchEnabled,
@@ -71,6 +68,15 @@ export default function SettingsPage() {
   ]);
   const autoLaunchLoading = autoLaunchStatus === "loading";
   const intl = useIntl();
+
+  const [appLocale, setAppLocale] = useState<Locale>(detectLocale());
+
+  const handleLocaleToggle = () => {
+    const next: Locale = appLocale === "ko" ? "en" : "ko";
+    setStoredLocale(next);
+    setAppLocale(next);
+    window.location.reload();
+  };
 
   const dictationLanguage = useAppStore((state) => {
     const user = getMyUser(state);
@@ -177,27 +183,71 @@ export default function SettingsPage() {
     void setAutoLaunchEnabled(enabled);
   };
 
-  const handleManageSubscription = async () => {
-    setManageSubscriptionLoading(true);
-    try {
-      const data = await invokeHandler(
-        "stripe/createCustomerPortalSession",
-        {},
-      );
-      openUrl(data.url);
-    } catch (error) {
-      showErrorSnackbar(error);
-    } finally {
-      setManageSubscriptionLoading(false);
-    }
-  };
-
   const handleSignOut = async () => {
     await getAuthRepo().signOut();
   };
 
   const general = (
     <Section title={<FormattedMessage defaultMessage="General" />}>
+      <ListTile
+        title={<FormattedMessage defaultMessage="Microphone" />}
+        leading={<MicOutlined />}
+        onClick={openMicrophoneDialog}
+      />
+      <ListTile
+        title={<FormattedMessage defaultMessage="Hotkey shortcuts" />}
+        leading={<KeyboardAltOutlined />}
+        onClick={openShortcutsDialog}
+      />
+      <ListTile
+        title={<FormattedMessage defaultMessage="Audio" />}
+        leading={<VolumeUpOutlined />}
+        onClick={openAudioDialog}
+      />
+      <ListTile
+        title={<FormattedMessage defaultMessage="App language" />}
+        leading={<TranslateOutlined />}
+        disableRipple={true}
+        trailing={
+          <Box
+            onClick={handleLocaleToggle}
+            sx={{
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 2,
+              bgcolor: "level1",
+              "&:hover": { bgcolor: "level2" },
+              transition: "background-color 0.2s ease",
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: appLocale === "ko" ? 700 : 400,
+                opacity: appLocale === "ko" ? 1 : 0.5,
+              }}
+            >
+              한국어
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.3 }}>
+              /
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: appLocale === "en" ? 700 : 400,
+                opacity: appLocale === "en" ? 1 : 0.5,
+              }}
+            >
+              EN
+            </Typography>
+          </Box>
+        }
+      />
       <ListTile
         title={<FormattedMessage defaultMessage="Start on system startup" />}
         leading={<RocketLaunchOutlined />}
@@ -212,21 +262,6 @@ export default function SettingsPage() {
         }
       />
       <ListTile
-        title={<FormattedMessage defaultMessage="Microphone" />}
-        leading={<MicOutlined />}
-        onClick={openMicrophoneDialog}
-      />
-      <ListTile
-        title={<FormattedMessage defaultMessage="Audio" />}
-        leading={<VolumeUpOutlined />}
-        onClick={openAudioDialog}
-      />
-      <ListTile
-        title={<FormattedMessage defaultMessage="Hotkey shortcuts" />}
-        leading={<KeyboardAltOutlined />}
-        onClick={openShortcutsDialog}
-      />
-      <ListTile
         title={<FormattedMessage defaultMessage="More settings" />}
         leading={<MoreVertOutlined />}
         onClick={openMoreSettingsDialog}
@@ -238,7 +273,7 @@ export default function SettingsPage() {
     <Section
       title={<FormattedMessage defaultMessage="Processing" />}
       description={
-        <FormattedMessage defaultMessage="How Voquill should manage your transcriptions." />
+        <FormattedMessage defaultMessage="How Vocally should manage your transcriptions." />
       }
     >
       <ListTile
@@ -345,26 +380,36 @@ export default function SettingsPage() {
           }
         />
       )}
-      <ListTile
-        title={<FormattedMessage defaultMessage="AI transcription" />}
-        leading={<GraphicEqOutlined />}
-        onClick={openTranscriptionDialog}
-      />
-      <ListTile
-        title={<FormattedMessage defaultMessage="AI post processing" />}
-        leading={<AutoFixHighOutlined />}
-        onClick={openPostProcessingDialog}
-      />
-      <ListTile
-        title={
-          <Stack direction="row" alignItems="center">
-            <FormattedMessage defaultMessage="Agent mode" />
-            <Chip label="Beta" size="small" color="primary" sx={{ ml: 1 }} />
-          </Stack>
-        }
-        leading={<AutoAwesomeOutlined />}
-        onClick={openAgentModeDialog}
-      />
+      <Box
+        sx={{
+          mt: 1,
+          pl: 1,
+          borderLeft: 2,
+          borderColor: "primary.main",
+          opacity: 0.95,
+        }}
+      >
+        <ListTile
+          title={<FormattedMessage defaultMessage="AI transcription" />}
+          leading={<GraphicEqOutlined />}
+          onClick={openTranscriptionDialog}
+        />
+        <ListTile
+          title={<FormattedMessage defaultMessage="AI post processing" />}
+          leading={<AutoFixHighOutlined />}
+          onClick={openPostProcessingDialog}
+        />
+        <ListTile
+          title={
+            <Stack direction="row" alignItems="center">
+              <FormattedMessage defaultMessage="Agent mode" />
+              <Chip label="Beta" size="small" color="primary" sx={{ ml: 1 }} />
+            </Stack>
+          }
+          leading={<AutoAwesomeOutlined />}
+          onClick={openAgentModeDialog}
+        />
+      </Box>
     </Section>
   );
 
@@ -382,24 +427,15 @@ export default function SettingsPage() {
           onClick={openChangePasswordDialog}
         />
       )}
-      {isPaying && (
-        <ListTile
-          title={<FormattedMessage defaultMessage="Manage subscription" />}
-          leading={<PaymentOutlined />}
-          onClick={handleManageSubscription}
-          disabled={manageSubscriptionLoading}
-          trailing={<ArrowOutwardRounded />}
-        />
-      )}
       <ListTile
         title={<FormattedMessage defaultMessage="Terms & conditions" />}
-        onClick={() => openUrl("https://voquill.com/terms")}
+        onClick={() => openUrl("https://vocally.com/terms")}
         trailing={<ArrowOutwardRounded />}
         leading={<DescriptionOutlined />}
       />
       <ListTile
         title={<FormattedMessage defaultMessage="Privacy policy" />}
-        onClick={() => openUrl("https://voquill.com/privacy")}
+        onClick={() => openUrl("https://vocally.com/privacy")}
         trailing={<ArrowOutwardRounded />}
         leading={<PrivacyTipOutlined />}
       />
@@ -444,10 +480,18 @@ export default function SettingsPage() {
         <Typography variant="h4" fontWeight={700} sx={{ marginBottom: 4 }}>
           <FormattedMessage defaultMessage="Settings" />
         </Typography>
-        {general}
-        {processing}
-        {advanced}
-        {dangerZone}
+        <Paper variant="flat" sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+          {general}
+        </Paper>
+        <Paper variant="flat" sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+          {processing}
+        </Paper>
+        <Paper variant="flat" sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+          {advanced}
+        </Paper>
+        <Paper variant="flat" sx={{ p: 2, borderRadius: 3 }}>
+          {dangerZone}
+        </Paper>
       </Stack>
     </DashboardEntryLayout>
   );
