@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { trackButtonClick } from "../../utils/analytics.utils";
 import pageStyles from "../../styles/page.module.css";
 import { DownloadButton } from "../download-button";
 import styles from "./pricing-section.module.css";
 
-type Feature = string | { text: string; deemphasized?: boolean };
+type Feature = { text: string; deemphasized?: boolean };
 
 type PricingPlan = {
   name: string;
@@ -19,58 +19,116 @@ type PricingPlan = {
   isLifetime?: boolean;
 };
 
-const pricingPlans: PricingPlan[] = [
-  {
-    name: "Personal",
-    description: "For individuals who want fast, local dictation.",
-    monthlyPrice: 0,
-    yearlyPrice: null,
-    features: [
-      "AI dictation",
-      "Bring your own API key",
-      "Offline mode",
-      "Smart autocorrect",
-      "Community support",
-      { text: "Basic agent mode", deemphasized: true },
-    ],
-    cta: "Download free",
-    popular: false,
-    isLifetime: true,
-  },
-  {
-    name: "Pro",
-    description: "Full power with cloud transcription and advanced integrations.",
-    monthlyPrice: 12,
-    yearlyPrice: 8,
-    features: [
-      { text: "Everything in Personal", deemphasized: true },
-      "AI dictation",
-      // "Advanced agent mode",
-      "Cross-device sync",
-      "Unlimited words per month",
-      "Priority support",
-    ],
-    cta: "Download free",
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    description: "Custom solutions for teams with advanced needs.",
-    monthlyPrice: null,
-    yearlyPrice: null,
-    features: [
-      { text: "Everything in Pro", deemphasized: true },
-      "On-premise deployment",
-      "Custom integrations",
-      "Data privacy & compliance",
-      "Dedicated support",
-      "Bring your own cloud",
-    ],
-    cta: "Contact us",
-    popular: false,
-    isEnterprise: true,
-  },
-];
+function usePricingPlans(): PricingPlan[] {
+  const intl = useIntl();
+  return [
+    {
+      name: "Personal",
+      description: intl.formatMessage({
+        defaultMessage: "For individuals who want fast, local dictation.",
+      }),
+      monthlyPrice: 0,
+      yearlyPrice: null,
+      features: [
+        { text: intl.formatMessage({ defaultMessage: "AI dictation" }) },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Bring your own API key",
+          }),
+        },
+        { text: intl.formatMessage({ defaultMessage: "Offline mode" }) },
+        {
+          text: intl.formatMessage({ defaultMessage: "Smart autocorrect" }),
+        },
+        {
+          text: intl.formatMessage({ defaultMessage: "Community support" }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Basic agent mode",
+          }),
+          deemphasized: true,
+        },
+      ],
+      cta: intl.formatMessage({ defaultMessage: "Download free" }),
+      popular: false,
+      isLifetime: true,
+    },
+    {
+      name: "Pro",
+      description: intl.formatMessage({
+        defaultMessage:
+          "Full power with cloud transcription and advanced integrations.",
+      }),
+      monthlyPrice: 5,
+      yearlyPrice: 5,
+      features: [
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Everything in Personal",
+          }),
+          deemphasized: true,
+        },
+        { text: intl.formatMessage({ defaultMessage: "AI dictation" }) },
+        {
+          text: intl.formatMessage({ defaultMessage: "Cross-device sync" }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Unlimited words per month",
+          }),
+        },
+        {
+          text: intl.formatMessage({ defaultMessage: "Priority support" }),
+        },
+      ],
+      cta: intl.formatMessage({ defaultMessage: "Download free" }),
+      popular: true,
+    },
+    {
+      name: "Enterprise",
+      description: intl.formatMessage({
+        defaultMessage: "Custom solutions for teams with advanced needs.",
+      }),
+      monthlyPrice: null,
+      yearlyPrice: null,
+      features: [
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Everything in Pro",
+          }),
+          deemphasized: true,
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "On-premise deployment",
+          }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Custom integrations",
+          }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Data privacy & compliance",
+          }),
+        },
+        {
+          text: intl.formatMessage({ defaultMessage: "Dedicated support" }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Bring your own cloud",
+          }),
+        },
+      ],
+      cta: intl.formatMessage({ defaultMessage: "Contact us" }),
+      popular: false,
+      isEnterprise: true,
+    },
+  ];
+}
 
 function CheckIcon({ className }: { className?: string }) {
   return (
@@ -110,6 +168,7 @@ function ShieldIcon({ className }: { className?: string }) {
 
 export default function PricingSection() {
   const [isYearly, setIsYearly] = useState(true);
+  const pricingPlans = usePricingPlans();
 
   const getPrice = (plan: PricingPlan): number | null => {
     if (plan.isEnterprise) return null;
@@ -205,7 +264,9 @@ export default function PricingSection() {
                         </span>
                       </div>
                       <div className={styles.billingNote}>
-                        {isYearly && plan.yearlyPrice !== null && plan.yearlyPrice > 0 ? (
+                        {isYearly &&
+                        plan.yearlyPrice !== null &&
+                        plan.yearlyPrice > 0 ? (
                           <FormattedMessage
                             defaultMessage="Billed annually (${total}/year)"
                             values={{ total: getYearlyTotal(plan) }}
@@ -237,13 +298,17 @@ export default function PricingSection() {
                 <a
                   href="mailto:hello@voquill.com"
                   className={styles.ctaButtonOutline}
-                  onClick={() => trackButtonClick(`pricing-${plan.name.toLowerCase()}`)}
+                  onClick={() =>
+                    trackButtonClick(`pricing-${plan.name.toLowerCase()}`)
+                  }
                 >
                   {plan.cta}
                 </a>
               ) : (
                 <DownloadButton
-                  className={plan.popular ? styles.ctaButton : styles.ctaButtonOutline}
+                  className={
+                    plan.popular ? styles.ctaButton : styles.ctaButtonOutline
+                  }
                   trackingId={`pricing-${plan.name.toLowerCase()}`}
                 />
               )}
@@ -255,8 +320,8 @@ export default function PricingSection() {
                 </p>
                 <ul className={styles.featuresList}>
                   {plan.features.map((feature) => {
-                    const text = typeof feature === "string" ? feature : feature.text;
-                    const deemphasized = typeof feature === "object" && feature.deemphasized;
+                    const text = feature.text;
+                    const deemphasized = feature.deemphasized;
                     return (
                       <li
                         key={text}

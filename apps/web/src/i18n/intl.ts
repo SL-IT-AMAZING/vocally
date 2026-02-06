@@ -46,6 +46,12 @@ const matchSupportedLocale = (value?: string | null): Locale | null => {
 };
 
 export const detectLocale = (): Locale => {
+  const stored =
+    typeof window !== "undefined" ? localStorage.getItem("app-locale") : null;
+  if (stored && SUPPORTED_LOCALES.includes(stored)) {
+    return stored;
+  }
+
   if (typeof navigator === "undefined") {
     return DEFAULT_LOCALE;
   }
@@ -66,6 +72,10 @@ export const detectLocale = (): Locale => {
   }
 
   return DEFAULT_LOCALE;
+};
+
+export const setStoredLocale = (locale: string) => {
+  localStorage.setItem("app-locale", locale);
 };
 
 export const getMessagesForLocale = (locale: Locale) => {
