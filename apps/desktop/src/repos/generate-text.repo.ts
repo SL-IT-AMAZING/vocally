@@ -1,4 +1,3 @@
-import { invokeHandler, type CloudModel } from "@repo/functions";
 import { JsonResponse, Nullable, OpenRouterProviderRouting } from "@repo/types";
 import {
   azureOpenAIGenerateText,
@@ -16,8 +15,11 @@ import {
   openrouterGenerateTextResponse,
 } from "@repo/voice-ai";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
+import { supabase } from "../supabase";
 import { PostProcessingMode } from "../types/ai.types";
 import { BaseRepo } from "./base.repo";
+
+export type CloudModel = "small" | "medium" | "large";
 
 export type GenerateTextInput = {
   system?: Nullable<string>;
@@ -48,12 +50,16 @@ export class CloudGenerateTextRepo extends BaseGenerateTextRepo {
   }
 
   async generateText(input: GenerateTextInput): Promise<GenerateTextOutput> {
-    const response = await invokeHandler("ai/generateText", {
-      system: input.system,
-      prompt: input.prompt,
-      jsonResponse: input.jsonResponse,
-      model: this.model,
+    const { data, error } = await supabase.functions.invoke("generate-text", {
+      body: {
+        system: input.system,
+        prompt: input.prompt,
+        jsonResponse: input.jsonResponse,
+        model: this.model,
+      },
     });
+    if (error) throw error;
+    const response = data;
 
     return {
       text: response.text,

@@ -1,6 +1,6 @@
-import { invokeHandler } from "@repo/functions";
 import { Nullable, User } from "@repo/types";
 import { invoke } from "@tauri-apps/api/core";
+import { supabase } from "../supabase";
 import { nowIso } from "../utils/date.utils";
 import { LOCAL_USER_ID } from "../utils/user.utils";
 import { BaseRepo } from "./base.repo";
@@ -92,14 +92,18 @@ export class LocalUserRepo extends BaseUserRepo {
 
 export class CloudUserRepo extends BaseUserRepo {
   async setUser(user: User): Promise<User> {
-    await invokeHandler("user/setMyUser", { value: user });
+    const { error } = await supabase.functions.invoke("user-set", {
+      body: { value: user },
+    });
+    if (error) throw error;
     return user;
   }
 
   async getUser(): Promise<Nullable<User>> {
-    const user = await invokeHandler("user/getMyUser", {}).then(
-      (res) => res.user,
-    );
-    return user;
+    const { data, error } = await supabase.functions.invoke("user-get", {
+      body: {},
+    });
+    if (error) throw error;
+    return data?.user ?? null;
   }
 }

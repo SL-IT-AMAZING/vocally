@@ -14,12 +14,12 @@ export function BaseLayout({ children, title, description }: BaseLayoutProps) {
   const location = useLocation();
 
   const DEFAULT_TITLE = intl.formatMessage({
-    defaultMessage: "Voquill | Your keyboard is holding you back",
+    defaultMessage: "Vocally | Your keyboard is holding you back",
   });
   const DEFAULT_DESCRIPTION = intl.formatMessage({
     defaultMessage: "Type four times faster with a voice-first keyboard.",
   });
-  const FALLBACK_CANONICAL_ORIGIN = "https://voquill.com";
+  const FALLBACK_CANONICAL_ORIGIN = "https://vocally.com";
 
   const finalTitle = title ?? DEFAULT_TITLE;
   const finalDescription = description ?? DEFAULT_DESCRIPTION;

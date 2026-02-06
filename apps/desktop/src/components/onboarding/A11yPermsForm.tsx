@@ -18,7 +18,9 @@ import {
 
 export const A11yPermsForm = () => {
   const [requesting, setRequesting] = useState(false);
-  const a11yPermission = useAppStore((state) => state.permissions.accessibility);
+  const a11yPermission = useAppStore(
+    (state) => state.permissions.accessibility,
+  );
   const isAuthorized = isPermissionAuthorized(a11yPermission?.state);
 
   const handleAllow = useCallback(async () => {
@@ -65,7 +67,7 @@ export const A11yPermsForm = () => {
             <FormattedMessage defaultMessage="Enable accessibility" />
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            <FormattedMessage defaultMessage="Voquill needs accessibility permissions to paste transcriptions into focused text fields." />
+            <FormattedMessage defaultMessage="Vocally needs accessibility permissions to paste transcriptions into focused text fields." />
           </Typography>
         </Box>
 

@@ -70,7 +70,7 @@ export default function WelcomePage() {
             <Stack direction="row" alignItems="center" spacing={1}>
               <Logo width="4rem" height="4rem" />
               <Typography variant="h3" fontWeight={700}>
-                Voquill
+                Vocally
               </Typography>
             </Stack>
             <Typography variant="body1" color="text.secondary">

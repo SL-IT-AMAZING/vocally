@@ -19,11 +19,10 @@ export const getIsLoggedIn = (state: AppState): boolean => {
   return !!state.auth;
 };
 
-export const getHasEmailProvider = (state: AppState): boolean => {
-  const auth = state.auth;
-  const providers = auth?.providerData ?? [];
-  const providerIds = providers.map((p) => p.providerId);
-  return providerIds.includes("password");
+export const getHasEmailProvider = (_state: AppState): boolean => {
+  // With Supabase, we don't track provider in AuthUser
+  // This is used for showing password change UI - assume true for now
+  return true;
 };
 
 export const getIsOnboarded = (state: AppState): boolean => {
@@ -40,7 +39,7 @@ export const getHasCloudAccess = (state: AppState): boolean => {
 };
 
 export const getMyCloudUserId = (state: AppState): Nullable<string> =>
-  state.auth?.uid ?? null;
+  state.auth?.id ?? null;
 
 export const getMyEffectiveUserId = (state: AppState): string => {
   const isCloud = getHasCloudAccess(state);

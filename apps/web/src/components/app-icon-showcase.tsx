@@ -12,7 +12,7 @@ const icons: IconDefinition[] = [
   { id: "notes", label: "Apple Notes", src: "/notes.png", delay: 2 },
   { id: "slack", label: "Slack", src: "/slack.png", delay: 4 },
   { id: "docs", label: "Google Docs", src: "/docs.png", delay: 6 },
-  { id: "github", label: "GitHub Source Code", src: "/vscode.png", delay: 8 },
+  { id: "vscode", label: "VS Code", src: "/vscode.png", delay: 8 },
   { id: "notion", label: "Notion", src: "/notion.png", delay: 10 },
 ];
 

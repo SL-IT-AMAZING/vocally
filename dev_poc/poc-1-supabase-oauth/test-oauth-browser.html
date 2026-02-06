@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoC-1: Supabase OAuth 테스트</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .google { background: #4285f4; color: white; }
+        .kakao { background: #FEE500; color: #000; }
+        .logout { background: #666; color: white; }
+        .status { padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+        input { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <h1>PoC-1: Supabase OAuth 테스트</h1>
+
+    <div class="card">
+        <h3>1. Supabase 설정</h3>
+        <label>Supabase URL:</label>
+        <input type="text" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+        <label>Supabase Anon Key:</label>
+        <input type="text" id="supabaseKey" placeholder="your-anon-key">
+        <button onclick="initSupabase()">연결 테스트</button>
+        <div id="connectionStatus"></div>
+    </div>
+
+    <div class="card">
+        <h3>2. OAuth 로그인 테스트</h3>
+        <button class="google" onclick="signInWithGoogle()">Google 로그인</button>
+        <button class="kakao" onclick="signInWithKakao()">Kakao 로그인</button>
+        <button class="logout" onclick="signOut()">로그아웃</button>
+        <div id="authStatus"></div>
+    </div>
+
+    <div class="card">
+        <h3>3. 현재 세션</h3>
+        <button onclick="checkSession()">세션 확인</button>
+        <pre id="sessionInfo">세션 정보 없음</pre>
+    </div>
+
+    <div class="card">
+        <h3>4. 테스트 결과</h3>
+        <div id="testResults">
+            <p>✅ Supabase 연결: <span id="resultConnection">미테스트</span></p>
+            <p>✅ Google OAuth: <span id="resultGoogle">미테스트</span></p>
+            <p>✅ Kakao OAuth: <span id="resultKakao">미테스트</span></p>
+            <p>✅ Session 획득: <span id="resultSession">미테스트</span></p>
+        </div>
+    </div>
+
+    <script>
+        let supabase = null;
+
+        function initSupabase() {
+            const url = document.getElementById('supabaseUrl').value;
+            const key = document.getElementById('supabaseKey').value;
+
+            if (!url || !key) {
+                showStatus('connectionStatus', 'URL과 Key를 입력하세요', 'error');
+                return;
+            }
+
+            try {
+                supabase = window.supabase.createClient(url, key);
+                showStatus('connectionStatus', '✅ Supabase 클라이언트 생성 성공', 'success');
+                document.getElementById('resultConnection').textContent = '성공 ✅';
+
+                // 세션 변경 리스너
+                supabase.auth.onAuthStateChange((event, session) => {
+                    console.log('Auth event:', event, session);
+                    if (session) {
+                        showStatus('authStatus', `✅ 로그인 성공: ${session.user.email}`, 'success');
+                        document.getElementById('resultSession').textContent = '성공 ✅';
+                        document.getElementById('sessionInfo').textContent = JSON.stringify(session, null, 2);
+                    }
+                });
+
+                // 기존 세션 확인
+                checkSession();
+            } catch (e) {
+                showStatus('connectionStatus', '❌ 연결 실패: ' + e.message, 'error');
+                document.getElementById('resultConnection').textContent = '실패 ❌';
+            }
+        }
+
+        async function signInWithGoogle() {
+            if (!supabase) {
+                showStatus('authStatus', '먼저 Supabase를 연결하세요', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                });
+                if (error) throw error;
+                showStatus('authStatus', 'Google 로그인 진행 중...', 'info');
+            } catch (e) {
+                showStatus('authStatus', '❌ Google 로그인 실패: ' + e.message, 'error');
+                document.getElementById('resultGoogle').textContent = '실패 ❌';
+            }
+        }
+
+        async function signInWithKakao() {
+            if (!supabase) {
+                showStatus('authStatus', '먼저 Supabase를 연결하세요', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'kakao',
+                });
+                if (error) throw error;
+                showStatus('authStatus', 'Kakao 로그인 진행 중...', 'info');
+            } catch (e) {
+                showStatus('authStatus', '❌ Kakao 로그인 실패: ' + e.message, 'error');
+                document.getElementById('resultKakao').textContent = '실패 ❌';
+            }
+        }
+
+        async function signOut() {
+            if (!supabase) return;
+            await supabase.auth.signOut();
+            showStatus('authStatus', '로그아웃 완료', 'info');
+            document.getElementById('sessionInfo').textContent = '세션 정보 없음';
+        }
+
+        async function checkSession() {
+            if (!supabase) {
+                document.getElementById('sessionInfo').textContent = 'Supabase 연결 필요';
+                return;
+            }
+
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                document.getElementById('sessionInfo').textContent = JSON.stringify(session, null, 2);
+                document.getElementById('resultSession').textContent = '성공 ✅';
+
+                // 프로바이더 확인
+                const provider = session.user.app_metadata?.provider;
+                if (provider === 'google') {
+                    document.getElementById('resultGoogle').textContent = '성공 ✅';
+                } else if (provider === 'kakao') {
+                    document.getElementById('resultKakao').textContent = '성공 ✅';
+                }
+            } else {
+                document.getElementById('sessionInfo').textContent = '로그인된 세션 없음';
+            }
+        }
+
+        function showStatus(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.className = 'status ' + type;
+            el.textContent = message;
+        }
+
+        // URL에서 세션 파라미터 확인 (OAuth 콜백)
+        if (window.location.hash.includes('access_token')) {
+            showStatus('authStatus', 'OAuth 콜백 감지됨, 세션 확인 중...', 'info');
+        }
+    </script>
+</body>
+</html>

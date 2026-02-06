@@ -25,6 +25,7 @@ import {
 import {
   migratePreferredMicrophoneToPreferences,
   refreshCurrentUser,
+  setDictationPillVisibility,
   toggleActiveDictationLanguage,
 } from "../../actions/user.actions";
 import { useAsyncEffect } from "../../hooks/async.hooks";
@@ -114,7 +115,7 @@ export const RootSideEffects = () => {
   const strategyRef = useRef<BaseStrategy | null>(null);
   const recordingWarningTimerRef = useRef<NodeJS.Timeout | null>(null);
   const recordingAutoStopTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const userId = useAppStore((state) => state.auth?.uid);
+  const userId = useAppStore((state) => state.auth?.id);
   const keyPermAuthorized = useAppStore((state) =>
     isPermissionAuthorized(getRec(state.permissions, "accessibility")?.state),
   );
@@ -630,6 +631,19 @@ export const RootSideEffects = () => {
 
   useTauriListen<void>("on-click-dictate", () => {
     debouncedToggle("dictation", dictationController);
+  });
+
+  useTauriListen<void>("pill-hide-request", () => {
+    void setDictationPillVisibility("hidden");
+  });
+
+  useTauriListen<void>("toggle-floating-bar", () => {
+    const currentVisibility = getEffectivePillVisibility(
+      getAppState().userPrefs?.dictationPillVisibility,
+    );
+    const newVisibility =
+      currentVisibility === "hidden" ? "persistent" : "hidden";
+    void setDictationPillVisibility(newVisibility);
   });
 
   const trayLanguageCode = useAppStore((state) => {

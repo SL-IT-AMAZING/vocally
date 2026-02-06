@@ -1,4 +1,3 @@
-import { invokeHandler } from "@repo/functions";
 import { Nullable } from "@repo/types";
 import { batchAsync } from "@repo/utilities";
 import {
@@ -12,6 +11,7 @@ import {
   TranscriptionModel,
 } from "@repo/voice-ai";
 import { invoke } from "@tauri-apps/api/core";
+import { supabase } from "../supabase";
 import { getAppState } from "../store";
 import {
   CPU_DEVICE_VALUE,
@@ -278,12 +278,16 @@ export class CloudTranscribeAudioRepo extends BaseTranscribeAudioRepo {
     }
 
     const audioBase64 = btoa(binary);
-    const response = await invokeHandler("ai/transcribeAudio", {
-      prompt: input.prompt,
-      audioBase64,
-      audioMimeType: "audio/wav",
-      language: input.language,
+    const { data, error } = await supabase.functions.invoke("transcribe", {
+      body: {
+        audioBase64,
+        audioMimeType: "audio/wav",
+        prompt: input.prompt,
+        language: input.language,
+      },
     });
+    if (error) throw error;
+    const response = data;
 
     return {
       text: response.text,

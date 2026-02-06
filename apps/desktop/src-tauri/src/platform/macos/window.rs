@@ -1,7 +1,5 @@
 use crate::platform::macos::dock;
-use cocoa::appkit::{
-    NSApp, NSApplication, NSMainMenuWindowLevel, NSWindow, NSWindowCollectionBehavior,
-};
+use cocoa::appkit::{NSApp, NSApplication, NSWindow, NSWindowCollectionBehavior};
 use cocoa::base::{id, nil, NO as COCOA_NO, YES};
 use std::sync::mpsc;
 use tauri::WebviewWindow;
@@ -69,13 +67,37 @@ pub fn show_overlay_no_focus(window: &WebviewWindow) -> Result<(), String> {
                     .map_err(|err| err.to_string())?;
 
                 unsafe {
+                    use objc::{msg_send, sel, sel_impl};
+                    
                     let ns_window = ns_window_ptr as id;
-                    ns_window.setLevel_(i64::from(NSMainMenuWindowLevel) + 1);
+
+                    let current_style_mask: u64 = msg_send![ns_window, styleMask];
+                    let new_style_mask = current_style_mask | (1 << 7);
+                    let _: () = msg_send![ns_window, setStyleMask: new_style_mask];
+                    
+                    #[link(name = "CoreGraphics", kind = "framework")]
+                    extern "C" {
+                        fn CGWindowLevelForKey(key: i32) -> i32;
+                    }
+                    const K_CG_MAXIMUM_WINDOW_LEVEL_KEY: i32 = 14;
+                    let max_level = CGWindowLevelForKey(K_CG_MAXIMUM_WINDOW_LEVEL_KEY);
+                    ns_window.setLevel_((max_level - 1) as i64);
+                    
                     ns_window.setCollectionBehavior_(
                         NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces
-                            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary,
+                            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorStationary
+                            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary
+                            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorIgnoresCycle,
                     );
+                    
+                    let _: () = msg_send![ns_window, setOpaque: COCOA_NO];
+                    let _: () = msg_send![ns_window, setHasShadow: COCOA_NO];
+                    
                     ns_window.orderFrontRegardless();
+                }
+                
+                if let Err(err) = window_for_handle.show() {
+                    eprintln!("Failed to show overlay window: {err}");
                 }
 
                 Ok(())
@@ -108,19 +130,7 @@ pub fn configure_overlay_non_activating(window: &WebviewWindow) -> Result<(), St
 
                     let ns_window = ns_window_ptr as id;
 
-                    // NSWindowCollectionBehavior flags to prevent activation:
-                    // - canJoinAllSpaces (1 << 0)
-                    // - stationary (1 << 4) - window doesn't move with space switches
-                    // - fullScreenAuxiliary (1 << 8) - auxiliary window for full screen
-                    // - fullScreenDisallowsTiling (1 << 11)
-                    let behavior: u64 = (1 << 0) | (1 << 4) | (1 << 8) | (1 << 11);
-                    let _: () = msg_send![ns_window, setCollectionBehavior: behavior];
-
-                    // Prevent the window from becoming key or main
                     let _: () = msg_send![ns_window, setHidesOnDeactivate: COCOA_NO];
-
-                    // Set window to not activate app on click using private API
-                    // _setPreventsActivation: is a private method but works reliably
                     let _: () = msg_send![ns_window, _setPreventsActivation: YES];
                 }
 
@@ -135,8 +145,31 @@ pub fn configure_overlay_non_activating(window: &WebviewWindow) -> Result<(), St
         .map_err(|_| "failed to configure overlay on main thread".to_string())?
 }
 
-pub fn set_overlay_click_through(window: &WebviewWindow, click_through: bool) -> Result<(), String> {
+pub fn set_overlay_click_through(
+    window: &WebviewWindow,
+    click_through: bool,
+) -> Result<(), String> {
     window
         .set_ignore_cursor_events(click_through)
         .map_err(|err| err.to_string())
+}
+
+pub fn set_window_position_native(window: &WebviewWindow, x: f64, y: f64, primary_height: f64) {
+    use cocoa::foundation::NSPoint;
+    use objc::{msg_send, sel, sel_impl};
+
+    let window_clone = window.clone();
+    let _ = window.run_on_main_thread(move || {
+        let Ok(ns_window_ptr) = window_clone.ns_window() else {
+            return;
+        };
+
+        let cocoa_y = primary_height - y;
+        let point = NSPoint::new(x, cocoa_y);
+
+        let ns_window = ns_window_ptr as id;
+        unsafe {
+            let _: () = msg_send![ns_window, setFrameTopLeftPoint: point];
+        }
+    });
 }

@@ -5,6 +5,8 @@ const TRAY_ICON_BYTES: &[u8] = include_bytes!(concat!(
 
 use crate::domain::EVT_REGISTER_CURRENT_APP;
 
+pub const EVT_TOGGLE_FLOATING_BAR: &str = "toggle-floating-bar";
+
 #[cfg(desktop)]
 pub fn setup_tray(app: &mut tauri::App) -> tauri::Result<()> {
     use tauri::image::Image;
@@ -15,11 +17,14 @@ pub fn setup_tray(app: &mut tauri::App) -> tauri::Result<()> {
     let open_item = MenuItem::with_id(app, "open-dashboard", "Open Dashboard", true, None::<&str>)?;
     let register_current_app_item =
         MenuItem::with_id(app, "register-current-app", "Register this app", true, None::<&str>)?;
+    let toggle_floating_bar_item =
+        MenuItem::with_id(app, "toggle-floating-bar", "Show Floating Bar", true, None::<&str>)?;
     let quit_item = MenuItem::with_id(app, "quit-voquill", "Quit Voquill", true, None::<&str>)?;
 
     let menu = MenuBuilder::new(app)
         .item(&open_item)
         .item(&register_current_app_item)
+        .item(&toggle_floating_bar_item)
         .separator()
         .item(&quit_item)
         .build()?;
@@ -40,6 +45,11 @@ pub fn setup_tray(app: &mut tauri::App) -> tauri::Result<()> {
             "register-current-app" => {
                 if let Err(err) = app.emit(EVT_REGISTER_CURRENT_APP, ()) {
                     eprintln!("Failed to emit register-current-app event: {err}");
+                }
+            }
+            "toggle-floating-bar" => {
+                if let Err(err) = app.emit(EVT_TOGGLE_FLOATING_BAR, ()) {
+                    eprintln!("Failed to emit toggle-floating-bar event: {err}");
                 }
             }
             "quit-voquill" => app.exit(0),

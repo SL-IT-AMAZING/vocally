@@ -8,10 +8,10 @@ function DownloadPage() {
 
   return (
     <BaseLayout
-      title={intl.formatMessage({ defaultMessage: "Download Voquill" })}
+      title={intl.formatMessage({ defaultMessage: "Download Vocally" })}
       description={intl.formatMessage({
         defaultMessage:
-          "Install Voquill on macOS, Windows, or Linux and start dictating with AI today.",
+          "Install Vocally on macOS, Windows, or Linux and start dictating with AI today.",
       })}
     >
       <PageLayout>

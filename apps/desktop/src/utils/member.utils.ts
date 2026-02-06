@@ -5,7 +5,7 @@ import type { AppState } from "../state/app.state";
 import { EffectivePlan } from "../types/member.types";
 
 export const getMyMember = (state: AppState): Nullable<Member> => {
-  return getRec(state.memberById, state.auth?.uid) ?? null;
+  return getRec(state.memberById, state.auth?.id) ?? null;
 };
 
 export const getEffectivePlan = (state: AppState): EffectivePlan => {

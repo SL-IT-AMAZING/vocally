@@ -1,4 +1,4 @@
-import type { CloudModel } from "@repo/functions";
+import type { CloudModel } from "./generate-text.repo";
 import { Nullable } from "@repo/types";
 import { getRec } from "@repo/utilities";
 import { getAppState } from "../store";
@@ -12,7 +12,7 @@ import {
 } from "../utils/user.utils";
 import { BaseApiKeyRepo, LocalApiKeyRepo } from "./api-key.repo";
 import { BaseAppTargetRepo, LocalAppTargetRepo } from "./app-target.repo";
-import { BaseAuthRepo, CloudAuthRepo } from "./auth.repo";
+import { BaseAuthRepo, SupabaseAuthRepo } from "./auth.repo";
 import {
   AzureOpenAIGenerateTextRepo,
   BaseGenerateTextRepo,
@@ -32,7 +32,7 @@ import {
   LocalUserPreferencesRepo,
 } from "./preferences.repo";
 import { BaseStorageRepo, LocalStorageRepo } from "./storage.repo";
-import { BaseTermRepo, CloudTermRepo, LocalTermRepo } from "./term.repo";
+import { BaseTermRepo, LocalTermRepo } from "./term.repo";
 import { BaseToneRepo, LocalToneRepo } from "./tone.repo";
 import {
   AldeaTranscribeAudioRepo,
@@ -53,7 +53,7 @@ import { BaseUserRepo, CloudUserRepo, LocalUserRepo } from "./user.repo";
 const shouldUseCloud = () => getHasCloudAccess(getAppState());
 
 export const getAuthRepo = (): BaseAuthRepo => {
-  return new CloudAuthRepo();
+  return new SupabaseAuthRepo();
 };
 
 export const getUserRepo = (): BaseUserRepo => {
@@ -73,7 +73,7 @@ export const getAppTargetRepo = (): BaseAppTargetRepo => {
 };
 
 export const getTermRepo = (): BaseTermRepo => {
-  return shouldUseCloud() ? new CloudTermRepo() : new LocalTermRepo();
+  return new LocalTermRepo();
 };
 
 export const getHotkeyRepo = (): BaseHotkeyRepo => {

@@ -185,10 +185,10 @@ export const KeybindingsForm = () => {
           }),
           "@keyframes borderPulse": {
             "0%, 100%": {
-              borderColor: "#1976d2",
+              borderColor: "var(--app-palette-blue)",
             },
             "50%": {
-              borderColor: "#90caf9",
+              borderColor: "rgba(20, 163, 168, 0.4)",
             },
           },
         }}

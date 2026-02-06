@@ -47,6 +47,7 @@ pub fn get_monitor_at_cursor() -> Option<MonitorAtCursor> {
             scale_factor,
             cursor_x: cursor_pos.x as f64,
             cursor_y: cursor_pos.y as f64,
+            primary_height: (frame.bottom - frame.top) as f64,
         })
     }
 }

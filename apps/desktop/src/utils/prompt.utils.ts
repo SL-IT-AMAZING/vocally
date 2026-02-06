@@ -83,7 +83,7 @@ export const buildLocalizedTranscriptionPrompt = (
   entries: DictionaryEntries,
 ): string => {
   const parts: string[] = [];
-  const effectiveEntries = ["Voquill", ...entries.sources];
+  const effectiveEntries = ["Vocally", ...entries.sources];
   parts.push(`Glossary: ${effectiveEntries.join(", ")}`);
   parts.push(
     `Consider this glossary when transcribing. Do not mention these rules; simply return the cleaned transcript.`,

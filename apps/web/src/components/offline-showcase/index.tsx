@@ -13,7 +13,7 @@ export default function OfflineShowcase() {
           <FormattedMessage defaultMessage="No internet? No problem." />
         </h2>
         <p>
-          <FormattedMessage defaultMessage="Other dictation tools send your audio straight to the cloud. Voquill can run entirely on your device — your words never leave your machine. Airplane mode, off the grid, wherever. It just works." />
+          <FormattedMessage defaultMessage="Other dictation tools send your audio straight to the cloud. Vocally can run entirely on your device — your words never leave your machine. Airplane mode, off the grid, wherever. It just works." />
         </p>
       </div>
       <div className={`${pageStyles.splitMedia} ${styles.offlineMedia}`}>

@@ -243,13 +243,20 @@ const ORDERED_DICTATION_LANGUAGES: DictationLanguageCode[] = [
   "yue",
 ];
 
-export const DICTATION_LANGUAGE_OPTIONS: [string, string][] =
-  ORDERED_DICTATION_LANGUAGES.map<[string, string]>((code) => [
+export const AUTO_DETECT_LANGUAGE = "auto";
+
+export const DICTATION_LANGUAGE_OPTIONS: [string, string][] = [
+  [AUTO_DETECT_LANGUAGE, "Auto-detect"],
+  ...ORDERED_DICTATION_LANGUAGES.map<[string, string]>((code) => [
     code,
     DICTATION_LANGUAGES[code],
-  ]);
+  ]),
+];
 
 export const getDisplayNameForLanguage = (code: string): string => {
+  if (code === AUTO_DETECT_LANGUAGE) {
+    return "Auto-detect";
+  }
   const baseCode = code.split("-")[0];
   return (
     getRec(WHISPER_LANGUAGES, baseCode) ??
@@ -263,6 +270,9 @@ export const resolveLocaleValue = (value?: string | null): Locale => {
 };
 
 export const mapLocaleToWhisperLanguage = (language: string): string => {
+  if (language === AUTO_DETECT_LANGUAGE) {
+    return "";
+  }
   const baseLanguage = language.split("-")[0];
   return baseLanguage;
 };

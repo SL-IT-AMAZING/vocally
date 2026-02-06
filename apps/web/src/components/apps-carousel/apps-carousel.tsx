@@ -97,7 +97,7 @@ export default function AppsCarousel() {
           <FormattedMessage defaultMessage="One voice. Every app." />
         </h2>
         <p className={styles.subtitle}>
-          <FormattedMessage defaultMessage="Voquill works system-wide across macOS, Windows, and Linux. Any text field, any application—your voice just works." />
+          <FormattedMessage defaultMessage="Vocally works system-wide across macOS, Windows, and Linux. Any text field, any application—your voice just works." />
         </p>
       </div>
 

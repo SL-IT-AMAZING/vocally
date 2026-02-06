@@ -5,7 +5,7 @@ const APP_ICON_EXTENSION = ".png";
 const FALLBACK_USER_ID = "unknown-user";
 
 export const buildAppIconPath = (state: AppState, targetId: string): string => {
-  const userId = state.auth?.uid ?? FALLBACK_USER_ID;
+  const userId = state.auth?.id ?? FALLBACK_USER_ID;
   return `${userId}/${APP_ICON_DIRECTORY}/${targetId}${APP_ICON_EXTENSION}`;
 };
 

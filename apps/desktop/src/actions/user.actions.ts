@@ -434,7 +434,7 @@ export const setActiveDictationLanguage = async (
 
 export const migrateLocalUserToCloud = async (): Promise<void> => {
   const state = getAppState();
-  const userId = state.auth?.uid;
+  const userId = state.auth?.id;
   if (!userId) {
     return;
   }

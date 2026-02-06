@@ -65,11 +65,11 @@ export default function StylingPage() {
             1. Open up the app you want to style (like Slack or Chrome).
           </Typography>
           <Typography variant="body2">
-            2. Click on the Voquill icon in the menu bar, and click "Register
+            2. Click on the Vocally icon in the menu bar, and click "Register
             this app".
           </Typography>
           <Typography variant="body2">
-            3. Go back to Voquill, and select a writing style for that app.
+            3. Go back to Vocally, and select a writing style for that app.
           </Typography>
         </Stack>
       }

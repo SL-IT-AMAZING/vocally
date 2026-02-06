@@ -43,7 +43,7 @@ export const AIAgentModeConfiguration = ({
             [
               {
                 value: "cloud",
-                label: "Voquill",
+                label: "Vocally",
               },
             ],
           ),

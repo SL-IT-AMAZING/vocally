@@ -187,7 +187,7 @@ export default function SpeedShowcase() {
         <article className={styles.voicePane}>
           <header className={styles.paneHeader}>
             <span>
-              <FormattedMessage defaultMessage="Voquill voice" />
+              <FormattedMessage defaultMessage="Vocally voice" />
             </span>
             <span className={styles.paneMetricHot}>
               <FormattedMessage defaultMessage="~220 wpm" />

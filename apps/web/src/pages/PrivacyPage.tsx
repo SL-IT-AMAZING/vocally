@@ -4,8 +4,8 @@ function PrivacyPage() {
   return (
     <LegalPage
       slug="privacy"
-      title="Privacy Policy | Voquill"
-      description="Learn how Voquill collects, processes, and protects information across our local-first AI dictation platform."
+      title="Privacy Policy | Vocally"
+      description="Learn how Vocally collects, processes, and protects information across our local-first AI dictation platform."
     />
   );
 }

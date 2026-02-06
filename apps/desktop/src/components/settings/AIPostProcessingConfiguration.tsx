@@ -48,7 +48,7 @@ export const AIPostProcessingConfiguration = ({
             [
               {
                 value: "cloud",
-                label: "Voquill",
+                label: "Vocally",
               },
             ],
           ),

@@ -20,6 +20,7 @@ pub struct MonitorAtCursor {
     pub scale_factor: f64,
     pub cursor_x: f64,
     pub cursor_y: f64,
+    pub primary_height: f64,
 }
 
 #[derive(serde::Serialize, Clone, Debug, Default)]

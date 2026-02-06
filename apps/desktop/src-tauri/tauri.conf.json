@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Voquill",
+  "productName": "Vocally",
   "version": "0.1.0",
   "identifier": "com.voquill.desktop",
   "build": {
@@ -13,7 +13,7 @@
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "Voquill",
+        "title": "Vocally",
         "width": 900,
         "height": 610,
         "minWidth": 800,
@@ -24,9 +24,7 @@
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": [
-          "$APPDATA/transcription-audio/**"
-        ]
+        "scope": ["$APPDATA/transcription-audio/**"]
       }
     }
   },
@@ -55,9 +53,7 @@
   },
   "plugins": {
     "sql": {
-      "preload": [
-        "sqlite:voquill.db"
-      ]
+      "preload": ["sqlite:voquill.db"]
     },
     "updater": {
       "endpoints": [],

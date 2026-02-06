@@ -199,17 +199,128 @@ struct CursorFollowerState {
 
 fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
     use crate::domain::OverlayAnchor;
+    use tauri::Manager;
 
-    let Some(monitor) = crate::platform::monitor::get_monitor_at_cursor() else {
+    #[cfg(target_os = "macos")]
+    let screen_info = crate::platform::monitor::get_screen_info_at_cursor();
+
+    #[cfg(target_os = "macos")]
+    let Some(info) = screen_info
+    else {
         return;
+    };
+
+    #[cfg(target_os = "macos")]
+    let (visible_x, visible_y, visible_width, visible_height, cursor_x, cursor_y, primary_height) = (
+        info.visible_x,
+        info.visible_y,
+        info.visible_width,
+        info.visible_height,
+        info.cursor_x,
+        info.cursor_y,
+        info.primary_height,
+    );
+
+    #[cfg(not(target_os = "macos"))]
+    let (visible_x, visible_y, visible_width, visible_height, cursor_x, cursor_y) = {
+        let Ok(cursor_pos) = app.cursor_position() else {
+            return;
+        };
+        let Ok(Some(tauri_monitor)) = app.monitor_from_point(cursor_pos.x, cursor_pos.y) else {
+            return;
+        };
+        let monitor_pos = tauri_monitor.position();
+        let monitor_size = tauri_monitor.size();
+        let scale = tauri_monitor.scale_factor();
+        let insets = crate::platform::monitor::get_screen_visible_area();
+
+        let logical_x = monitor_pos.x as f64 / scale;
+        let logical_y = monitor_pos.y as f64 / scale;
+        let logical_width = monitor_size.width as f64 / scale;
+        let logical_height = monitor_size.height as f64 / scale;
+
+        (
+            logical_x + insets.left_inset,
+            logical_y + insets.top_inset,
+            logical_width - insets.left_inset - insets.right_inset,
+            logical_height - insets.top_inset - insets.bottom_inset,
+            cursor_pos.x,
+            cursor_pos.y,
+        )
     };
 
     let bottom_offset = crate::platform::monitor::get_bottom_pill_offset();
 
+    #[cfg(target_os = "macos")]
+    let position_overlay =
+        |window: &tauri::WebviewWindow, anchor: OverlayAnchor, w: f64, h: f64, margin: f64| {
+            let (x, y) = match anchor {
+                OverlayAnchor::BottomCenter => {
+                    let x = visible_x + (visible_width - w) / 2.0;
+                    let y = visible_y + visible_height - h - margin;
+                    (x, y)
+                }
+                OverlayAnchor::TopRight => {
+                    let x = visible_x + visible_width - w - margin;
+                    let y = visible_y + margin;
+                    (x, y)
+                }
+                OverlayAnchor::TopLeft => {
+                    let x = visible_x + margin;
+                    let y = visible_y + margin;
+                    (x, y)
+                }
+            };
+            crate::platform::window::set_window_position_native(window, x, y, primary_height);
+        };
+
+    #[cfg(not(target_os = "macos"))]
+    let position_overlay =
+        |window: &tauri::WebviewWindow, anchor: OverlayAnchor, w: f64, h: f64, margin: f64| {
+            let (x, y) = match anchor {
+                OverlayAnchor::BottomCenter => {
+                    let x = visible_x + (visible_width - w) / 2.0;
+                    let y = visible_y + visible_height - h - margin;
+                    (x, y)
+                }
+                OverlayAnchor::TopRight => {
+                    let x = visible_x + visible_width - w - margin;
+                    let y = visible_y + margin;
+                    (x, y)
+                }
+                OverlayAnchor::TopLeft => {
+                    let x = visible_x + margin;
+                    let y = visible_y + margin;
+                    (x, y)
+                }
+            };
+            let _ =
+                window.set_position(tauri::Position::Logical(tauri::LogicalPosition::new(x, y)));
+        };
+
     if let Some(pill_window) = app.get_webview_window(PILL_OVERLAY_LABEL) {
-        crate::platform::position::set_overlay_position(
+        #[cfg(debug_assertions)]
+        {
+            static LAST_LOG: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_secs())
+                .unwrap_or(0);
+            let last = LAST_LOG.load(std::sync::atomic::Ordering::Relaxed);
+            if now > last + 3 {
+                LAST_LOG.store(now, std::sync::atomic::Ordering::Relaxed);
+                let pill_x = visible_x + (visible_width - PILL_OVERLAY_WIDTH) / 2.0;
+                let pill_y = visible_y + visible_height - PILL_OVERLAY_HEIGHT - bottom_offset;
+                eprintln!(
+                    "[pill] cursor=({:.0}, {:.0}) visible=({:.0}, {:.0}, {:.0}x{:.0}) pill_pos=({:.0}, {:.0})",
+                    cursor_x, cursor_y,
+                    visible_x, visible_y, visible_width, visible_height,
+                    pill_x, pill_y
+                );
+            }
+        }
+        position_overlay(
             &pill_window,
-            &monitor,
             OverlayAnchor::BottomCenter,
             PILL_OVERLAY_WIDTH,
             PILL_OVERLAY_HEIGHT,
@@ -218,9 +329,8 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
     }
 
     if let Some(toast_window) = app.get_webview_window(TOAST_OVERLAY_LABEL) {
-        crate::platform::position::set_overlay_position(
+        position_overlay(
             &toast_window,
-            &monitor,
             OverlayAnchor::TopRight,
             TOAST_OVERLAY_WIDTH,
             TOAST_OVERLAY_HEIGHT,
@@ -229,9 +339,8 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
     }
 
     if let Some(agent_window) = app.get_webview_window(AGENT_OVERLAY_LABEL) {
-        crate::platform::position::set_overlay_position(
+        position_overlay(
             &agent_window,
-            &monitor,
             OverlayAnchor::TopLeft,
             AGENT_OVERLAY_WIDTH,
             AGENT_OVERLAY_HEIGHT,
@@ -257,13 +366,12 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
         };
 
         let new_hovered = if hover_enabled {
-            crate::platform::position::is_cursor_in_bounds(
-                &monitor,
-                OverlayAnchor::BottomCenter,
-                hover_width,
-                hover_height,
-                bottom_offset,
-            )
+            let pill_x = visible_x + (visible_width - hover_width) / 2.0;
+            let pill_y = visible_y + visible_height - hover_height - bottom_offset;
+            cursor_x >= pill_x
+                && cursor_x <= pill_x + hover_width
+                && cursor_y >= pill_y
+                && cursor_y <= pill_y + hover_height
         } else {
             false
         };

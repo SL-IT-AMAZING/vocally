@@ -6,33 +6,25 @@ import {
   PLATFORM_ORDER,
   type Platform,
 } from "../../lib/downloads";
-import pageStyles from "../../styles/page.module.css";
 import styles from "./hero.module.css";
-import { HeroGraphic } from "./hero-graphic";
+import { SonicWaveform } from "./sonic-waveform";
 
 export function HeroSection() {
   const intl = useIntl();
 
   return (
     <section className={styles.heroSection} id="overview">
+      <SonicWaveform />
+      <div className={styles.heroOverlay} />
       <div className={styles.heroContent}>
         <h1 className={styles.heroTitle}>
           <FormattedMessage defaultMessage="Your keyboard is holding you back." />
         </h1>
         <p className={styles.heroSubtitle}>
-          <FormattedMessage defaultMessage="Make voice your new keyboard. Type four times faster by using your voice. Voquill is the open-source alternative to WisprFlow." />
+          <FormattedMessage defaultMessage="Make voice your new keyboard. Type four times faster by using your voice." />
         </p>
         <div className={styles.heroActions}>
           <DownloadButton trackingId="download-hero" />
-          <a
-            href="https://github.com/josiahsrc/voquill"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={pageStyles.secondaryButton}
-          >
-            <span className={styles.githubIcon} aria-hidden="true" />
-            <FormattedMessage defaultMessage="Open source" />
-          </a>
         </div>
         <div className={styles.heroMeta}>
           <p className={styles.heroNote}>
@@ -62,22 +54,8 @@ export function HeroSection() {
           <Link to="/download" className={styles.heroMoreLink}>
             <FormattedMessage defaultMessage="More download options" />
           </Link>
-          <a
-            href="https://www.producthunt.com/products/voquill?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-voquill-2"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.productHuntBadge}
-          >
-            <img
-              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1061874&theme=dark"
-              alt="Voquill - The open source WisprFlow alternative | Product Hunt"
-              width="250"
-              height="54"
-            />
-          </a>
         </div>
       </div>
-      <HeroGraphic />
     </section>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { signOut, submitSignInWithGoogle } from "../../actions/login.actions";
+import { supabase } from "../../supabase";
 import {
   goToOnboardingPage,
   setAwaitingSignInNavigation,
@@ -164,6 +165,21 @@ export const SignInForm = () => {
           disabled={loginStatus === "loading"}
         >
           <FormattedMessage defaultMessage="Continue with Google" />
+        </Button>
+
+        <Button
+          fullWidth
+          variant="contained"
+          sx={{
+            bgcolor: '#FEE500',
+            color: '#191919',
+            '&:hover': { bgcolor: '#FDD835' },
+            fontWeight: 600,
+          }}
+          onClick={() => supabase.auth.signInWithOAuth({ provider: 'kakao' })}
+          disabled={loginStatus === "loading"}
+        >
+          카카오로 계속하기
         </Button>
 
         <Button

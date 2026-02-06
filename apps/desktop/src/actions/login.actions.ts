@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { invokeHandler } from "@repo/functions";
+import { supabase } from "../supabase";
 import type { LoginMode } from "../state/login.state";
 import type { GoogleAuthPayload } from "../types/google-auth.types";
 import { GOOGLE_AUTH_COMMAND } from "../types/google-auth.types";
@@ -10,9 +10,9 @@ import { registerMembers } from "../utils/app.utils";
 import { listify } from "@repo/utilities";
 
 const tryInit = async () => {
-  await invokeHandler("member/tryInitialize", {});
-  const member = await invokeHandler("member/getMyMember", {})
-    .then((res) => res.member)
+  await supabase.functions.invoke("member-init", { body: {} });
+  const member = await supabase.functions.invoke("member-get", { body: {} })
+    .then((res) => res.data?.member)
     .catch(() => null);
   produceAppState((state) => {
     registerMembers(state, listify(member));

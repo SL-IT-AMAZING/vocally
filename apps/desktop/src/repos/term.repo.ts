@@ -1,4 +1,3 @@
-import { invokeHandler } from "@repo/functions";
 import { Term } from "@repo/types";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
@@ -61,26 +60,5 @@ export class LocalTermRepo extends BaseTermRepo {
 
   async deleteTerm(termId: string): Promise<void> {
     await invoke<void>("term_delete", { id: termId });
-  }
-}
-
-export class CloudTermRepo extends BaseTermRepo {
-  async listTerms(): Promise<Term[]> {
-    const res = await invokeHandler("term/listMyTerms", {});
-    return res.terms;
-  }
-
-  async createTerm(term: Term): Promise<Term> {
-    await invokeHandler("term/upsertMyTerm", { term });
-    return term;
-  }
-
-  async updateTerm(term: Term): Promise<Term> {
-    await invokeHandler("term/upsertMyTerm", { term });
-    return term;
-  }
-
-  async deleteTerm(termId: string): Promise<void> {
-    await invokeHandler("term/deleteMyTerm", { termId });
   }
 }

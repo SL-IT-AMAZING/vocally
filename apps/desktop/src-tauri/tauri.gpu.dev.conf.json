@@ -1,7 +1,7 @@
 {
-  "productName": "Voquill GPU (dev)",
+  "productName": "Vocally GPU (dev)",
   "identifier": "com.voquill.desktop.gpu.dev",
-  "mainBinaryName": "Voquill GPU (dev)",
+  "mainBinaryName": "Vocally GPU (dev)",
   "plugins": {
     "updater": {
       "endpoints": [

@@ -1,4 +1,3 @@
-import { invokeHandler } from "@repo/functions";
 import { Member, Nullable, User } from "@repo/types";
 import { listify } from "@repo/utilities";
 import dayjs from "dayjs";
@@ -11,14 +10,14 @@ import {
   refreshCurrentUser,
 } from "../../actions/user.actions";
 import { useAsyncEffect } from "../../hooks/async.hooks";
-import { useIntervalAsync, useKeyDownHandler } from "../../hooks/helper.hooks";
+import { useKeyDownHandler } from "../../hooks/helper.hooks";
 import { useStreamWithSideEffects } from "../../hooks/stream.hooks";
 import { detectLocale } from "../../i18n";
 import { produceAppState, useAppStore } from "../../store";
+import { supabase } from "../../supabase";
 import { AuthUser } from "../../types/auth.types";
 import { CURRENT_COHORT } from "../../utils/analytics.utils";
 import { registerMembers, registerUsers } from "../../utils/app.utils";
-import { getEffectiveAuth } from "../../utils/auth.utils";
 import { getIsDevMode } from "../../utils/env.utils";
 import { getPlatform } from "../../utils/platform.utils";
 import {
@@ -29,28 +28,25 @@ import {
 
 type StreamRet = Nullable<[Nullable<Member>, Nullable<User>]>;
 
-// Timeout for Firebase Auth initialization (handles cases where IndexedDB hangs on some Linux systems)
+// Timeout for Supabase Auth initialization (handles cases where IndexedDB hangs on some Linux systems)
 const AUTH_READY_TIMEOUT_MS = 4_000;
-
-// 10 minutes
-const CONFIG_REFRESH_INTERVAL_MS = 1000 * 60 * 10;
 
 export const AppSideEffects = () => {
   const [authReady, setAuthReady] = useState(false);
   const [streamReady, setStreamReady] = useState(false);
   const [initReady, setInitReady] = useState(false);
   const authReadyRef = useRef(false);
-  const userId = useAppStore((state) => state.auth?.uid ?? "");
+  const userId = useAppStore((state) => state.auth?.id ?? "");
   const initialized = useAppStore((state) => state.initialized);
   const member = useAppStore((state) => {
-    const uid = state.auth?.uid;
+    const uid = state.auth?.id;
     return uid ? (state.memberById[uid] ?? null) : null;
   });
   const localUser = useAppStore(
     (state) => state.userById[LOCAL_USER_ID] ?? null,
   );
   const cloudUser = useAppStore((state) => {
-    const uid = state.auth?.uid;
+    const uid = state.auth?.id;
     return uid ? (state.userById[uid] ?? null) : null;
   });
   const prefs = useAppStore((state) => getMyUserPreferences(state));
@@ -65,43 +61,37 @@ export const AppSideEffects = () => {
   };
 
   useEffect(() => {
-    // Safety timeout: if Firebase Auth doesn't respond within the timeout,
+    // Safety timeout: if Supabase Auth doesn't respond within the timeout,
     // proceed with null auth state. This handles cases where IndexedDB
     // initialization hangs on some Linux systems.
     const timeoutId = setTimeout(() => {
       if (!authReadyRef.current) {
         console.warn(
-          "[AppSideEffects] Firebase Auth timed out, proceeding without auth",
+          "[AppSideEffects] Supabase Auth timed out, proceeding without auth",
         );
         onAuthStateChanged(null);
       }
     }, AUTH_READY_TIMEOUT_MS);
 
-    const unsubscribe = getEffectiveAuth().onAuthStateChanged(
-      onAuthStateChanged,
-      (error) => {
-        showErrorSnackbar(error);
-        onAuthStateChanged(null);
-      },
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user
+        ? ({
+            id: session.user.id,
+            email: session.user.email ?? null,
+            displayName: session.user.user_metadata?.display_name ?? null,
+          } as AuthUser)
+        : null;
+      onAuthStateChanged(user);
+    });
 
     return () => {
       clearTimeout(timeoutId);
-      unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 
-  useIntervalAsync(CONFIG_REFRESH_INTERVAL_MS, async () => {
-    const config = await invokeHandler("config/getFullConfig", {})
-      .then((res) => res.config)
-      .catch(() => null);
-
-    if (config) {
-      produceAppState((draft) => {
-        draft.config = config;
-      });
-    }
-  }, []);
 
   useStreamWithSideEffects({
     builder: (): Observable<StreamRet> => {
@@ -115,13 +105,15 @@ export const AppSideEffects = () => {
 
       return combineLatest([
         from(
-          invokeHandler("member/getMyMember", {})
-            .then((res) => res.member)
+          supabase.functions
+            .invoke("member-get", { body: {} })
+            .then((res) => res.data?.member ?? null)
             .catch(() => null),
         ),
         from(
-          invokeHandler("user/getMyUser", {})
-            .then((res) => res.user)
+          supabase.functions
+            .invoke("user-get", { body: {} })
+            .then((res) => res.data?.user ?? null)
             .catch(() => null),
         ),
       ]);
@@ -190,7 +182,7 @@ export const AppSideEffects = () => {
       return;
     }
 
-    const currentUserId = auth?.uid ?? null;
+    const currentUserId = auth?.id ?? null;
     const prevUserId = prevUserIdRef.current;
     if (prevUserId && !currentUserId) {
       mixpanel.reset();

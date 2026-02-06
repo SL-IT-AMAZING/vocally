@@ -174,15 +174,15 @@ const ASSET_KEY_MAPPINGS: Array<{
   keys: string[];
 }> = [
   {
-    match: (name) => /^Voquill[._](?!GPU).*\.AppImage$/i.test(name),
+    match: (name) => /^Vocally[._](?!GPU).*\.AppImage$/i.test(name),
     keys: ["linux-x86_64", "linux-x86_64-appimage"],
   },
   {
-    match: (name) => /^Voquill[._](?!GPU).*\.deb$/i.test(name),
+    match: (name) => /^Vocally[._](?!GPU).*\.deb$/i.test(name),
     keys: ["linux-x86_64-deb"],
   },
   {
-    match: (name) => /^Voquill[._](?!GPU).*\.rpm$/i.test(name),
+    match: (name) => /^Vocally[._](?!GPU).*\.rpm$/i.test(name),
     keys: ["linux-x86_64-rpm"],
   },
   {
@@ -203,31 +203,31 @@ const ASSET_KEY_MAPPINGS: Array<{
     ],
   },
   {
-    match: (name) => /^Voquill[._](?!GPU).*\.msi$/i.test(name),
+    match: (name) => /^Vocally[._](?!GPU).*\.msi$/i.test(name),
     keys: ["windows-x86_64", "windows-x86_64-msi"],
   },
   {
-    match: (name) => /^Voquill[._](?!GPU).*setup.*\.exe$/i.test(name),
+    match: (name) => /^Vocally[._](?!GPU).*setup.*\.exe$/i.test(name),
     keys: ["windows-x86_64-nsis"],
   },
   {
-    match: (name) => /Voquill\.GPU.*\.AppImage$/i.test(name),
+    match: (name) => /Vocally\.GPU.*\.AppImage$/i.test(name),
     keys: ["linux-x86_64-gpu"],
   },
   {
-    match: (name) => /Voquill\.GPU.*\.deb$/i.test(name),
+    match: (name) => /Vocally\.GPU.*\.deb$/i.test(name),
     keys: ["linux-x86_64-gpu-deb"],
   },
   {
-    match: (name) => /Voquill\.GPU.*\.rpm$/i.test(name),
+    match: (name) => /Vocally\.GPU.*\.rpm$/i.test(name),
     keys: ["linux-x86_64-gpu-rpm"],
   },
   {
-    match: (name) => /Voquill\.GPU.*\.msi$/i.test(name),
+    match: (name) => /Vocally\.GPU.*\.msi$/i.test(name),
     keys: ["windows-x86_64-gpu"],
   },
   {
-    match: (name) => /Voquill\.GPU.*setup.*\.exe$/i.test(name),
+    match: (name) => /Vocally\.GPU.*setup.*\.exe$/i.test(name),
     keys: ["windows-x86_64-gpu-nsis"],
   },
 ];

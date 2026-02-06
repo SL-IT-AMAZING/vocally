@@ -1,9 +1,5 @@
-import { HandlerOutput, invokeHandler } from "@repo/functions";
-import { PRICE_KEYS, Prices, type PriceKey } from "@repo/pricing";
+import { PRICE_KEYS, type PriceKey } from "@repo/pricing";
 import { MemberPlan } from "@repo/types";
-import { getRec } from "@repo/utilities";
-import type { AppState } from "../state/app.state";
-import { isDev, isEmulators, isProd } from "./env.utils";
 
 export const PRICING_PLANS = [
   "community",
@@ -22,62 +18,74 @@ export const convertPricingPlanToMemberPlan = (
   return "free";
 };
 
-export const getPriceIdFromKey = (priceKey: PriceKey) => {
-  const data = Prices[priceKey];
-  if (isProd()) {
-    return data.prodId;
-  } else if (isDev()) {
-    return data.devId;
-  } else if (isEmulators()) {
-    return data.sandboxId;
-  }
+export const getKoreaPrices = () => ({
+  pro_monthly: { unitAmount: 9900, currency: "KRW" },
+  pro_yearly: { unitAmount: 99000, currency: "KRW" },
+});
 
-  throw new Error("Unknown environment");
-};
-
-export const unitAmountToDollars = (
+export const unitAmountToKRW = (
   unitAmount: number | null | undefined,
 ): number => {
   if (unitAmount == null) {
     return 0;
   }
-  return unitAmount / 100;
+  return unitAmount;
 };
 
-export const getDollarPriceFromKey = (state: AppState, priceKey: PriceKey) => {
-  const output = state.priceValueByKey;
-  const price = getRec(output?.prices, getPriceIdFromKey(priceKey));
-  return unitAmountToDollars(price?.unitAmount);
+export const getKRWPriceFromKey = (priceKey: PriceKey) => {
+  const prices = getKoreaPrices();
+  const price = prices[priceKey];
+  return unitAmountToKRW(price?.unitAmount);
 };
 
-let lastPriceTime = 0;
-let cachedPrices: HandlerOutput<"stripe/getPrices"> | null = null;
-let pendingPromise: Promise<HandlerOutput<"stripe/getPrices">> | null = null;
-const CACHE_DURATION = 60 * 1000;
+export const getPriceIdFromKey = (key: string) => key;
 
-export const getPricesWithRuntimeCaching = async () => {
-  if (cachedPrices && Date.now() - lastPriceTime < CACHE_DURATION) {
-    return cachedPrices;
+export const getPricesWithRuntimeCaching = async (): Promise<
+  Record<
+    string,
+    Record<
+      string,
+      {
+        unitAmount: number | null;
+        unitAmountDecimal: string | null;
+        currency: string;
+      }
+    >
+  >
+> => {
+  const koreaPrices = getKoreaPrices();
+  const result: Record<
+    string,
+    Record<
+      string,
+      {
+        unitAmount: number | null;
+        unitAmountDecimal: string | null;
+        currency: string;
+      }
+    >
+  > = {};
+
+  for (const [key, value] of Object.entries(koreaPrices)) {
+    result[key] = {
+      [key]: {
+        unitAmount: value.unitAmount,
+        unitAmountDecimal: value.unitAmount.toString(),
+        currency: value.currency,
+      },
+    };
   }
 
-  if (pendingPromise) {
-    return pendingPromise;
-  }
+  return result;
+};
 
-  const pricesIds = [
-    getPriceIdFromKey("pro_monthly"),
-    getPriceIdFromKey("pro_yearly"),
-  ];
+export const getUSDPrices = () => ({
+  pro_monthly: { unitAmount: 5, currency: "USD" },
+  pro_yearly: { unitAmount: 50, currency: "USD" },
+});
 
-  pendingPromise = invokeHandler("stripe/getPrices", {
-    priceIds: pricesIds,
-  });
-
-  try {
-    cachedPrices = await pendingPromise;
-    lastPriceTime = Date.now();
-    return cachedPrices;
-  } finally {
-    pendingPromise = null;
-  }
+export const getDollarPriceFromKey = (_state: any, priceKey: PriceKey) => {
+  const prices = getUSDPrices();
+  const price = prices[priceKey];
+  return price?.unitAmount ?? 0;
 };

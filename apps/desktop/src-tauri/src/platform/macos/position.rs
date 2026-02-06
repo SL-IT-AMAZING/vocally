@@ -39,7 +39,19 @@ pub fn set_overlay_position(
         }
     };
 
-    // macOS uses LogicalPosition - Tauri handles the coordinate conversion
+    #[cfg(debug_assertions)]
+    {
+        static LAST_LOG: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        let last = LAST_LOG.load(std::sync::atomic::Ordering::Relaxed);
+        if now > last + 2 {
+            LAST_LOG.store(now, std::sync::atomic::Ordering::Relaxed);
+            eprintln!("[position] setting overlay to ({}, {})", target_x, target_y);
+        }
+    }
     let _ = window.set_position(tauri::Position::Logical(tauri::LogicalPosition::new(
         target_x, target_y,
     )));
@@ -71,10 +83,10 @@ pub fn is_cursor_in_bounds(
         }
     };
 
-    // macOS cursor coordinates are in Cocoa system (Y=0 at bottom)
-    // Convert to standard coordinates (Y=0 at top) to match bounds position
+    // macOS cursor coordinates are in Cocoa system (Y=0 at bottom of primary screen)
+    // Convert to standard coordinates (Y=0 at top) using primary screen height
     let cursor_x = monitor.cursor_x;
-    let cursor_y = monitor.height - monitor.cursor_y;
+    let cursor_y = monitor.primary_height - monitor.cursor_y;
 
     cursor_x >= bounds_x
         && cursor_x <= bounds_x + bounds_width

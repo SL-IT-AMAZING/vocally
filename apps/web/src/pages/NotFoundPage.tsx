@@ -9,7 +9,7 @@ function NotFoundPage() {
 
   return (
     <BaseLayout
-      title={intl.formatMessage({ defaultMessage: "Page not found | Voquill" })}
+      title={intl.formatMessage({ defaultMessage: "Page not found | Vocally" })}
       description={intl.formatMessage({
         defaultMessage: "Sorry, we couldn't find that page.",
       })}

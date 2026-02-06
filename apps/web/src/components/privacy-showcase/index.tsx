@@ -13,16 +13,8 @@ export default function PrivacyShowcase() {
           <FormattedMessage defaultMessage="Your data is yours. Period." />
         </h2>
         <p>
-          <FormattedMessage defaultMessage="Process everything locally on your device, bring your own API key, or connect to our cloud. Don't believe us? See for yourself. Voquill is fully open-source." />
+          <FormattedMessage defaultMessage="Process everything locally on your device, bring your own API key, or connect to our cloud. Your voice data stays private." />
         </p>
-        <a
-          href="https://github.com/josiahsrc/voquill"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.inlineLink}
-        >
-          <FormattedMessage defaultMessage="GitHub Source Code →" />
-        </a>
       </div>
       <div className={`${styles.splitMedia} ${styles.privacyMedia}`}>
         <PrivacyLock />

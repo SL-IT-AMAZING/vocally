@@ -26,6 +26,7 @@ pub fn get_monitor_at_cursor() -> Option<MonitorAtCursor> {
         scale_factor,
         cursor_x: x as f64,
         cursor_y: y as f64,
+        primary_height: geometry.height() as f64,
     })
 }
 

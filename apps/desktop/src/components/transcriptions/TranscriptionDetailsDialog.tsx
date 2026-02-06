@@ -156,7 +156,7 @@ export const TranscriptionDetailsDialog = () => {
       return <FormattedMessage defaultMessage="API" />;
     }
     if (transcription?.transcriptionMode === "cloud") {
-      return <FormattedMessage defaultMessage="Voquill Cloud" />;
+      return <FormattedMessage defaultMessage="Vocally Cloud" />;
     }
     if (transcription?.transcriptionMode === "local") {
       return <FormattedMessage defaultMessage="Local" />;
@@ -180,7 +180,7 @@ export const TranscriptionDetailsDialog = () => {
       return <FormattedMessage defaultMessage="API" />;
     }
     if (transcription?.postProcessMode === "cloud") {
-      return <FormattedMessage defaultMessage="Voquill Cloud" />;
+      return <FormattedMessage defaultMessage="Vocally Cloud" />;
     }
     return <FormattedMessage defaultMessage="Disabled" />;
   }, [transcription?.postProcessDevice, transcription?.postProcessMode]);
