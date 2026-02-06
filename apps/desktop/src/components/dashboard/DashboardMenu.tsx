@@ -5,11 +5,10 @@ import {
   PaletteOutlined,
   SettingsOutlined,
 } from "@mui/icons-material";
-import { Box, List, Stack } from "@mui/material";
+import { Box, List, Stack, Typography } from "@mui/material";
 import { FormattedMessage } from "react-intl";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ListTile } from "../common/ListTile";
-import { DiscordListTile } from "./DiscordListTile";
 import { UpdateListTile } from "./UpdateListTile";
 
 const settingsPath = "/dashboard/settings";
@@ -20,7 +19,7 @@ type NavItem = {
   icon: React.ReactNode;
 };
 
-const navItems: NavItem[] = [
+const primaryNavItems: NavItem[] = [
   {
     label: <FormattedMessage defaultMessage="Home" />,
     path: "/dashboard",
@@ -31,6 +30,9 @@ const navItems: NavItem[] = [
     path: "/dashboard/transcriptions",
     icon: <HistoryOutlined />,
   },
+];
+
+const toolNavItems: NavItem[] = [
   {
     label: <FormattedMessage defaultMessage="Dictionary" />,
     path: "/dashboard/dictionary",
@@ -68,7 +70,31 @@ export const DashboardMenu = ({ onChoose }: DashboardMenuProps) => {
         pb: 8,
       }}
     >
-      {navItems.map(({ label, path, icon }) => (
+      {primaryNavItems.map(({ label, path, icon }) => (
+        <ListTile
+          key={path}
+          onClick={() => onChooseHandler(path)}
+          selected={location.pathname === path}
+          leading={icon}
+          title={label}
+        />
+      ))}
+
+      <Typography
+        sx={{
+          fontSize: "0.7rem",
+          letterSpacing: "0.05em",
+          textTransform: "uppercase",
+          opacity: 0.5,
+          paddingLeft: 2,
+          marginTop: 2,
+          marginBottom: 1,
+        }}
+      >
+        <FormattedMessage defaultMessage="Tools" />
+      </Typography>
+
+      {toolNavItems.map(({ label, path, icon }) => (
         <ListTile
           key={path}
           onClick={() => onChooseHandler(path)}
@@ -85,7 +111,6 @@ export const DashboardMenu = ({ onChoose }: DashboardMenuProps) => {
       <Box sx={{ flexGrow: 1, overflowY: "auto" }}>{list}</Box>
       <Box sx={{ mt: 2, p: 2 }}>
         <UpdateListTile />
-        <DiscordListTile />
         <ListTile
           key={settingsPath}
           onClick={() => onChooseHandler(settingsPath)}
