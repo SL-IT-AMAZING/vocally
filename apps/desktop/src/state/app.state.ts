@@ -1,4 +1,4 @@
-import { HandlerOutput } from "@repo/functions";
+// HandlerOutput removed - using local type for PriceValue
 import {
   ApiKey,
   AppTarget,
@@ -42,7 +42,14 @@ export type SnackbarMode = "info" | "success" | "error";
 
 export type RecordingMode = "dictate" | "agent";
 
-export type PriceValue = HandlerOutput<"stripe/getPrices">["prices"];
+export type PriceValue = Record<
+  string,
+  {
+    unitAmount: number | null;
+    unitAmountDecimal: string | null;
+    currency: string;
+  }
+>;
 
 export type AppState = {
   initialized: boolean;
@@ -78,6 +85,9 @@ export type AppState = {
   pricing: PricingState;
   login: LoginState;
   agent: AgentState;
+  home: {
+    recentIds: string[];
+  };
 
   snackbarMessage?: string;
   snackbarCounter: number;
@@ -133,4 +143,7 @@ export const INITIAL_APP_STATE: AppState = {
   payment: INITIAL_PAYMENT_STATE,
   pricing: INITIAL_PRICING_STATE,
   login: INITIAL_LOGIN_STATE,
+  home: {
+    recentIds: [],
+  },
 };

@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import { refreshCurrentUser } from "../../actions/user.actions";
 import { useAsyncEffect } from "../../hooks/async.hooks";
+import { getTranscriptionRepo } from "../../repos";
+import { produceAppState } from "../../store";
+import { registerTranscriptions } from "../../utils/app.utils";
 
 const useRefreshCurrentUser = () => {
   const pendingRef = useRef(false);
@@ -25,6 +28,15 @@ export const HomeSideEffects = () => {
   useAsyncEffect(async () => {
     await refresh();
   }, [refresh]);
+
+  useAsyncEffect(async () => {
+    const transcriptions = await getTranscriptionRepo().listTranscriptions();
+    const recentIds = transcriptions.slice(0, 5).map((t) => t.id);
+    produceAppState((draft) => {
+      registerTranscriptions(draft, transcriptions);
+      draft.home.recentIds = recentIds;
+    });
+  }, []);
 
   useEffect(() => {
     const handleFocus = () => {

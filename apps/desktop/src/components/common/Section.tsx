@@ -11,6 +11,7 @@ type SectionProps = {
   onToggleEnable?: () => void;
   blocked?: boolean;
   blockedReason?: React.ReactNode;
+  action?: React.ReactNode;
 };
 
 export const Section = ({
@@ -21,6 +22,7 @@ export const Section = ({
   onToggleEnable,
   blocked,
   blockedReason,
+  action,
 }: SectionProps) => {
   const fieldEnabled = !blocked && (enabled ?? true);
   const headerEnabled = !blocked;
@@ -30,19 +32,23 @@ export const Section = ({
       <Stack
         direction="row"
         alignItems="center"
+        justifyContent="space-between"
         sx={{ opacity: headerEnabled ? 1 : 0.3 }}
       >
-        <Typography variant="h6" fontWeight="bold">
-          {title}
-        </Typography>
-        {isDefined(enabled) && (
-          <Box
-            sx={{ ml: 1, cursor: "pointer", pt: 1 }}
-            onClick={onToggleEnable}
-          >
-            {enabled ? <CheckBox /> : <CheckBoxOutlineBlank />}
-          </Box>
-        )}
+        <Stack direction="row" alignItems="center">
+          <Typography variant="h6" fontWeight="bold">
+            {title}
+          </Typography>
+          {isDefined(enabled) && (
+            <Box
+              sx={{ ml: 1, cursor: "pointer", pt: 1 }}
+              onClick={onToggleEnable}
+            >
+              {enabled ? <CheckBox /> : <CheckBoxOutlineBlank />}
+            </Box>
+          )}
+        </Stack>
+        {action}
       </Stack>
       <Box sx={{ opacity: fieldEnabled ? 1 : 0.3 }}>
         {description && (
