@@ -1,11 +1,10 @@
-import { Box, Stack, TextField, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useAppStore } from "../../store";
 import { getMyUser, getMyUserName } from "../../utils/user.utils";
-import { DictationInstruction } from "../common/DictationInstruction";
-import { Section } from "../common/Section";
 import { DashboardEntryLayout } from "../dashboard/DashboardEntryLayout";
 import { HomeSideEffects } from "./HomeSideEffects";
+import { RecentTranscriptions } from "./RecentTranscriptions";
 import { Stat } from "./Stat";
 
 export default function HomePage() {
@@ -26,7 +25,7 @@ export default function HomePage() {
             values={{ name: userName }}
           />
         </Typography>
-        <Box sx={{ my: 8 }}>
+        <Box sx={{ my: 3 }}>
           <Stack
             direction="row"
             spacing={2}
@@ -47,29 +46,7 @@ export default function HomePage() {
             />
           </Stack>
         </Box>
-        <Section
-          title={intl.formatMessage({
-            defaultMessage: "Try it out",
-          })}
-          description={intl.formatMessage({
-            defaultMessage:
-              "Use this space to type or paste anything and see how Voquill handles it. Nothing you write here is saved.",
-          })}
-        >
-          <Box sx={{ mb: 2 }}>
-            <DictationInstruction />
-          </Box>
-          <TextField
-            variant="outlined"
-            fullWidth
-            multiline
-            minRows={5}
-            placeholder={intl.formatMessage({
-              defaultMessage: "Start dictating here...",
-            })}
-            autoComplete="off"
-          />
-        </Section>
+        <RecentTranscriptions />
       </Stack>
     </DashboardEntryLayout>
   );

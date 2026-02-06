@@ -1,31 +1,28 @@
-import { Stack, Typography, type StackProps } from "@mui/material";
-import { Logo } from "./Logo";
+import { Box, type StackProps } from "@mui/material";
+import brandLogoFull from "../../assets/brand-logo-full.png";
 
 export type LogoWithTextProps = StackProps;
 
 export const LogoWithText = ({ sx, ...rest }: LogoWithTextProps) => {
   return (
-    <Stack
-      direction="row"
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        userSelect: "none",
-        ...sx,
-      }}
-      {...rest}
-    >
-      <Logo sx={{ mr: 1 }} />
-      <Typography
-        variant="h5"
-        fontWeight="bold"
-        sx={{
+    <Box
+      component="img"
+      src={brandLogoFull}
+      alt="vocally"
+      draggable={false}
+      sx={[
+        (theme) => ({
+          height: "5rem",
+          width: "auto",
+          objectFit: "contain",
           userSelect: "none",
-          display: { xs: "none", sm: "block" },
-        }}
-      >
-        Voquill
-      </Typography>
-    </Stack>
+          ...theme.applyStyles("dark", {
+            filter: "brightness(0) invert(1)",
+          }),
+        }),
+        ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+      ]}
+      {...rest}
+    />
   );
 };

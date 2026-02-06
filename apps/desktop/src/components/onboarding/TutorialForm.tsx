@@ -1,4 +1,10 @@
-import { ArrowForward, Check, Email, TouchApp } from "@mui/icons-material";
+import {
+  ArrowForward,
+  Chat,
+  Check,
+  Email,
+  TouchApp,
+} from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -15,7 +21,7 @@ import {
   finishOnboarding,
   submitOnboarding,
 } from "../../actions/onboarding.actions";
-import discordIcon from "../../assets/discord.svg";
+
 import { produceAppState, useAppStore } from "../../store";
 import { trackButtonClick } from "../../utils/analytics.utils";
 import {
@@ -31,14 +37,14 @@ import {
   OnboardingFormLayout,
 } from "./OnboardingCommon";
 
-const pulseDiscord = keyframes`
+const pulseChat = keyframes`
   0%, 100% {
-    border-color: rgba(88, 101, 242, 0.4);
-    box-shadow: 0 0 0 0 rgba(88, 101, 242, 0.4);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
   }
   50% {
-    border-color: rgba(88, 101, 242, 1);
-    box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.3);
+    border-color: rgba(59, 130, 246, 1);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
   }
 `;
 
@@ -203,7 +209,7 @@ ${userName}`;
             <FormattedMessage defaultMessage="Now try an email" />
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            <FormattedMessage defaultMessage="Dictate a short email. Voquill works great for longer-form content like messages, notes, and documents." />
+            <FormattedMessage defaultMessage="Dictate a short email. Vocally works great for longer-form content like messages, notes, and documents." />
           </Typography>
           <DictationInstruction />
         </Stack>
@@ -244,12 +250,12 @@ ${userName}`;
     </>
   );
 
-  const discordContent = (
+  const chatContent = (
     <Box sx={{ position: "relative", pb: 6 }}>
       <Stack
         spacing={0}
         sx={{
-          bgcolor: "#313338",
+          bgcolor: "#1e293b",
           borderRadius: 1.33,
           boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
           overflow: "hidden",
@@ -263,22 +269,16 @@ ${userName}`;
             gap: 1,
             px: 2,
             py: 1.5,
-            borderBottom: "1px solid #1e1f22",
+            borderBottom: "1px solid #0f172a",
           }}
         >
-          <img
-            src={discordIcon}
-            alt="Discord"
-            width={20}
-            height={20}
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
+          <Chat sx={{ fontSize: 20, color: "#f1f5f9" }} />
           <Typography
             variant="body2"
             fontWeight={600}
-            sx={{ color: "#f2f3f5" }}
+            sx={{ color: "#f1f5f9" }}
           >
-            Discord
+            Chat
           </Typography>
         </Box>
         <Box sx={{ p: 2 }}>
@@ -288,7 +288,7 @@ ${userName}`;
                 width: 40,
                 height: 40,
                 borderRadius: "50%",
-                bgcolor: "#5865F2",
+                bgcolor: "#3b82f6",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -302,15 +302,15 @@ ${userName}`;
                 <Typography
                   variant="body2"
                   fontWeight={600}
-                  sx={{ color: "#f2f3f5" }}
+                  sx={{ color: "#f1f5f9" }}
                 >
                   Jordan
                 </Typography>
-                <Typography variant="caption" sx={{ color: "#949ba4" }}>
+                <Typography variant="caption" sx={{ color: "#94a3b8" }}>
                   Today at 10:32 AM
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: "#dbdee1", mt: 0.5 }}>
+              <Typography variant="body2" sx={{ color: "#cbd5e1", mt: 0.5 }}>
                 What&apos;s your favorite breakfast?
               </Typography>
             </Box>
@@ -327,25 +327,25 @@ ${userName}`;
             onBlur={() => setIsFieldFocused(false)}
             sx={{
               "& .MuiOutlinedInput-root": {
-                bgcolor: "#383a40",
+                bgcolor: "#334155",
                 borderRadius: 1,
                 "& fieldset": isFieldFocused
-                  ? { borderColor: "#1e1f22" }
+                  ? { borderColor: "#0f172a" }
                   : {
                       borderWidth: 2,
-                      animation: `${pulseDiscord} 1.5s ease-in-out infinite`,
+                      animation: `${pulseChat} 1.5s ease-in-out infinite`,
                     },
                 "&:hover fieldset": {
-                  borderColor: isFieldFocused ? "#1e1f22" : undefined,
+                  borderColor: isFieldFocused ? "#0f172a" : undefined,
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#5865F2",
+                  borderColor: "#3b82f6",
                 },
               },
               "& .MuiInputBase-input": {
-                color: "#dbdee1",
+                color: "#cbd5e1",
                 "&::placeholder": {
-                  color: "#949ba4",
+                  color: "#94a3b8",
                   opacity: 1,
                 },
               },
@@ -515,7 +515,7 @@ ${userName}`;
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          {stepIndex === 0 ? discordContent : emailContent}
+          {stepIndex === 0 ? chatContent : emailContent}
           {stepper}
         </motion.div>
       )}

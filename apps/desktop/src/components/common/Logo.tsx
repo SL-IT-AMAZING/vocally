@@ -1,5 +1,5 @@
 import { Box, type BoxProps } from "@mui/material";
-import AppLogo from "../../assets/app-logo.svg?react";
+import vocallyIcon from "../../assets/vocally-icon.png";
 
 export type LogoProps = BoxProps;
 
@@ -11,11 +11,15 @@ export const Logo = ({
 }: LogoProps) => {
   return (
     <Box
-      component={AppLogo}
+      component="img"
+      src={vocallyIcon}
+      alt="Vocally"
+      draggable={false}
       width={width}
       height={height}
       sx={{
-        color: "primary.main",
+        objectFit: "contain",
+        borderRadius: "22%",
         ...sx,
       }}
       {...rest}

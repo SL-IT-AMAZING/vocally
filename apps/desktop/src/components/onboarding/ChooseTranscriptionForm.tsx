@@ -43,7 +43,7 @@ export const ChooseTranscriptionForm = () => {
             <FormattedMessage defaultMessage="Set up transcription" />
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            <FormattedMessage defaultMessage="Decide how Voquill should process your recordings. Locally or through an API." />
+            <FormattedMessage defaultMessage="Decide how Vocally should process your recordings. Locally or through an API." />
           </Typography>
         </Box>
 

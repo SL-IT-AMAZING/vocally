@@ -85,7 +85,7 @@ export const MoreSettingsDialog = () => {
           <SettingSection
             title={<FormattedMessage defaultMessage="Incognito mode" />}
             description={
-              <FormattedMessage defaultMessage="When enabled, Voquill will not save transcription history or audio snapshots." />
+              <FormattedMessage defaultMessage="When enabled, Vocally will not save transcription history or audio snapshots." />
             }
             action={
               <Switch

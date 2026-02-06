@@ -73,7 +73,7 @@ export const UpgradePlanDialog = () => {
               <FormattedMessage defaultMessage="Upgrade your plan" />
             </Typography>
             <Typography component="div" variant="body1" color="textSecondary">
-              <FormattedMessage defaultMessage="Cross-device sync, Voquill Cloud, and more advanced features." />
+              <FormattedMessage defaultMessage="Cross-device sync, Vocally Cloud, and more advanced features." />
             </Typography>
           </DialogTitle>
           <DialogContent>

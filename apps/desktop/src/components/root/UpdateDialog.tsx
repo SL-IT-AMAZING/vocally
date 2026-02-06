@@ -8,11 +8,9 @@ import {
   DialogContent,
   DialogTitle,
   LinearProgress,
-  Link,
   Stack,
   Typography,
 } from "@mui/material";
-import { openUrl } from "@tauri-apps/plugin-opener";
 import { useCallback, useMemo } from "react";
 import Markdown from "react-markdown";
 import {
@@ -62,12 +60,12 @@ export const UpdateDialog = () => {
   const versionLabel = availableVersion
     ? intl.formatMessage(
         {
-          defaultMessage: "Voquill {version}",
+          defaultMessage: "Vocally {version}",
         },
         { version: availableVersion },
       )
     : intl.formatMessage({
-        defaultMessage: "A Voquill update",
+        defaultMessage: "A Vocally update",
       });
 
   const formattedDate = useMemo(
@@ -141,21 +139,7 @@ export const UpdateDialog = () => {
       <DialogTitle>
         <FormattedMessage defaultMessage="Update available" />
         <Typography variant="caption" color="text.secondary" component="p">
-          <FormattedMessage
-            defaultMessage="Release notes are AI-generated and may contain errors. Visit the {discord} for a more accurate discussion on what's being developed."
-            values={{
-              discord: (
-                <Link
-                  component="button"
-                  variant="caption"
-                  onClick={() => openUrl("https://discord.gg/5jXkDvdVdt")}
-                  sx={{ verticalAlign: "baseline" }}
-                >
-                  Discord
-                </Link>
-              ),
-            }}
-          />
+          <FormattedMessage defaultMessage="Release notes are AI-generated and may contain errors." />
         </Typography>
       </DialogTitle>
       <DialogContent>
@@ -212,7 +196,7 @@ export const UpdateDialog = () => {
 
           {status === "installing" && (
             <Alert severity="info" variant="outlined">
-              <FormattedMessage defaultMessage="Installation in progress. Voquill may restart automatically when finished." />
+              <FormattedMessage defaultMessage="Installation in progress. Vocally may restart automatically when finished." />
             </Alert>
           )}
 

@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { useIntl } from "react-intl";
 import { Link } from "react-router-dom";
+import { detectLocale, setStoredLocale } from "../i18n";
 import styles from "../styles/page.module.css";
 import DownloadButton from "./download-button";
-import GitHubButton from "./github-button";
-import LogoMark from "./logo-mark";
 
 export function SiteHeader() {
   const intl = useIntl();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [locale, setLocale] = useState(() => detectLocale());
+
+  const handleLocaleToggle = () => {
+    const next = locale === "ko" ? "en" : "ko";
+    setStoredLocale(next);
+    setLocale(next);
+    window.location.reload();
+  };
 
   const navLinks = [
     {
@@ -33,8 +40,12 @@ export function SiteHeader() {
     <div className={styles.headerWrapper}>
       <header className={styles.header}>
         <Link to="/" className={styles.logo}>
-          <LogoMark className={styles.logoMark} />
-          <span>Voquill</span>
+          <img
+            src="/vocally-logo.png"
+            alt="Vocally"
+            className={styles.logoImage}
+            draggable={false}
+          />
         </Link>
         <nav
           className={styles.nav}
@@ -49,7 +60,13 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className={styles.headerActions}>
-          <GitHubButton className={styles.headerCta} />
+          <button
+            onClick={handleLocaleToggle}
+            className={styles.langToggle}
+            aria-label="Switch language"
+          >
+            {locale === "ko" ? "EN" : "한국어"}
+          </button>
           <DownloadButton className={styles.headerCta} />
         </div>
         <button
@@ -100,7 +117,6 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className={styles.mobileMenuActions}>
-            <GitHubButton />
             <DownloadButton />
           </div>
         </div>
