@@ -5,7 +5,7 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://github.com/josiahsrc/voquill/releases/download/desktop-gpu-dev/latest.json"
+        "https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-gpu-dev/latest.json"
       ]
     }
   }

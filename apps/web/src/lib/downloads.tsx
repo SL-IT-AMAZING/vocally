@@ -39,7 +39,7 @@ export type PlatformDownload = {
 export const DEFAULT_PLATFORM: Platform = "mac";
 
 const RELEASES_API_URL =
-  "https://api.github.com/repos/josiahsrc/voquill/releases";
+  "https://api.github.com/repos/SL-IT-AMAZING/vocally/releases";
 
 const RELEASE_TAG_PATTERNS = {
   cpu: /^desktop-v\d/,

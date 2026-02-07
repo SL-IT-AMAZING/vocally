@@ -11,7 +11,7 @@ export function GitHubButton({ className }: GitHubButtonProps) {
 
   return (
     <a
-      href="https://github.com/josiahsrc/voquill"
+      href="https://github.com/SL-IT-AMAZING/vocally"
       className={classes}
       target="_blank"
       rel="noopener noreferrer"
