@@ -205,6 +205,7 @@ jobs:
 
       - name: Generate release notes
         id: release_notes
+        continue-on-error: true
         uses: josiahsrc/ai-release-notes-builder@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -363,6 +364,12 @@ jobs:
       FLAVOR: ${{ needs.metadata.outputs.release_flavor }}
       VITE_FLAVOR: ${{ needs.metadata.outputs.release_flavor }}
       VITE_GPU_BUILD: ${{ matrix.gpu_variant }}
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      VITE_PADDLE_CLIENT_TOKEN: ${{ secrets.VITE_PADDLE_CLIENT_TOKEN }}
+      VITE_PADDLE_PRICE_MONTHLY: ${{ secrets.VITE_PADDLE_PRICE_MONTHLY }}
+      VITE_PADDLE_PRICE_YEARLY: ${{ secrets.VITE_PADDLE_PRICE_YEARLY }}
+      VITE_MIXPANEL_TOKEN: ${{ secrets.VITE_MIXPANEL_TOKEN }}
       VOQUILL_BUILD_FLAVOR: ${{ needs.metadata.outputs.release_flavor }}
       VOQUILL_DESKTOP_FLAVOR: ${{ needs.metadata.outputs.release_flavor }}
       TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -578,8 +585,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo "client_id=777461284594-dhgao2eek53ppl4o188ik2i9cigdcmnp.apps.googleusercontent.com" >> "$GITHUB_OUTPUT"
-          echo "client_secret=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" >> "$GITHUB_OUTPUT"
+          echo "client_id=${{ secrets.VOQUILL_GOOGLE_CLIENT_ID }}" >> "$GITHUB_OUTPUT"
+          echo "client_secret=${{ secrets.VOQUILL_GOOGLE_CLIENT_SECRET }}" >> "$GITHUB_OUTPUT"
 
       - name: Compute Tauri CLI args
         id: tauri-cli-args
