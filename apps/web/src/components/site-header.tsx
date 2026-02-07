@@ -43,7 +43,7 @@ export function SiteHeader() {
           <img
             src="/vocally-logo.png"
             alt="Vocally"
-            className={styles.logoImage}
+            className={styles.headerLogo}
             draggable={false}
           />
         </Link>
