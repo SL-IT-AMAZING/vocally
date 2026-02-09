@@ -16,7 +16,7 @@ import { detectLocale } from "../../i18n";
 import { produceAppState, useAppStore } from "../../store";
 import { supabase } from "../../supabase";
 import { AuthUser } from "../../types/auth.types";
-import { CURRENT_COHORT } from "../../utils/analytics.utils";
+import { CURRENT_COHORT, isMixpanelReady } from "../../utils/analytics.utils";
 import { registerMembers, registerUsers } from "../../utils/app.utils";
 import { getIsDevMode } from "../../utils/env.utils";
 import { getPlatform } from "../../utils/platform.utils";
@@ -91,7 +91,6 @@ export const AppSideEffects = () => {
       subscription.unsubscribe();
     };
   }, []);
-
 
   useStreamWithSideEffects({
     builder: (): Observable<StreamRet> => {
@@ -184,9 +183,6 @@ export const AppSideEffects = () => {
 
     const currentUserId = auth?.id ?? null;
     const prevUserId = prevUserIdRef.current;
-    if (prevUserId && !currentUserId) {
-      mixpanel.reset();
-    }
 
     const isPro = member?.plan === "pro";
     const isFree = member?.plan === "free";
@@ -202,53 +198,58 @@ export const AppSideEffects = () => {
     const onboarded = cloudUser?.onboarded ?? localUser?.onboarded ?? false;
     const planStatus = member?.plan ?? "community";
 
-    if (currentUserId && currentUserId !== prevUserId) {
-      mixpanel.identify(currentUserId);
+    if (isMixpanelReady()) {
+      if (prevUserId && !currentUserId) {
+        mixpanel.reset();
+      }
 
-      // Set creation time to ISO 8601 (2024-01-01T12:00:00.000Z) for Mixpanel
-      mixpanel.people.set_once({
-        $created: new Date().toISOString(),
-        initialPlatform: platform,
-        initialLocale: locale,
-        initialCohort: CURRENT_COHORT,
+      if (currentUserId && currentUserId !== prevUserId) {
+        mixpanel.identify(currentUserId);
+
+        mixpanel.people.set_once({
+          $created: new Date().toISOString(),
+          initialPlatform: platform,
+          initialLocale: locale,
+          initialCohort: CURRENT_COHORT,
+        });
+
+        mixpanel.register_once({
+          initialPlatform: platform,
+          initialLocale: locale,
+          initialCohort: CURRENT_COHORT,
+        });
+      }
+
+      mixpanel.people.set({
+        $email: auth?.email ?? undefined,
+        $name: auth?.displayName ?? undefined,
+        planStatus,
+        isPro,
+        isFree,
+        isCommunity,
+        isTrial,
+        isPaying,
+        onboarded,
+        onboardedAt: onboardedAt ?? undefined,
+        activeSystemCohort: CURRENT_COHORT,
+        daysSinceOnboarded,
+        pillState: getEffectivePillVisibility(prefs?.dictationPillVisibility),
       });
 
-      mixpanel.register_once({
-        initialPlatform: platform,
-        initialLocale: locale,
-        initialCohort: CURRENT_COHORT,
+      mixpanel.register({
+        userId: currentUserId,
+        planStatus,
+        isPro,
+        isFree,
+        isCommunity,
+        platform,
+        locale,
+        onboarded,
+        daysSinceOnboarded,
+        activeSystemCohort: CURRENT_COHORT,
+        pillState: getEffectivePillVisibility(prefs?.dictationPillVisibility),
       });
     }
-
-    mixpanel.people.set({
-      $email: auth?.email ?? undefined,
-      $name: auth?.displayName ?? undefined,
-      planStatus,
-      isPro,
-      isFree,
-      isCommunity,
-      isTrial,
-      isPaying,
-      onboarded,
-      onboardedAt: onboardedAt ?? undefined,
-      activeSystemCohort: CURRENT_COHORT,
-      daysSinceOnboarded,
-      pillState: getEffectivePillVisibility(prefs?.dictationPillVisibility),
-    });
-
-    mixpanel.register({
-      userId: currentUserId,
-      planStatus,
-      isPro,
-      isFree,
-      isCommunity,
-      platform,
-      locale,
-      onboarded,
-      daysSinceOnboarded,
-      activeSystemCohort: CURRENT_COHORT,
-      pillState: getEffectivePillVisibility(prefs?.dictationPillVisibility),
-    });
 
     prevUserIdRef.current = currentUserId;
   }, [initialized, auth, member, cloudUser, localUser, prefs]);
