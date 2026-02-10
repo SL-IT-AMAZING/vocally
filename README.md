@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/graphic.png" alt="Voquill Logo" width="400" />
+<img src="docs/graphic.png" alt="Vocally Logo" width="400" />
 
 # Your keyboard is holding you back.
 
@@ -8,11 +8,11 @@
 
 <br/>
 
-**[Visit our website →](https://voquill.com)**
+**[Visit our website →](https://vocally-web.vercel.app)**
 
 </div>
 
-Voquill is an open-source, cross-platform speech-to-text workspace that lets you dictate into any desktop application, clean the transcript with AI, and keep your personal glossary in sync. The repo bundles the production desktop app, marketing site, Firebase backend, and all shared packages in a single Turborepo.
+Vocally is an open-source, cross-platform speech-to-text workspace that lets you dictate into any desktop application, clean the transcript with AI, and keep your personal glossary in sync. The repo bundles the production desktop app, marketing site, Firebase backend, and all shared packages in a single Turborepo.
 
 ## Highlights
 
@@ -28,7 +28,7 @@ Voquill is an open-source, cross-platform speech-to-text workspace that lets you
 | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `apps/desktop`                                                                                                                                            | Tauri desktop app (Vite + React + Zustand) controlling UI, state, and business logic.                      |
 | `apps/desktop/src-tauri`                                                                                                                                  | Rust API layer invoked from TypeScript for native capabilities, SQLite storage, and Whisper inference.     |
-| `apps/web`                                                                                                                                                | Astro-powered marketing site hosted at voquill.com.                                                        |
+| `apps/web`                                                                                                                                                | Marketing site hosted at vocally-web.vercel.app.                                                           |
 | `apps/firebase`                                                                                                                                           | Firebase Functions project handling authentication, billing, demos, and Groq-powered server transcription. |
 | `packages/voice-ai`                                                                                                                                       | Audio chunking + Groq client used for transcription and transcript cleanup.                                |
 | `packages/types`                                                                                                                                          | Shared domain models (users, transcriptions, dictionary terms, etc.).                                      |
@@ -174,4 +174,4 @@ Individual workspaces expose the same commands if you need a narrower scope.
 
 ## License
 
-Unless otherwise noted, Voquill is released under the AGPLv3. See `LICENCE` for the complete terms and third-party attributions.
+Unless otherwise noted, Vocally is released under the AGPLv3. See `LICENCE` for the complete terms and third-party attributions.

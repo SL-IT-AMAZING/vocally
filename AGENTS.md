@@ -19,7 +19,7 @@ The desktop application built using Tauri.
 
 ## apps/web
 
-The product website for Voquill. Built with Astro.
+The product website for Vocally. Built with Vite + React.
 
 ## packages/\*\*
 

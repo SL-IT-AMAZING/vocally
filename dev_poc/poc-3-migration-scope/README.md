@@ -1,12 +1,15 @@
 # PoC-3: Firebase → Supabase 마이그레이션 범위 ✅ 검증완료
 
 ## 검증 목표
-Voquill 코드에서 Firebase 의존성 파악
+
+Vocally 코드에서 Firebase 의존성 파악
 
 ## 가설
+
 Firebase 교체가 2주 내 가능하다
 
 ## 성공 기준
+
 - [x] Firebase import 위치 전체 파악
 - [x] 변경 필요 파일 수 < 20개 ✅ (15개)
 - [x] 핵심 로직 변경 없이 교체 가능 ✅ (Repository 패턴 사용)
@@ -14,6 +17,7 @@ Firebase 교체가 2주 내 가능하다
 ## 검증 결과: ✅ 성공
 
 ### Firebase Auth 직접 사용 (4개 파일)
+
 ```
 apps/desktop/src/repos/auth.repo.ts      # 핵심 - CloudAuthRepo 클래스
 apps/desktop/src/utils/auth.utils.ts     # getEffectiveAuth() 유틸
@@ -22,6 +26,7 @@ apps/desktop/src/main.tsx                # Firebase 초기화
 ```
 
 ### Cloud Functions 호출 - invokeHandler (11개 파일)
+
 ```
 apps/desktop/src/repos/user.repo.ts
 apps/desktop/src/repos/term.repo.ts

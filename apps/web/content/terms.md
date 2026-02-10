@@ -2,15 +2,15 @@
 
 _Last updated: October 20, 2025_
 
-Welcome to **Voquill**. These Terms of Service ("Terms") govern your use of the Voquill open source software application ("Software"). By downloading, installing, or using the Software, you agree to be bound by these Terms.
+Welcome to **Vocally**. These Terms of Service ("Terms") govern your use of the Vocally open source software application ("Software"). By downloading, installing, or using the Software, you agree to be bound by these Terms.
 
 ## 1. Open Source License
 
-Voquill is open source software. The Software's source code is available under the terms of its open source license (as specified in the repository). These Terms supplement, but do not replace, the applicable open source license.
+Vocally is open source software. The Software's source code is available under the terms of its open source license (as specified in the repository). These Terms supplement, but do not replace, the applicable open source license.
 
 ## 2. No Account Required
 
-Voquill does not require account registration. You can download and use the Software freely without providing any personal information.
+Vocally does not require account registration. You can download and use the Software freely without providing any personal information.
 
 ## 3. Local Installation & Use
 
@@ -52,7 +52,7 @@ The Software is provided under an open source license. You have the rights grant
 
 ### 6.2 Trademarks
 
-The "Voquill" name and associated trademarks remain the property of their respective owners. Use of the Software does not grant you rights to use these trademarks except as permitted by the open source license.
+The "Vocally" name and associated trademarks remain the property of their respective owners. Use of the Software does not grant you rights to use these trademarks except as permitted by the open source license.
 
 ### 6.3 Your Content
 
@@ -60,7 +60,7 @@ You retain all rights to any audio, transcriptions, or other content you create 
 
 ## 7. Contributions
 
-If you contribute code, documentation, or other materials to the Voquill project, you agree that your contributions will be licensed under the same open source license as the Software.
+If you contribute code, documentation, or other materials to the Vocally project, you agree that your contributions will be licensed under the same open source license as the Software.
 
 ## 8. Disclaimers
 
@@ -85,7 +85,7 @@ TO THE FULLEST EXTENT PERMITTED BY LAW, THE VOQUILL DEVELOPERS AND CONTRIBUTORS 
 
 ## 10. Indemnification
 
-You agree to indemnify and hold harmless the Voquill developers and contributors from any claims, damages, losses, liabilities, and expenses arising from:
+You agree to indemnify and hold harmless the Vocally developers and contributors from any claims, damages, losses, liabilities, and expenses arising from:
 
 - Your use of the Software
 - Your violation of these Terms
@@ -120,11 +120,11 @@ If any provision of these Terms is found to be unenforceable, the remaining prov
 
 ## 16. Entire Agreement
 
-These Terms, together with the applicable open source license, constitute the entire agreement between you and Voquill regarding the Software.
+These Terms, together with the applicable open source license, constitute the entire agreement between you and Vocally regarding the Software.
 
 ## 17. Contact
 
 For questions about these Terms, you can:
 
 - Open an issue on our GitHub repository
-- Contact us at [legal@voquill.com](mailto:legal@voquill.com)
+- Contact us at [legal@vocally.so](mailto:legal@vocally.so)

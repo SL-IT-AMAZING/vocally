@@ -1,4 +1,4 @@
-# Voquill Desktop
+# Vocally Desktop
 
 Cross-platform voice-to-text desktop application built with Tauri 2 (Rust + TypeScript/React).
 
@@ -64,13 +64,13 @@ src-tauri/
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `VITE_FLAVOR` | Environment: `dev`, `prod`, or `emulators` (default) |
-| `VITE_USE_EMULATORS` | Connect to Firebase emulators |
-| `VOQUILL_WHISPER_DISABLE_GPU` | Force CPU-only Whisper inference |
-| `VOQUILL_ENABLE_DEVTOOLS` | Open dev tools on startup |
-| `VOQUILL_DESKTOP_PLATFORM` | Override platform detection |
+| Variable                      | Description                                          |
+| ----------------------------- | ---------------------------------------------------- |
+| `VITE_FLAVOR`                 | Environment: `dev`, `prod`, or `emulators` (default) |
+| `VITE_USE_EMULATORS`          | Connect to Firebase emulators                        |
+| `VOQUILL_WHISPER_DISABLE_GPU` | Force CPU-only Whisper inference                     |
+| `VOQUILL_ENABLE_DEVTOOLS`     | Open dev tools on startup                            |
+| `VOQUILL_DESKTOP_PLATFORM`    | Override platform detection                          |
 
 ## Internationalization
 

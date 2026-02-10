@@ -1,6 +1,6 @@
-## Voquill Web
+## Vocally Web
 
-Static marketing site for Voquill built with Vite, React, and TypeScript.
+Static marketing site for Vocally built with Vite, React, and TypeScript.
 
 ### Available scripts
 

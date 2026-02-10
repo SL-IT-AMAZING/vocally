@@ -6,10 +6,10 @@ This guide covers the Docker Compose setup for running Ollama locally during dev
 
 The Docker setup provides two ways to access Ollama:
 
-| Port  | Service | Authentication | Use Case |
-|-------|---------|----------------|----------|
+| Port  | Service        | Authentication        | Use Case                                                         |
+| ----- | -------------- | --------------------- | ---------------------------------------------------------------- |
 | 11430 | Caddy → Ollama | Bearer token required | Testing API key auth (e.g., secured Ollama behind reverse proxy) |
-| 11431 | Ollama direct | None | Standard local development |
+| 11431 | Ollama direct  | None                  | Standard local development                                       |
 
 ## Quick Start
 
@@ -40,9 +40,9 @@ docker compose exec ollama ollama pull llama3.1:8b
 docker compose exec ollama ollama pull mistral:7b
 ```
 
-### 3. Configure Voquill
+### 3. Configure Vocally
 
-In Voquill settings, add an Ollama API key with:
+In Vocally settings, add an Ollama API key with:
 
 - **URL**: `http://localhost:11430` (with auth) or `http://localhost:11431` (no auth)
 - **API Key**: `test-api-key-12345` (only needed for port 11430)
@@ -54,7 +54,7 @@ In Voquill settings, add an Ollama API key with:
 ┌─────────────────────────────────────────────────────────┐
 │                    Host Machine                         │
 │                                                         │
-│  Voquill App                                            │
+│  Vocally App                                            │
 │      │                                                  │
 │      ├──► :11430 ──► Caddy (auth) ──► Ollama (:11434)  │
 │      │                                                  │
@@ -87,13 +87,13 @@ docker compose exec ollama ollama rm <model-name>
 
 ### Model recommendations
 
-| Model | Size | Speed | Quality | Best For |
-|-------|------|-------|---------|----------|
-| `llama3.2:1b` | ~2GB | Fast | Good | Quick testing, light post-processing |
-| `llama3.2:3b` | ~4GB | Medium | Better | General use |
-| `llama3.1:8b` | ~8GB | Slower | Best | High-quality post-processing |
-| `mistral:7b` | ~7GB | Medium | Great | Alternative to Llama |
-| `phi3:mini` | ~2GB | Fast | Good | Lightweight alternative |
+| Model         | Size | Speed  | Quality | Best For                             |
+| ------------- | ---- | ------ | ------- | ------------------------------------ |
+| `llama3.2:1b` | ~2GB | Fast   | Good    | Quick testing, light post-processing |
+| `llama3.2:3b` | ~4GB | Medium | Better  | General use                          |
+| `llama3.1:8b` | ~8GB | Slower | Best    | High-quality post-processing         |
+| `mistral:7b`  | ~7GB | Medium | Great   | Alternative to Llama                 |
+| `phi3:mini`   | ~2GB | Fast   | Good    | Lightweight alternative              |
 
 Browse all available models at [ollama.com/library](https://ollama.com/library).
 
@@ -163,14 +163,14 @@ docker compose up -d
 
 1. Check if containers are running: `docker compose ps`
 2. Check logs: `docker compose logs ollama` or `docker compose logs caddy`
-3. Verify the URL and port in Voquill settings
+3. Verify the URL and port in Vocally settings
 4. If using port 11430, ensure the API key is set
 
 ### Model not appearing in dropdown
 
 1. Ensure the model is pulled: `docker compose exec ollama ollama list`
 2. Check Ollama logs: `docker compose logs ollama`
-3. Try refreshing the model picker in Voquill
+3. Try refreshing the model picker in Vocally
 
 ### GPU not being used (Linux)
 
@@ -194,7 +194,7 @@ brew install ollama
 ollama serve
 ```
 
-Then point Voquill to `http://localhost:11434`.
+Then point Vocally to `http://localhost:11434`.
 
 ## Stopping the Services
 
