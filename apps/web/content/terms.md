@@ -14,7 +14,9 @@ Vocally does not require account registration. You can download and use the Soft
 
 ## 3. Local Installation & Use
 
-The Software runs locally on your device. You are responsible for:
+The Software runs locally on your device. All transcription and text processing is performed entirely by AI and machine learning models — either on your device or via cloud-based AI APIs. No human operators, transcribers, or reviewers are involved at any point. Vocally is a fully automated digital software product with no human-driven services.
+
+You are responsible for:
 
 - Ensuring your device meets the Software's system requirements
 - Maintaining the security of your local installation
