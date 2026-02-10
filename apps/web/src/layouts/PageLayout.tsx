@@ -20,7 +20,7 @@ export function PageLayout({ children, mainClassName }: PageLayoutProps) {
       <main className={mainClasses}>{children}</main>
       <SiteFooter />
       <div className={styles.pageMeta}>
-        <span>© {currentYear} BIBO</span>
+        <span>© {currentYear} SL:IT</span>
         <div className={styles.pageLinks}>
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>

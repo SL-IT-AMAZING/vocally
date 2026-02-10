@@ -2,7 +2,7 @@
 
 _Last updated: February 10, 2026_
 
-Welcome to **Vocally**, operated by **BIBO** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
+Welcome to **Vocally**, operated by **SL:IT** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
 
 ## 1. Open Source License
 
@@ -75,7 +75,7 @@ We do not guarantee that:
 
 ## 9. Limitation of Liability
 
-TO THE FULLEST EXTENT PERMITTED BY LAW, BIBO AND ITS CONTRIBUTORS SHALL NOT BE LIABLE FOR ANY:
+TO THE FULLEST EXTENT PERMITTED BY LAW, SL:IT AND ITS CONTRIBUTORS SHALL NOT BE LIABLE FOR ANY:
 
 - Direct, indirect, incidental, special, consequential, or punitive damages
 - Loss of profits, data, use, or other intangible losses
