@@ -18,67 +18,6 @@ export const convertPricingPlanToMemberPlan = (
   return "free";
 };
 
-export const getKoreaPrices = () => ({
-  pro_monthly: { unitAmount: 9900, currency: "KRW" },
-  pro_yearly: { unitAmount: 99000, currency: "KRW" },
-});
-
-export const unitAmountToKRW = (
-  unitAmount: number | null | undefined,
-): number => {
-  if (unitAmount == null) {
-    return 0;
-  }
-  return unitAmount;
-};
-
-export const getKRWPriceFromKey = (priceKey: PriceKey) => {
-  const prices = getKoreaPrices();
-  const price = prices[priceKey];
-  return unitAmountToKRW(price?.unitAmount);
-};
-
-export const getPriceIdFromKey = (key: string) => key;
-
-export const getPricesWithRuntimeCaching = async (): Promise<
-  Record<
-    string,
-    Record<
-      string,
-      {
-        unitAmount: number | null;
-        unitAmountDecimal: string | null;
-        currency: string;
-      }
-    >
-  >
-> => {
-  const koreaPrices = getKoreaPrices();
-  const result: Record<
-    string,
-    Record<
-      string,
-      {
-        unitAmount: number | null;
-        unitAmountDecimal: string | null;
-        currency: string;
-      }
-    >
-  > = {};
-
-  for (const [key, value] of Object.entries(koreaPrices)) {
-    result[key] = {
-      [key]: {
-        unitAmount: value.unitAmount,
-        unitAmountDecimal: value.unitAmount.toString(),
-        currency: value.currency,
-      },
-    };
-  }
-
-  return result;
-};
-
 export const getUSDPrices = () => ({
   pro_monthly: { unitAmount: 5, currency: "USD" },
   pro_yearly: { unitAmount: 50, currency: "USD" },

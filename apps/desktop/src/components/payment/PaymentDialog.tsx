@@ -8,6 +8,7 @@ import {
   Stack,
 } from "@mui/material";
 import { useState, useEffect } from "react";
+import { FormattedMessage } from "react-intl";
 import { useOnExit } from "../../hooks/helper.hooks";
 import { produceAppState, useAppStore } from "../../store";
 import { supabase } from "../../supabase";
@@ -83,7 +84,7 @@ export const PaymentDialog = () => {
 
                 if (verifyError) {
                   setError(
-                    "결제 확인에 실패했습니다. 고객센터에 문의해주세요.",
+                    "Payment verification failed. Please contact support.",
                   );
                   return;
                 }
@@ -94,7 +95,7 @@ export const PaymentDialog = () => {
                 setError(
                   err instanceof Error
                     ? err.message
-                    : "결제 확인에 실패했습니다.",
+                    : "Payment verification failed.",
                 );
               }
             }
@@ -130,7 +131,7 @@ export const PaymentDialog = () => {
 
   const handlePayment = async () => {
     if (!paddleLoaded || !window.Paddle) {
-      setError("결제 시스템을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+      setError("Loading payment system. Please try again shortly.");
       return;
     }
 
@@ -143,7 +144,7 @@ export const PaymentDialog = () => {
       } = await supabase.auth.getUser();
 
       if (!user?.email || !user?.id) {
-        setError("로그인 정보를 확인할 수 없습니다. 다시 로그인해주세요.");
+        setError("Unable to verify login. Please sign in again.");
         return;
       }
 
@@ -152,13 +153,18 @@ export const PaymentDialog = () => {
           ? import.meta.env.VITE_PADDLE_PRICE_MONTHLY
           : import.meta.env.VITE_PADDLE_PRICE_YEARLY;
 
+      if (!priceId) {
+        setError("Payment is not configured. Please contact support.");
+        return;
+      }
+
       window.Paddle.Checkout.open({
-        items: [{ priceId: priceId ?? "", quantity: 1 }],
+        items: [{ priceId, quantity: 1 }],
         customer: { email: user.email },
         customData: { userId: user.id },
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "결제에 실패했습니다.");
+      setError(err instanceof Error ? err.message : "Payment failed.");
     } finally {
       setLoading(false);
     }
@@ -170,10 +176,10 @@ export const PaymentDialog = () => {
         <DialogContent>
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" sx={{ mb: 3 }}>
-              결제가 완료되었습니다!
+              <FormattedMessage defaultMessage="Payment completed!" />
             </Typography>
             <Button variant="contained" onClick={handleClose} fullWidth>
-              확인
+              <FormattedMessage defaultMessage="Continue" />
             </Button>
           </Box>
         </DialogContent>
@@ -189,7 +195,7 @@ export const PaymentDialog = () => {
             variant="h5"
             sx={{ mb: 3, textAlign: "center", fontWeight: 600 }}
           >
-            보퀼 Pro 구독
+            <FormattedMessage defaultMessage="Vocally Pro" />
           </Typography>
 
           <Stack spacing={2} sx={{ mb: 3 }}>
@@ -218,14 +224,14 @@ export const PaymentDialog = () => {
               >
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    월간
+                    <FormattedMessage defaultMessage="Monthly" />
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    매월 자동 결제
+                    <FormattedMessage defaultMessage="Billed monthly" />
                   </Typography>
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  ₩9,900/월
+                  $5/mo
                 </Typography>
               </Stack>
             </Box>
@@ -263,7 +269,7 @@ export const PaymentDialog = () => {
                   fontWeight: 700,
                 }}
               >
-                17% 할인
+                <FormattedMessage defaultMessage="Save 17%" />
               </Box>
               <Stack
                 direction="row"
@@ -272,14 +278,14 @@ export const PaymentDialog = () => {
               >
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    연간
+                    <FormattedMessage defaultMessage="Yearly" />
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    1년 단위 결제
+                    <FormattedMessage defaultMessage="Billed annually" />
                   </Typography>
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  ₩95,000/년
+                  $50/yr
                 </Typography>
               </Stack>
             </Box>
@@ -303,7 +309,11 @@ export const PaymentDialog = () => {
             size="large"
             sx={{ height: 48 }}
           >
-            {loading ? <CircularProgress size={24} /> : "결제하기"}
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : (
+              <FormattedMessage defaultMessage="Subscribe" />
+            )}
           </Button>
         </Box>
       </DialogContent>
