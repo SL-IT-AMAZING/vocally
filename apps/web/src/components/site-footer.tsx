@@ -1,5 +1,4 @@
 import { FormattedMessage } from "react-intl";
-import { Link } from "react-router-dom";
 import DownloadButton from "./download-button";
 import styles from "../styles/page.module.css";
 
@@ -16,15 +15,15 @@ export function SiteFooter() {
           <DownloadButton />
         </div>
       </div>
-      <div className={styles.pageMeta}>
+      <nav className={styles.pageMeta} aria-label="Legal">
         <span>© {currentYear} SL:IT</span>
         <div className={styles.pageLinks}>
-          <Link to="/privacy">Privacy Policy</Link>
-          <Link to="/terms">Terms of Service</Link>
-          <Link to="/refund">Refund Policy</Link>
+          <a href="https://vocally-web.vercel.app/privacy">Privacy Policy</a>
+          <a href="https://vocally-web.vercel.app/terms">Terms of Service</a>
+          <a href="https://vocally-web.vercel.app/refund">Refund Policy</a>
           <a href="mailto:support@vocally.so">Contact</a>
         </div>
-      </div>
+      </nav>
     </footer>
   );
 }
