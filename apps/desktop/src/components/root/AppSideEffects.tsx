@@ -55,8 +55,25 @@ export const AppSideEffects = () => {
     authReadyRef.current = true;
     setAuthReady(true);
     produceAppState((draft) => {
+      const wasLoggedIn = !!draft.auth;
       draft.auth = user;
       draft.initialized = false;
+
+      if (!user && wasLoggedIn) {
+        // Clear all cloud/user-specific data on logout
+        draft.memberById = {};
+        draft.userPrefs = null;
+        draft.transcriptionById = {};
+        draft.termById = {};
+        draft.apiKeyById = {};
+        draft.toneById = {};
+        draft.hotkeyById = {};
+        draft.appTargetById = {};
+        draft.priceValueByKey = {};
+        // Preserve local user, clear cloud user entries
+        const localUser = draft.userById[LOCAL_USER_ID];
+        draft.userById = localUser ? { [LOCAL_USER_ID]: localUser } : {};
+      }
     });
   };
 

@@ -1,20 +1,34 @@
 import { getAppState, produceAppState } from "../store";
-import { getPricesWithRuntimeCaching, PricingPlan } from "../utils/price.utils";
+import { getUSDPrices, PricingPlan } from "../utils/price.utils";
 import { setMode } from "./login.actions";
 
-export const loadPrices = async () => {
-  try {
-    const prices = await getPricesWithRuntimeCaching();
-
-    produceAppState((draft) => {
-      draft.pricing.initialized = true;
-      draft.priceValueByKey = prices;
-    });
-  } catch {
-    produceAppState((draft) => {
-      draft.pricing.initialized = false;
-    });
+export const loadPrices = () => {
+  const prices = getUSDPrices();
+  const mapped: Record<
+    string,
+    Record<
+      string,
+      {
+        unitAmount: number | null;
+        unitAmountDecimal: string | null;
+        currency: string;
+      }
+    >
+  > = {};
+  for (const [key, value] of Object.entries(prices)) {
+    mapped[key] = {
+      [key]: {
+        unitAmount: value.unitAmount,
+        unitAmountDecimal: value.unitAmount.toString(),
+        currency: value.currency,
+      },
+    };
   }
+
+  produceAppState((draft) => {
+    draft.pricing.initialized = true;
+    draft.priceValueByKey = mapped;
+  });
 };
 
 export const openUpgradePlanDialog = () => {

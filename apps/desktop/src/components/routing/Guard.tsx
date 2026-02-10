@@ -29,7 +29,7 @@ const graph: Graph = {
     edges: [
       {
         to: "dashboard",
-        condition: (s) => s.isOnboarded,
+        condition: (s) => s.isLoggedIn && s.isOnboarded,
       },
       {
         to: "onboarding",
@@ -42,13 +42,17 @@ const graph: Graph = {
     edges: [
       {
         to: "dashboard",
-        condition: (s) => s.isOnboarded,
+        condition: (s) => s.isLoggedIn && s.isOnboarded,
       },
     ],
     builder: () => <Redirect to="/onboarding" />,
   },
   dashboard: {
     edges: [
+      {
+        to: "welcome",
+        condition: (s) => !s.isLoggedIn,
+      },
       {
         to: "welcome",
         condition: (s) => !s.isOnboarded,

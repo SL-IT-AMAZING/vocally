@@ -1,9 +1,5 @@
 import { produceAppState } from "../store";
-import {
-  getPriceIdFromKey,
-  PRICING_PLANS,
-  PricingPlan,
-} from "../utils/price.utils";
+import { PRICING_PLANS, PricingPlan } from "../utils/price.utils";
 
 export const openPaymentDialog = (priceId: string) => {
   produceAppState((draft) => {
@@ -28,6 +24,6 @@ export const tryOpenPaymentDialogForPricingPlan = (
     return false;
   }
 
-  openPaymentDialog(getPriceIdFromKey(castedPlan));
+  openPaymentDialog(castedPlan);
   return true;
 };
