@@ -111,7 +111,7 @@ impl WhisperTranscriber {
         let cache_key = ContextCacheKey::new(model_path_ref, cache_variant.clone());
 
         if let Some(existing) = {
-            let cache = self.context_cache.lock().unwrap();
+            let cache = self.context_cache.lock().unwrap_or_else(|e| e.into_inner());
             cache.get(&cache_key).cloned()
         } {
             return Ok(existing);
@@ -119,7 +119,7 @@ impl WhisperTranscriber {
 
         let context = Self::load_context(model_path_ref, strategy)?;
 
-        let mut cache = self.context_cache.lock().unwrap();
+        let mut cache = self.context_cache.lock().unwrap_or_else(|e| e.into_inner());
         Ok(cache
             .entry(cache_key)
             .or_insert_with(|| context.clone())
@@ -440,8 +440,10 @@ fn resample_to_sample_rate(samples: &[f32], input_rate: u32, target_rate: u32) -
             let a = samples[base_index];
             let b = samples[base_index + 1];
             a + (b - a) * frac as f32
-        } else {
+        } else if base_index < samples.len() {
             samples[base_index]
+        } else {
+            samples[samples.len() - 1]
         };
 
         output.push(sample);

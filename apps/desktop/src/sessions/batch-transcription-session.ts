@@ -5,6 +5,7 @@ import {
   TranscriptionSessionResult,
 } from "../types/transcription-session.types";
 import { showErrorSnackbar } from "../actions/app.actions";
+import { produceAppState } from "../store";
 
 /**
  * Batch transcription session - records audio first, then transcribes all at once.
@@ -46,6 +47,17 @@ export class BatchTranscriptionSession implements TranscriptionSession {
       };
     } catch (error) {
       console.error("Failed to transcribe audio", error);
+      if (error instanceof Error && error.name === "WordLimitExceeded") {
+        produceAppState((draft) => {
+          draft.payment.open = true;
+        });
+        warnings.push("Monthly word limit reached.");
+        return {
+          rawTranscript: null,
+          metadata: {},
+          warnings,
+        };
+      }
       const message =
         error instanceof Error
           ? error.message

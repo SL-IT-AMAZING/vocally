@@ -198,8 +198,6 @@ export const FeatureReleaseDialog = () => {
   const lastSeenFeature = useAppStore(
     (state) => getMyUserPreferences(state)?.lastSeenFeature,
   );
-  const myUserPrefs = useAppStore((state) => state.userPrefs);
-  console.log("User prefs in FeatureReleaseDialog:", myUserPrefs);
   const isCommunity = useAppStore(
     (state) => getEffectivePlan(state) === "community",
   );

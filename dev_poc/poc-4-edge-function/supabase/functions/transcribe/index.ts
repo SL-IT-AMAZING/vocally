@@ -49,9 +49,9 @@ Deno.serve(async (req) => {
       return errorResponse("Member not initialized. Call member-init first.", 403)
     }
 
-    const dailyLimit = member.plan === "pro" ? 15000 : 1000
-    if (member.words_today >= dailyLimit) {
-      return errorResponse("Daily word limit reached", 429)
+    const monthlyLimit = member.plan === "pro" ? 100_000 : 500
+    if (member.words_this_month >= monthlyLimit) {
+      return errorResponse("Monthly word limit reached", 429)
     }
 
     const binaryString = atob(audioBase64)
@@ -86,14 +86,11 @@ Deno.serve(async (req) => {
     const text = result.text || ""
     const wordsUsed = countWords(text)
 
-    await supabase
-      .from("members")
-      .update({
-        words_today: member.words_today + wordsUsed,
-        words_this_month: member.words_this_month + wordsUsed,
-        words_total: member.words_total + wordsUsed,
-      })
-      .eq("id", user.id)
+    await supabase.rpc("increment_member_usage", {
+      p_member_id: user.id,
+      p_words: wordsUsed,
+      p_tokens: 0,
+    })
 
     return jsonResponse({ text })
   } catch (err) {

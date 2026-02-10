@@ -44,7 +44,9 @@ pub fn build() -> tauri::Builder<tauri::Wry> {
         .setup(|app| {
             eprintln!("[app] Starting application setup...");
 
-            // Write startup diagnostics for debugging
+            #[cfg(target_os = "macos")]
+            app.handle().plugin(tauri_nspanel::init())?;
+
             crate::system::diagnostics::write_startup_diagnostics(app.handle());
 
             let db_url = {

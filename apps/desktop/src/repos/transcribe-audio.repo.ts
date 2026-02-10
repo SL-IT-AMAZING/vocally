@@ -111,7 +111,9 @@ export abstract class BaseTranscribeAudioRepo extends BaseRepo {
     }
 
     const segmentDurationSec = this.getSegmentDurationSec();
-    const segmentSampleCount = Math.floor(input.sampleRate * segmentDurationSec);
+    const segmentSampleCount = Math.floor(
+      input.sampleRate * segmentDurationSec,
+    );
 
     // If audio fits in a single segment, transcribe directly
     if (floatSamples.length <= segmentSampleCount) {
@@ -286,7 +288,26 @@ export class CloudTranscribeAudioRepo extends BaseTranscribeAudioRepo {
         language: input.language,
       },
     });
-    if (error) throw error;
+    if (error) {
+      const msg =
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : String(error);
+      if (msg.includes("limit reached") || msg.includes("429")) {
+        const limitError = new Error(msg);
+        limitError.name = "WordLimitExceeded";
+        throw limitError;
+      }
+      throw error;
+    }
+    if (
+      data?.error &&
+      (String(data.error).includes("limit reached") || String(data.status) === "429")
+    ) {
+      const limitError = new Error(String(data.error));
+      limitError.name = "WordLimitExceeded";
+      throw limitError;
+    }
     const response = data;
 
     return {

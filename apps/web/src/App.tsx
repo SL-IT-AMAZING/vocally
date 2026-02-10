@@ -2,6 +2,7 @@ import { Fragment, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import ScrollToTop from "./components/scroll-to-top";
 import { trackPageView } from "./utils/analytics.utils";
+import AuthConfirmedPage from "./pages/AuthConfirmedPage";
 import DownloadPage from "./pages/DownloadPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -20,6 +21,7 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/auth/confirmed" element={<AuthConfirmedPage />} />
         <Route path="/download" element={<DownloadPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />

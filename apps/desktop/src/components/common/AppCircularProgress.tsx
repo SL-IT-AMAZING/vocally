@@ -16,7 +16,7 @@ export const AppCircularProgress = ({
       size={size}
       value={value}
       sx={sx}
-      variant={value ? "determinate" : "indeterminate"}
+      variant={value != null ? "determinate" : "indeterminate"}
     />
   );
 };

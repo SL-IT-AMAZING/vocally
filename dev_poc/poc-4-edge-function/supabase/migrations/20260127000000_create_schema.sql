@@ -2,7 +2,7 @@
 CREATE TABLE public.members (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   type TEXT NOT NULL DEFAULT 'user' CHECK (type = 'user'),
-  plan TEXT NOT NULL DEFAULT 'pro' CHECK (plan IN ('free', 'pro')),
+  plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free', 'pro')),
   words_today INTEGER NOT NULL DEFAULT 0,
   words_this_month INTEGER NOT NULL DEFAULT 0,
   words_total INTEGER NOT NULL DEFAULT 0,
@@ -68,3 +68,21 @@ CREATE TRIGGER members_updated_at
 CREATE TRIGGER profiles_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+CREATE OR REPLACE FUNCTION public.increment_member_usage(
+  p_member_id UUID,
+  p_words INTEGER DEFAULT 0,
+  p_tokens INTEGER DEFAULT 0
+) RETURNS void AS $$
+BEGIN
+  UPDATE public.members SET
+    words_today = words_today + p_words,
+    words_this_month = words_this_month + p_words,
+    words_total = words_total + p_words,
+    tokens_today = tokens_today + p_tokens,
+    tokens_this_month = tokens_this_month + p_tokens,
+    tokens_total = tokens_total + p_tokens,
+    updated_at = NOW()
+  WHERE id = p_member_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

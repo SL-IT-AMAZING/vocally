@@ -51,7 +51,7 @@ export function useStream<R>(
     return () => {
       subscription?.unsubscribe();
     };
-  }, dependencies);
+  }, dependencies ?? []);
 
   return result;
 }
@@ -76,7 +76,7 @@ export function useStreamWithSideEffects<R>(args: {
       if (args.onError) {
         args.onError(dataStream.error);
       } else {
-        throw new Error(`Unable to fetch data: ${dataStream.error}`);
+        console.error(`Unable to fetch data: ${dataStream.error}`);
       }
     }
   }, [dataStream]);

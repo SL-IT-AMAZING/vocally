@@ -1,8 +1,8 @@
 use crate::platform::macos::dock;
-use cocoa::appkit::{NSApp, NSApplication, NSWindow, NSWindowCollectionBehavior};
+use cocoa::appkit::{NSApp, NSApplication, NSWindow as CocaoNSWindow};
 use cocoa::base::{id, nil, NO as COCOA_NO, YES};
 use std::sync::mpsc;
-use tauri::WebviewWindow;
+use tauri::{Manager, WebviewWindow};
 
 pub fn surface_main_window(window: &WebviewWindow) -> Result<(), String> {
     let window_for_handle = window.clone();
@@ -55,63 +55,37 @@ pub fn surface_main_window(window: &WebviewWindow) -> Result<(), String> {
     result
 }
 
+tauri_nspanel::tauri_panel! {
+    panel!(OverlayPanel {
+        config: {
+            can_become_key_window: false,
+            can_become_main_window: false,
+            is_floating_panel: true
+        }
+    })
+}
+
 pub fn show_overlay_no_focus(window: &WebviewWindow) -> Result<(), String> {
-    let window_for_handle = window.clone();
-    let (tx, rx) = mpsc::channel();
+    use tauri_nspanel::{CollectionBehavior, PanelLevel, StyleMask, WebviewWindowExt};
 
-    window
-        .run_on_main_thread(move || {
-            let result = (|| -> Result<(), String> {
-                let ns_window_ptr = window_for_handle
-                    .ns_window()
-                    .map_err(|err| err.to_string())?;
+    let panel = window
+        .to_panel::<OverlayPanel>()
+        .map_err(|e| e.to_string())?;
 
-                unsafe {
-                    use objc::{msg_send, sel, sel_impl};
-                    
-                    let ns_window = ns_window_ptr as id;
+    panel.set_level(PanelLevel::ScreenSaver.into());
+    panel.set_style_mask(StyleMask::empty().nonactivating_panel().into());
+    panel.set_collection_behavior(
+        CollectionBehavior::new()
+            .can_join_all_spaces()
+            .stationary()
+            .full_screen_auxiliary()
+            .into(),
+    );
+    panel.set_hides_on_deactivate(false);
+    panel.order_front_regardless();
+    panel.show();
 
-                    let current_style_mask: u64 = msg_send![ns_window, styleMask];
-                    let new_style_mask = current_style_mask | (1 << 7);
-                    let _: () = msg_send![ns_window, setStyleMask: new_style_mask];
-                    
-                    #[link(name = "CoreGraphics", kind = "framework")]
-                    extern "C" {
-                        fn CGWindowLevelForKey(key: i32) -> i32;
-                    }
-                    const K_CG_MAXIMUM_WINDOW_LEVEL_KEY: i32 = 14;
-                    let max_level = CGWindowLevelForKey(K_CG_MAXIMUM_WINDOW_LEVEL_KEY);
-                    ns_window.setLevel_((max_level - 1) as i64);
-                    
-                    ns_window.setCollectionBehavior_(
-                        NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces
-                            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorStationary
-                            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary
-                            | NSWindowCollectionBehavior::NSWindowCollectionBehaviorIgnoresCycle,
-                    );
-                    
-                    let _: () = msg_send![ns_window, setOpaque: COCOA_NO];
-                    let _: () = msg_send![ns_window, setHasShadow: COCOA_NO];
-                    
-                    ns_window.orderFrontRegardless();
-                }
-                
-                if let Err(err) = window_for_handle.show() {
-                    eprintln!("Failed to show overlay window: {err}");
-                }
-
-                Ok(())
-            })();
-
-            let _ = tx.send(result);
-        })
-        .map_err(|err| err.to_string())?;
-
-    let result = rx
-        .recv()
-        .map_err(|_| "failed to show overlay on main thread".to_string())?;
-
-    result
+    Ok(())
 }
 
 pub fn configure_overlay_non_activating(window: &WebviewWindow) -> Result<(), String> {

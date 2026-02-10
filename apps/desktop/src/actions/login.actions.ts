@@ -5,13 +5,24 @@ import type { GoogleAuthPayload } from "../types/google-auth.types";
 import { GOOGLE_AUTH_COMMAND } from "../types/google-auth.types";
 import { getAppState, produceAppState } from "../store";
 import { getAuthRepo } from "../repos";
-import { validateEmail } from "../utils/login.utils";
+import {
+  validateEmail,
+  validatePassword,
+  validateConfirmPassword,
+} from "../utils/login.utils";
 import { registerMembers } from "../utils/app.utils";
 import { listify } from "@repo/utilities";
 
 const tryInit = async () => {
-  await supabase.functions.invoke("member-init", { body: {} });
-  const member = await supabase.functions.invoke("member-get", { body: {} })
+  try {
+    await supabase.functions.invoke("member-init", { body: {} });
+  } catch {
+    try {
+      await supabase.functions.invoke("member-init", { body: {} });
+    } catch {}
+  }
+  const member = await supabase.functions
+    .invoke("member-get", { body: {} })
     .then((res) => res.data?.member)
     .catch(() => null);
   produceAppState((state) => {
@@ -87,8 +98,8 @@ export const submitSignUp = async (): Promise<void> => {
   const state = getAppState();
 
   const emailValidation = validateEmail(state);
-  const passwordValidation = validateEmail(state);
-  const confirmPasswordValidation = validateEmail(state);
+  const passwordValidation = validatePassword(state);
+  const confirmPasswordValidation = validateConfirmPassword(state);
   const isInvalid =
     emailValidation || passwordValidation || confirmPasswordValidation;
 
@@ -109,8 +120,6 @@ export const submitSignUp = async (): Promise<void> => {
       state.login.email,
       state.login.password,
     );
-    await tryInit();
-    await getAuthRepo().sendEmailVerificationForCurrentUser();
     produceAppState((state) => {
       state.login.status = "success";
     });

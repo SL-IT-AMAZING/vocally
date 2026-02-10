@@ -639,13 +639,15 @@ pub async fn clear_local_data(
     let pool = database.pool();
     let mut transaction = pool.begin().await.map_err(|err| err.to_string())?;
 
-    const TABLES_TO_CLEAR: [&str; 6] = [
+    const TABLES_TO_CLEAR: [&str; 8] = [
         "user_profiles",
         "transcriptions",
         "terms",
         "hotkeys",
         "api_keys",
         "user_preferences",
+        "tones",
+        "app_targets",
     ];
 
     for table in TABLES_TO_CLEAR {

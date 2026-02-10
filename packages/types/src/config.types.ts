@@ -10,19 +10,18 @@ export type FullConfig = {
 };
 
 const TOKEN_MULT = 18;
-const MONTH_MULT = 30;
-const FREE_WORDS_PER_DAY = 1_000;
-const FREE_TOKENS_PER_DAY = FREE_WORDS_PER_DAY * TOKEN_MULT;
-const PRO_WORDS_PER_DAY = 15_000;
-const PRO_TOKENS_PER_DAY = PRO_WORDS_PER_DAY * TOKEN_MULT;
+const FREE_WORDS_PER_MONTH = 500;
+const FREE_TOKENS_PER_MONTH = FREE_WORDS_PER_MONTH * TOKEN_MULT;
+const PRO_WORDS_PER_MONTH = 100_000;
+const PRO_TOKENS_PER_MONTH = PRO_WORDS_PER_MONTH * TOKEN_MULT;
 
 export const FULL_CONFIG: FullConfig = {
-  freeWordsPerDay: FREE_WORDS_PER_DAY,
-  freeWordsPerMonth: FREE_WORDS_PER_DAY * MONTH_MULT,
-  freeTokensPerDay: FREE_TOKENS_PER_DAY,
-  freeTokensPerMonth: FREE_TOKENS_PER_DAY * MONTH_MULT,
-  proWordsPerDay: PRO_WORDS_PER_DAY,
-  proWordsPerMonth: PRO_WORDS_PER_DAY * MONTH_MULT,
-  proTokensPerDay: PRO_TOKENS_PER_DAY,
-  proTokensPerMonth: PRO_TOKENS_PER_DAY * MONTH_MULT,
+  freeWordsPerDay: Number.MAX_SAFE_INTEGER,
+  freeWordsPerMonth: FREE_WORDS_PER_MONTH,
+  freeTokensPerDay: Number.MAX_SAFE_INTEGER,
+  freeTokensPerMonth: FREE_TOKENS_PER_MONTH,
+  proWordsPerDay: Number.MAX_SAFE_INTEGER,
+  proWordsPerMonth: PRO_WORDS_PER_MONTH,
+  proTokensPerDay: Number.MAX_SAFE_INTEGER,
+  proTokensPerMonth: PRO_TOKENS_PER_MONTH,
 };

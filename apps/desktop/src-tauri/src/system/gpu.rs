@@ -117,11 +117,8 @@ fn enumerate_gpus_in_child_process() -> Vec<GpuAdapterInfo> {
         }
     };
 
-    // Set a timeout for the child process
-    let _timeout = Duration::from_secs(10);
-    let _start = std::time::Instant::now();
+    let timeout = Duration::from_secs(10);
 
-    // Read stdout completely
     let mut stdout = match child.stdout.take() {
         Some(stdout) => stdout,
         None => {
@@ -131,15 +128,29 @@ fn enumerate_gpus_in_child_process() -> Vec<GpuAdapterInfo> {
         }
     };
 
-    // Read all output
-    let mut output = String::new();
-    if let Err(err) = stdout.read_to_string(&mut output) {
-        eprintln!("[gpu] ERROR: Failed to read from child stdout: {err}");
-        let _ = child.kill();
-        return Vec::new();
-    }
+    let (tx, rx) = std::sync::mpsc::channel();
+    let reader_thread = std::thread::spawn(move || {
+        let mut output = String::new();
+        let result = stdout.read_to_string(&mut output);
+        let _ = tx.send((output, result));
+    });
 
-    // Wait for child to exit
+    let output = match rx.recv_timeout(timeout) {
+        Ok((output, Ok(_))) => output,
+        Ok((_, Err(err))) => {
+            eprintln!("[gpu] ERROR: Failed to read from child stdout: {err}");
+            let _ = child.kill();
+            let _ = reader_thread.join();
+            return Vec::new();
+        }
+        Err(_) => {
+            eprintln!("[gpu] ERROR: GPU enumeration timed out after 10 seconds");
+            let _ = child.kill();
+            let _ = reader_thread.join();
+            return Vec::new();
+        }
+    };
+
     match child.wait() {
         Ok(status) => {
             if !status.success() {

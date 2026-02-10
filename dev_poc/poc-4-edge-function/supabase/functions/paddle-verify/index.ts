@@ -38,6 +38,10 @@ Deno.serve(async (req) => {
     return errorResponse("Transaction not completed", 400)
   }
 
+  if (transactionData.data.custom_data?.userId !== user.id) {
+    return errorResponse("Transaction does not belong to this user", 403)
+  }
+
   const supabase = createServiceClient()
 
   const { error } = await supabase

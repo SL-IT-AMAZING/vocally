@@ -2,6 +2,7 @@
 import {
   ApiKey,
   AppTarget,
+  FULL_CONFIG,
   FullConfig,
   Hotkey,
   Member,
@@ -122,7 +123,7 @@ export const INITIAL_APP_STATE: AppState = {
   hotkeyById: {},
   auth: null,
   confettiCounter: 0,
-  config: null,
+  config: FULL_CONFIG,
   keysHeld: [],
   initialized: false,
   snackbarCounter: 0,

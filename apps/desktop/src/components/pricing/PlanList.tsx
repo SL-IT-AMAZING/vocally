@@ -169,7 +169,7 @@ const BillingToggle = ({ isYearly, onToggle }: BillingToggleProps) => {
             letterSpacing: "0.02em",
           }}
         >
-          <FormattedMessage defaultMessage="Save 33%" />
+          <FormattedMessage defaultMessage="Save 17%" />
         </Box>
       </Stack>
     </Stack>
@@ -206,10 +206,6 @@ export const PlanList = ({
   const proYearlyPrice = useAppStore((state) =>
     getDollarPriceFromKey(state, "pro_yearly"),
   );
-  const freeWordsPerDay = useAppStore(
-    (state) => state.config?.freeWordsPerDay ?? 1_000,
-  );
-
   const proYearlyPerMonth = proYearlyPrice
     ? Math.round(proYearlyPrice / 12)
     : null;
@@ -253,13 +249,13 @@ export const PlanList = ({
     setInviteCodeDialogOpen(false);
   };
 
-  const trialCard = (
+  const freeCard = (
     <PlanCard
-      title={<FormattedMessage defaultMessage="Trial" />}
+      title={<FormattedMessage defaultMessage="Free" />}
       price={
         <Stack>
           <Typography variant="h5" fontWeight={600}>
-            <FormattedMessage defaultMessage="Free" />
+            <FormattedMessage defaultMessage="$0" />
           </Typography>
           <Typography variant="caption" color="text.secondary">
             <FormattedMessage defaultMessage="No credit card required" />
@@ -282,25 +278,16 @@ export const PlanList = ({
       }
     >
       <CheckmarkRow>
-        <FormattedMessage
-          defaultMessage="{freeWordsPerDay, number} free words per day"
-          values={{ freeWordsPerDay }}
-        />
-      </CheckmarkRow>
-      <CheckmarkRow>
-        <FormattedMessage defaultMessage="Commercial use" />
+        <FormattedMessage defaultMessage="500 words per month" />
       </CheckmarkRow>
       <CheckmarkRow>
         <FormattedMessage defaultMessage="AI dictation" />
       </CheckmarkRow>
       <CheckmarkRow>
-        <FormattedMessage defaultMessage="Cross-device data storage" />
+        <FormattedMessage defaultMessage="Commercial use" />
       </CheckmarkRow>
       <CheckmarkRow>
         <FormattedMessage defaultMessage="Community support" />
-      </CheckmarkRow>
-      <CheckmarkRow disabled>
-        <FormattedMessage defaultMessage="Basic agent mode" />
       </CheckmarkRow>
     </PlanCard>
   );
@@ -344,9 +331,6 @@ export const PlanList = ({
         </Button>
       }
     >
-      <CheckmarkRow disabled>
-        <FormattedMessage defaultMessage="Everything the trial has" />
-      </CheckmarkRow>
       <CheckmarkRow>
         <FormattedMessage defaultMessage="Unlimited words per month" />
       </CheckmarkRow>
@@ -414,13 +398,18 @@ export const PlanList = ({
   );
 
   const enterpriseDialog = (
-    <Dialog open={inviteCodeDialogOpen} onClose={handleInviteCodeCancel} maxWidth="xs" fullWidth>
+    <Dialog
+      open={inviteCodeDialogOpen}
+      onClose={handleInviteCodeCancel}
+      maxWidth="xs"
+      fullWidth
+    >
       <DialogTitle>
         <FormattedMessage defaultMessage="Enter invite code" />
       </DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          <FormattedMessage defaultMessage="Contact sales@voquill.com to get an enterprise account with dedicated support." />
+          <FormattedMessage defaultMessage="Contact sales@vocally.so to get an enterprise account with dedicated support." />
         </Typography>
         <TextField
           autoFocus
@@ -482,7 +471,7 @@ export const PlanList = ({
             flexWrap: "wrap",
           }}
         >
-          {trialCard}
+          {freeCard}
           {proCard}
           {showEnterprise && enterpriseCard}
         </Stack>

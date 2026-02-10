@@ -1,8 +1,17 @@
-import { Dialog, DialogContent, Typography, Box, Button, CircularProgress, Stack } from "@mui/material";
+import {
+  Dialog,
+  DialogContent,
+  Typography,
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import { useOnExit } from "../../hooks/helper.hooks";
 import { produceAppState, useAppStore } from "../../store";
 import { supabase } from "../../supabase";
+import { refreshMember } from "../../actions/member.actions";
 
 declare global {
   interface Window {
@@ -60,20 +69,33 @@ export const PaymentDialog = () => {
         window.Paddle.Initialize({
           token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
           eventCallback: async (event) => {
-            if (event.name === "checkout.completed" && event.data?.transaction_id) {
+            if (
+              event.name === "checkout.completed" &&
+              event.data?.transaction_id
+            ) {
               try {
-                const { error: verifyError } = await supabase.functions.invoke("paddle-verify", {
-                  body: { transactionId: event.data.transaction_id },
-                });
+                const { error: verifyError } = await supabase.functions.invoke(
+                  "paddle-verify",
+                  {
+                    body: { transactionId: event.data.transaction_id },
+                  },
+                );
 
                 if (verifyError) {
-                  setError("결제 확인에 실패했습니다. 고객센터에 문의해주세요.");
+                  setError(
+                    "결제 확인에 실패했습니다. 고객센터에 문의해주세요.",
+                  );
                   return;
                 }
 
                 setSuccess(true);
+                await refreshMember();
               } catch (err) {
-                setError(err instanceof Error ? err.message : "결제 확인에 실패했습니다.");
+                setError(
+                  err instanceof Error
+                    ? err.message
+                    : "결제 확인에 실패했습니다.",
+                );
               }
             }
           },
@@ -116,16 +138,19 @@ export const PaymentDialog = () => {
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (!user?.email || !user?.id) {
         setError("로그인 정보를 확인할 수 없습니다. 다시 로그인해주세요.");
         return;
       }
 
-      const priceId = selectedPlan === "monthly"
-        ? import.meta.env.VITE_PADDLE_PRICE_MONTHLY
-        : import.meta.env.VITE_PADDLE_PRICE_YEARLY;
+      const priceId =
+        selectedPlan === "monthly"
+          ? import.meta.env.VITE_PADDLE_PRICE_MONTHLY
+          : import.meta.env.VITE_PADDLE_PRICE_YEARLY;
 
       window.Paddle.Checkout.open({
         items: [{ priceId, quantity: 1 }],
@@ -160,7 +185,10 @@ export const PaymentDialog = () => {
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogContent>
         <Box sx={{ py: 2 }}>
-          <Typography variant="h5" sx={{ mb: 3, textAlign: "center", fontWeight: 600 }}>
+          <Typography
+            variant="h5"
+            sx={{ mb: 3, textAlign: "center", fontWeight: 600 }}
+          >
             보퀼 Pro 구독
           </Typography>
 
@@ -170,17 +198,24 @@ export const PaymentDialog = () => {
               sx={{
                 p: 2.5,
                 border: 2,
-                borderColor: selectedPlan === "monthly" ? "primary.main" : "grey.300",
+                borderColor:
+                  selectedPlan === "monthly" ? "primary.main" : "grey.300",
                 borderRadius: 2,
                 cursor: "pointer",
                 transition: "all 0.2s",
-                bgcolor: selectedPlan === "monthly" ? "primary.50" : "transparent",
+                bgcolor:
+                  selectedPlan === "monthly" ? "primary.50" : "transparent",
                 "&:hover": {
-                  borderColor: selectedPlan === "monthly" ? "primary.main" : "grey.400",
+                  borderColor:
+                    selectedPlan === "monthly" ? "primary.main" : "grey.400",
                 },
               }}
             >
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
                     월간
@@ -200,14 +235,17 @@ export const PaymentDialog = () => {
               sx={{
                 p: 2.5,
                 border: 2,
-                borderColor: selectedPlan === "yearly" ? "primary.main" : "grey.300",
+                borderColor:
+                  selectedPlan === "yearly" ? "primary.main" : "grey.300",
                 borderRadius: 2,
                 cursor: "pointer",
                 position: "relative",
                 transition: "all 0.2s",
-                bgcolor: selectedPlan === "yearly" ? "primary.50" : "transparent",
+                bgcolor:
+                  selectedPlan === "yearly" ? "primary.50" : "transparent",
                 "&:hover": {
-                  borderColor: selectedPlan === "yearly" ? "primary.main" : "grey.400",
+                  borderColor:
+                    selectedPlan === "yearly" ? "primary.main" : "grey.400",
                 },
               }}
             >
@@ -225,9 +263,13 @@ export const PaymentDialog = () => {
                   fontWeight: 700,
                 }}
               >
-                16% 할인
+                17% 할인
               </Box>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
                     연간
@@ -237,7 +279,7 @@ export const PaymentDialog = () => {
                   </Typography>
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  ₩99,000/년
+                  ₩95,000/년
                 </Typography>
               </Stack>
             </Box>

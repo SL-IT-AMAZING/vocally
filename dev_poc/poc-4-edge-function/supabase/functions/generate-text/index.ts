@@ -35,6 +35,11 @@ Deno.serve(async (req) => {
 
     if (!member) return errorResponse("Member not initialized. Call member-init first.", 403)
 
+    const monthlyTokenLimit = member.plan === "pro" ? 1_800_000 : 9_000
+    if (member.tokens_this_month >= monthlyTokenLimit) {
+      return errorResponse("Monthly token limit reached", 429)
+    }
+
     const resolvedModel = MODEL_MAP[model || "medium"] || MODEL_MAP.medium
 
     const messages: Array<{ role: string; content: string }> = []
@@ -88,15 +93,11 @@ Deno.serve(async (req) => {
     const text = result.choices[0].message?.content || ""
     const tokensUsed = result.usage?.total_tokens || 0
 
-    // Increment token counters
-    await supabase
-      .from("members")
-      .update({
-        tokens_today: member.tokens_today + tokensUsed,
-        tokens_this_month: member.tokens_this_month + tokensUsed,
-        tokens_total: member.tokens_total + tokensUsed,
-      })
-      .eq("id", user.id)
+    await supabase.rpc("increment_member_usage", {
+      p_member_id: user.id,
+      p_words: 0,
+      p_tokens: tokensUsed,
+    })
 
     return jsonResponse({ text })
   } catch (err) {

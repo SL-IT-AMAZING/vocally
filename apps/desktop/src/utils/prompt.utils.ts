@@ -299,6 +299,5 @@ Return ONLY the requested output, nothing else. The output will be pasted direct
     );
   }
 
-  console.log("Agent prompt", prompt);
   return base;
 };

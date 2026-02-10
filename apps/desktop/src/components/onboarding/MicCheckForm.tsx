@@ -29,10 +29,6 @@ export const MicCheckForm = () => {
 
   const audioLevels = useAppStore((state) => state.audioLevels);
   const overlayPhase = useAppStore((state) => state.overlayPhase);
-  const didSignUpWithAccount = useAppStore(
-    (state) => state.onboarding.didSignUpWithAccount,
-  );
-
   const isGlobalRecording =
     overlayPhase === "recording" || overlayPhase === "loading";
   const isRecording = recordingState === "recording";
@@ -110,11 +106,7 @@ export const MicCheckForm = () => {
   const handleConfirm = async () => {
     trackButtonClick("onboarding_mic_looks_good");
     await stopRecording();
-    if (didSignUpWithAccount) {
-      goToOnboardingPage("unlockedPro");
-    } else {
-      goToOnboardingPage("tutorial");
-    }
+    goToOnboardingPage("tutorial");
   };
 
   const form = (

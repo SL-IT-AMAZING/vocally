@@ -149,7 +149,6 @@ export const refreshCurrentUser = async (): Promise<void> => {
         setCurrentUser(draft, user);
       }
 
-      console.log("REFRESHING", userId, preferences);
       if (preferences) {
         setUserPreferences(draft, preferences);
       } else {
