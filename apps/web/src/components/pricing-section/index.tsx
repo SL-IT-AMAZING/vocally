@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { trackButtonClick } from "../../utils/analytics.utils";
 import pageStyles from "../../styles/page.module.css";
 import { DownloadButton } from "../download-button";
 import styles from "./pricing-section.module.css";
@@ -15,7 +14,6 @@ type PricingPlan = {
   features: Feature[];
   cta: string;
   popular: boolean;
-  isEnterprise?: boolean;
   isLifetime?: boolean;
 };
 
@@ -85,48 +83,6 @@ function usePricingPlans(): PricingPlan[] {
       cta: intl.formatMessage({ defaultMessage: "Download free" }),
       popular: true,
     },
-    {
-      name: "Enterprise",
-      description: intl.formatMessage({
-        defaultMessage: "Custom solutions for teams with advanced needs.",
-      }),
-      monthlyPrice: null,
-      yearlyPrice: null,
-      features: [
-        {
-          text: intl.formatMessage({
-            defaultMessage: "Everything in Pro",
-          }),
-          deemphasized: true,
-        },
-        {
-          text: intl.formatMessage({
-            defaultMessage: "On-premise deployment",
-          }),
-        },
-        {
-          text: intl.formatMessage({
-            defaultMessage: "Custom integrations",
-          }),
-        },
-        {
-          text: intl.formatMessage({
-            defaultMessage: "Data privacy & compliance",
-          }),
-        },
-        {
-          text: intl.formatMessage({ defaultMessage: "Dedicated support" }),
-        },
-        {
-          text: intl.formatMessage({
-            defaultMessage: "Bring your own cloud",
-          }),
-        },
-      ],
-      cta: intl.formatMessage({ defaultMessage: "Contact us" }),
-      popular: false,
-      isEnterprise: true,
-    },
   ];
 }
 
@@ -171,7 +127,6 @@ export default function PricingSection() {
   const pricingPlans = usePricingPlans();
 
   const getPrice = (plan: PricingPlan): number | null => {
-    if (plan.isEnterprise) return null;
     if (plan.isLifetime) return plan.monthlyPrice;
     return isYearly ? plan.yearlyPrice : plan.monthlyPrice;
   };
@@ -277,41 +232,16 @@ export default function PricingSection() {
                       </div>
                     </>
                   )
-                ) : (
-                  <>
-                    <span className={styles.customPrice}>
-                      <FormattedMessage defaultMessage="Custom" />
-                    </span>
-                    <div className={styles.billingNote}>
-                      {isYearly ? (
-                        <FormattedMessage defaultMessage="Billed annually" />
-                      ) : (
-                        <FormattedMessage defaultMessage="Billed monthly" />
-                      )}
-                    </div>
-                  </>
-                )}
+                ) : null}
               </div>
 
               {/* CTA Button */}
-              {plan.isEnterprise ? (
-                <a
-                  href="mailto:support@vocally.so"
-                  className={styles.ctaButtonOutline}
-                  onClick={() =>
-                    trackButtonClick(`pricing-${plan.name.toLowerCase()}`)
-                  }
-                >
-                  {plan.cta}
-                </a>
-              ) : (
-                <DownloadButton
-                  className={
-                    plan.popular ? styles.ctaButton : styles.ctaButtonOutline
-                  }
-                  trackingId={`pricing-${plan.name.toLowerCase()}`}
-                />
-              )}
+              <DownloadButton
+                className={
+                  plan.popular ? styles.ctaButton : styles.ctaButtonOutline
+                }
+                trackingId={`pricing-${plan.name.toLowerCase()}`}
+              />
 
               {/* Features */}
               <div className={styles.featuresSection}>
