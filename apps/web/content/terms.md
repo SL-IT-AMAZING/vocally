@@ -1,8 +1,8 @@
 # Terms of Service
 
-_Last updated: October 20, 2025_
+_Last updated: February 10, 2026_
 
-Welcome to **Vocally**. These Terms of Service ("Terms") govern your use of the Vocally open source software application ("Software"). By downloading, installing, or using the Software, you agree to be bound by these Terms.
+Welcome to **Vocally**, operated by **BIBO** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
 
 ## 1. Open Source License
 
@@ -75,7 +75,7 @@ We do not guarantee that:
 
 ## 9. Limitation of Liability
 
-TO THE FULLEST EXTENT PERMITTED BY LAW, THE VOQUILL DEVELOPERS AND CONTRIBUTORS SHALL NOT BE LIABLE FOR ANY:
+TO THE FULLEST EXTENT PERMITTED BY LAW, BIBO AND ITS CONTRIBUTORS SHALL NOT BE LIABLE FOR ANY:
 
 - Direct, indirect, incidental, special, consequential, or punitive damages
 - Loss of profits, data, use, or other intangible losses
@@ -110,19 +110,23 @@ There is no guarantee of response time or resolution.
 
 We may update these Terms from time to time. Changes will be posted on this page with a new "Last updated" date. Continued use of the Software after changes constitutes acceptance of the revised Terms.
 
-## 14. Governing Law
+## 14. Payment and Subscriptions
 
-These Terms are governed by the laws of the State of California, without regard to conflicts of law principles.
+Vocally offers optional paid subscription plans. Payments are processed by **Paddle**, our merchant of record. By purchasing a subscription, you also agree to Paddle's terms of service. All prices are listed in USD. You may cancel your subscription at any time. Please refer to our [Refund Policy](/refund) for details on refunds.
 
-## 15. Severability
+## 15. Governing Law
+
+These Terms are governed by the laws of the Republic of Korea, without regard to conflicts of law principles.
+
+## 16. Severability
 
 If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.
 
-## 16. Entire Agreement
+## 17. Entire Agreement
 
 These Terms, together with the applicable open source license, constitute the entire agreement between you and Vocally regarding the Software.
 
-## 17. Contact
+## 18. Contact
 
 For questions about these Terms, you can:
 

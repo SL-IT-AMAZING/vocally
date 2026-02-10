@@ -7,6 +7,7 @@ import DownloadPage from "./pages/DownloadPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import PricingPage from "./pages/PricingPage";
 import RefundPage from "./pages/RefundPage";
 import TermsPage from "./pages/TermsPage";
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/auth/confirmed" element={<AuthConfirmedPage />} />
         <Route path="/download" element={<DownloadPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/refund" element={<RefundPage />} />

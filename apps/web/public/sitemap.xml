@@ -13,6 +13,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://vocally-web.vercel.app/pricing</loc>
+    <lastmod>2026-02-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://vocally-web.vercel.app/privacy</loc>
     <lastmod>2026-02-10</lastmod>
     <changefreq>monthly</changefreq>
