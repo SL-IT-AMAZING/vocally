@@ -20,11 +20,12 @@ export function PageLayout({ children, mainClassName }: PageLayoutProps) {
       <main className={mainClasses}>{children}</main>
       <SiteFooter />
       <div className={styles.pageMeta}>
-        <span>© {currentYear} Handaptive LLC</span>
+        <span>© {currentYear} BIBO</span>
         <div className={styles.pageLinks}>
           <Link to="/privacy">Privacy</Link>
           <Link to="/terms">Terms</Link>
-          <a href="mailto:hello@voquill.com">Contact</a>
+          <Link to="/refund">Refund</Link>
+          <a href="mailto:support@vocally.so">Contact</a>
         </div>
       </div>
     </div>

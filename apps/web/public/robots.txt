@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://voquill.com/sitemap.xml
+Sitemap: https://vocally-web.vercel.app/sitemap.xml

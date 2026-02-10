@@ -7,6 +7,7 @@ import DownloadPage from "./pages/DownloadPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import RefundPage from "./pages/RefundPage";
 import TermsPage from "./pages/TermsPage";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/download" element={<DownloadPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
+        <Route path="/refund" element={<RefundPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Fragment>

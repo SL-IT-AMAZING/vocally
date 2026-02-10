@@ -296,7 +296,7 @@ export default function PricingSection() {
               {/* CTA Button */}
               {plan.isEnterprise ? (
                 <a
-                  href="mailto:hello@voquill.com"
+                  href="mailto:support@vocally.so"
                   className={styles.ctaButtonOutline}
                   onClick={() =>
                     trackButtonClick(`pricing-${plan.name.toLowerCase()}`)
