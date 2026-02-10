@@ -67,7 +67,7 @@ export const PaymentDialog = () => {
         }
 
         window.Paddle.Initialize({
-          token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN,
+          token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN ?? "",
           eventCallback: async (event) => {
             if (
               event.name === "checkout.completed" &&
@@ -153,7 +153,7 @@ export const PaymentDialog = () => {
           : import.meta.env.VITE_PADDLE_PRICE_YEARLY;
 
       window.Paddle.Checkout.open({
-        items: [{ priceId, quantity: 1 }],
+        items: [{ priceId: priceId ?? "", quantity: 1 }],
         customer: { email: user.email },
         customData: { userId: user.id },
       });
