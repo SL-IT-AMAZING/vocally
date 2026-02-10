@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
 import SiteFooter from "../components/site-footer";
 import SiteHeader from "../components/site-header";
 import styles from "../styles/page.module.css";
@@ -10,7 +9,6 @@ type PageLayoutProps = {
 };
 
 export function PageLayout({ children, mainClassName }: PageLayoutProps) {
-  const currentYear = new Date().getFullYear();
   const mainClasses = [styles.main, mainClassName].filter(Boolean).join(" ");
 
   return (
@@ -19,15 +17,6 @@ export function PageLayout({ children, mainClassName }: PageLayoutProps) {
       <div className={styles.headerSpacer} />
       <main className={mainClasses}>{children}</main>
       <SiteFooter />
-      <div className={styles.pageMeta}>
-        <span>© {currentYear} SL:IT</span>
-        <div className={styles.pageLinks}>
-          <Link to="/privacy">Privacy</Link>
-          <Link to="/terms">Terms</Link>
-          <Link to="/refund">Refund</Link>
-          <a href="mailto:support@vocally.so">Contact</a>
-        </div>
-      </div>
     </div>
   );
 }
