@@ -221,8 +221,28 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
         info.primary_height,
     );
 
+    // Full screen frame (includes dock/menu bar area) used for pill overlay positioning.
+    // The pill is always-on-top so it renders above the dock; using visibleFrame causes
+    // the pill to stay "stuck" above the dock gap when entering/exiting fullscreen on macOS.
+    #[cfg(target_os = "macos")]
+    let (pill_frame_x, pill_frame_width, pill_frame_bottom) = (
+        info.screen_x,
+        info.screen_width,
+        info.screen_y + info.screen_height,
+    );
+
     #[cfg(not(target_os = "macos"))]
-    let (visible_x, visible_y, visible_width, visible_height, cursor_x, cursor_y) = {
+    let (
+        visible_x,
+        visible_y,
+        visible_width,
+        visible_height,
+        pill_frame_x,
+        pill_frame_width,
+        pill_frame_bottom,
+        cursor_x,
+        cursor_y,
+    ) = {
         let Ok(cursor_pos) = app.cursor_position() else {
             return;
         };
@@ -244,6 +264,9 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
             logical_y + insets.top_inset,
             logical_width - insets.left_inset - insets.right_inset,
             logical_height - insets.top_inset - insets.bottom_inset,
+            logical_x,
+            logical_width,
+            logical_y + logical_height,
             cursor_pos.x,
             cursor_pos.y,
         )
@@ -299,6 +322,9 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
         };
 
     if let Some(pill_window) = app.get_webview_window(PILL_OVERLAY_LABEL) {
+        let pill_x = pill_frame_x + (pill_frame_width - PILL_OVERLAY_WIDTH) / 2.0;
+        let pill_y = pill_frame_bottom - PILL_OVERLAY_HEIGHT - bottom_offset;
+
         #[cfg(debug_assertions)]
         {
             static LAST_LOG: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
@@ -309,23 +335,25 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
             let last = LAST_LOG.load(std::sync::atomic::Ordering::Relaxed);
             if now > last + 3 {
                 LAST_LOG.store(now, std::sync::atomic::Ordering::Relaxed);
-                let pill_x = visible_x + (visible_width - PILL_OVERLAY_WIDTH) / 2.0;
-                let pill_y = visible_y + visible_height - PILL_OVERLAY_HEIGHT - bottom_offset;
                 eprintln!(
-                    "[pill] cursor=({:.0}, {:.0}) visible=({:.0}, {:.0}, {:.0}x{:.0}) pill_pos=({:.0}, {:.0})",
-                    cursor_x, cursor_y,
-                    visible_x, visible_y, visible_width, visible_height,
-                    pill_x, pill_y
+                    "[pill] cursor=({:.0}, {:.0}) frame_bottom={:.0} pill_pos=({:.0}, {:.0})",
+                    cursor_x, cursor_y, pill_frame_bottom, pill_x, pill_y
                 );
             }
         }
-        position_overlay(
+
+        #[cfg(target_os = "macos")]
+        crate::platform::window::set_window_position_native(
             &pill_window,
-            OverlayAnchor::BottomCenter,
-            PILL_OVERLAY_WIDTH,
-            PILL_OVERLAY_HEIGHT,
-            bottom_offset,
+            pill_x,
+            pill_y,
+            primary_height,
         );
+
+        #[cfg(not(target_os = "macos"))]
+        let _ = pill_window.set_position(tauri::Position::Logical(tauri::LogicalPosition::new(
+            pill_x, pill_y,
+        )));
     }
 
     if let Some(toast_window) = app.get_webview_window(TOAST_OVERLAY_LABEL) {
@@ -366,8 +394,8 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
         };
 
         let new_hovered = if hover_enabled {
-            let pill_x = visible_x + (visible_width - hover_width) / 2.0;
-            let pill_y = visible_y + visible_height - hover_height - bottom_offset;
+            let pill_x = pill_frame_x + (pill_frame_width - hover_width) / 2.0;
+            let pill_y = pill_frame_bottom - hover_height - bottom_offset;
             cursor_x >= pill_x
                 && cursor_x <= pill_x + hover_width
                 && cursor_y >= pill_y
