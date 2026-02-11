@@ -460,6 +460,30 @@
   color: var(--text-muted);
 }
 
+.downloadAdvancedToggle {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.downloadAdvancedButton {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+
+.downloadAdvancedButton:hover {
+  color: var(--text-strong);
+  background: var(--level1);
+}
+
 .videoFrame {
   position: relative;
   border-radius: 28px;

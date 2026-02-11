@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { Link } from "react-router-dom";
 import { trackButtonClick } from "../utils/analytics.utils";
 import {
   DEFAULT_PLATFORM,
   detectPlatform,
-  fetchReleaseManifest,
   isMobileDevice,
   PLATFORM_CONFIG,
-  selectPlatformUrl,
   type Platform,
 } from "../lib/downloads";
 import styles from "../styles/page.module.css";
@@ -30,7 +29,6 @@ export function DownloadButton({
 }: DownloadButtonProps) {
   const classes = [styles.primaryButton, className].filter(Boolean).join(" ");
   const [platform, setPlatform] = useState<Platform>(DEFAULT_PLATFORM);
-  const [downloadHref, setDownloadHref] = useState<string | undefined>(href);
   const [isCompact, setIsCompact] = useState(false);
   const { label: platformLabel, shortLabel, Icon } = PLATFORM_CONFIG[platform];
   const isMobile = useMemo(() => isMobileDevice(), []);
@@ -53,43 +51,8 @@ export function DownloadButton({
   }, []);
 
   useEffect(() => {
-    let isCancelled = false;
-    const abortController = new AbortController();
-    const detectedPlatform = detectPlatform();
-
-    setPlatform(detectedPlatform);
-    setDownloadHref(href);
-
-    if (isMobile) {
-      return () => {
-        isCancelled = true;
-        abortController.abort();
-      };
-    }
-
-    async function updateDownloadHref() {
-      try {
-        const manifest = await fetchReleaseManifest(abortController.signal);
-        if (isCancelled || !manifest) {
-          return;
-        }
-
-        const url = await selectPlatformUrl(manifest, detectedPlatform);
-        if (!isCancelled && url) {
-          setDownloadHref(url);
-        }
-      } catch (error) {
-        console.error("Failed to resolve download URL", error);
-      }
-    }
-
-    void updateDownloadHref();
-
-    return () => {
-      isCancelled = true;
-      abortController.abort();
-    };
-  }, [href, isMobile]);
+    setPlatform(detectPlatform());
+  }, []);
 
   const buttonLabel = isMobile
     ? "iOS/Android coming soon"
@@ -111,11 +74,22 @@ export function DownloadButton({
     }
   };
 
+  // When href is provided (e.g. download page's own button), use <a> tag
+  if (href) {
+    return (
+      <a href={href} className={classes} onClick={handleClick}>
+        <Icon className={styles.buttonIcon} size={BUTTON_ICON_SIZE} />
+        <span>{label ?? buttonLabel}</span>
+      </a>
+    );
+  }
+
+  // Default: navigate to /download page
   return (
-    <a href={downloadHref} className={classes} onClick={handleClick}>
+    <Link to="/download" className={classes} onClick={handleClick}>
       <Icon className={styles.buttonIcon} size={BUTTON_ICON_SIZE} />
       <span>{label ?? buttonLabel}</span>
-    </a>
+    </Link>
   );
 }
 

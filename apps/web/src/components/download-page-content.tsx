@@ -24,6 +24,7 @@ export function DownloadPageContent() {
   const [manifest, setManifest] = useState<ReleaseManifest | undefined>();
   const [downloads, setDownloads] = useState<PlatformDownload[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
     setPlatform(detectPlatform());
@@ -117,7 +118,10 @@ export function DownloadPageContent() {
       >
         {PLATFORM_ORDER.map((id: Platform) => {
           const config = PLATFORM_CONFIG[id];
-          const platformDownloads = downloadsByPlatform.get(id) ?? [];
+          const allPlatformDownloads = downloadsByPlatform.get(id) ?? [];
+          const platformDownloads = showAdvanced
+            ? allPlatformDownloads
+            : allPlatformDownloads.filter((d) => !d.advanced);
           const hasDownloads = platformDownloads.length > 0;
 
           return (
@@ -150,7 +154,9 @@ export function DownloadPageContent() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() =>
-                          trackButtonClick(`download-${download.platform}-${download.key}`)
+                          trackButtonClick(
+                            `download-${download.platform}-${download.key}`,
+                          )
                         }
                       >
                         <span>{download.label}</span>
@@ -176,6 +182,20 @@ export function DownloadPageContent() {
           );
         })}
       </section>
+
+      <div className={styles.downloadAdvancedToggle}>
+        <button
+          type="button"
+          className={styles.downloadAdvancedButton}
+          onClick={() => setShowAdvanced(!showAdvanced)}
+        >
+          {showAdvanced ? (
+            <FormattedMessage defaultMessage="Hide advanced options" />
+          ) : (
+            <FormattedMessage defaultMessage="Show advanced options (GPU, .deb, .rpm)" />
+          )}
+        </button>
+      </div>
     </section>
   );
 }

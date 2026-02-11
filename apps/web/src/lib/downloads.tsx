@@ -34,6 +34,7 @@ export type PlatformDownload = {
   label: string;
   description?: string;
   url: string;
+  advanced?: boolean;
 };
 
 export const DEFAULT_PLATFORM: Platform = "mac";
@@ -77,9 +78,15 @@ export function getPlatformConfig(
 // Export non-function version for backwards compatibility
 export const PLATFORM_CONFIG = getPlatformConfig();
 
-function getManifestKeyDetails(
-  intl = getIntl(),
-): Record<string, { platform: Platform; label: string; description?: string }> {
+function getManifestKeyDetails(intl = getIntl()): Record<
+  string,
+  {
+    platform: Platform;
+    label: string;
+    description?: string;
+    advanced?: boolean;
+  }
+> {
   return {
     "darwin-aarch64": {
       platform: "mac",
@@ -113,6 +120,7 @@ function getManifestKeyDetails(
       description: intl.formatMessage({
         defaultMessage: ".msi installer with Vulkan acceleration",
       }),
+      advanced: true,
     },
     "linux-x86_64": {
       platform: "linux",
@@ -125,6 +133,7 @@ function getManifestKeyDetails(
       description: intl.formatMessage({
         defaultMessage: "AppImage with Vulkan acceleration",
       }),
+      advanced: true,
     },
     "linux-x86_64-gpu-deb": {
       platform: "linux",
@@ -132,6 +141,7 @@ function getManifestKeyDetails(
       description: intl.formatMessage({
         defaultMessage: ".deb with Vulkan acceleration",
       }),
+      advanced: true,
     },
     "linux-x86_64-gpu-rpm": {
       platform: "linux",
@@ -139,6 +149,7 @@ function getManifestKeyDetails(
       description: intl.formatMessage({
         defaultMessage: ".rpm with Vulkan acceleration",
       }),
+      advanced: true,
     },
     "windows-x86_64-gpu-nsis": {
       platform: "windows",
@@ -146,6 +157,7 @@ function getManifestKeyDetails(
       description: intl.formatMessage({
         defaultMessage: ".exe installer with Vulkan acceleration",
       }),
+      advanced: true,
     },
   };
 }
@@ -302,6 +314,7 @@ export function extractDownloads(manifest: ReleaseManifest) {
           label: meta.label,
           description: meta.description,
           url: details.url,
+          advanced: meta.advanced,
         };
         return [download];
       }
