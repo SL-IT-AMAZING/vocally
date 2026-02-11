@@ -134,13 +134,13 @@ function ProSubscribeButton({
   isYearly: boolean;
   className?: string;
 }) {
-  const { user, signInWithGoogle } = useAuth();
+  const { user, openSignInModal } = useAuth();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const intl = useIntl();
 
   const handleSubscribe = async () => {
     if (!user) {
-      await signInWithGoogle();
+      openSignInModal();
       return;
     }
 

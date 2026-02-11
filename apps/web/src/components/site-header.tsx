@@ -5,10 +5,11 @@ import { useAuth } from "../context/auth-context";
 import { detectLocale, setStoredLocale } from "../i18n";
 import styles from "../styles/page.module.css";
 import DownloadButton from "./download-button";
+import SignInModal from "./sign-in-modal";
 
 export function SiteHeader() {
   const intl = useIntl();
-  const { user, signInWithGoogle, signOut } = useAuth();
+  const { user, openSignInModal, signOut } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [locale, setLocale] = useState(() => detectLocale());
@@ -95,7 +96,7 @@ export function SiteHeader() {
               )}
             </div>
           ) : (
-            <button onClick={signInWithGoogle} className={styles.langToggle}>
+            <button onClick={openSignInModal} className={styles.langToggle}>
               <FormattedMessage defaultMessage="Sign in" />
             </button>
           )}
@@ -153,6 +154,7 @@ export function SiteHeader() {
           </div>
         </div>
       )}
+      <SignInModal />
     </div>
   );
 }

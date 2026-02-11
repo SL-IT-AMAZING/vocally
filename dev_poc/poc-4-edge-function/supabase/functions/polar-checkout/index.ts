@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
   const checkoutBody = {
     product_id: productId,
     payment_processor: "stripe",
-    customer_email: user.email,
+    ...(user.email ? { customer_email: user.email } : {}),
     metadata: { supabase_user_id: user.id },
     success_url: "https://vocally-web.vercel.app/checkout/success",
     allow_discount_codes: true,
