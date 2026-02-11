@@ -68,6 +68,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!prevUserRef.current && next) {
         setIsSignInModalOpen(false);
         initMember();
+        if (window.location.hash) {
+          history.replaceState(
+            null,
+            "",
+            window.location.pathname + window.location.search,
+          );
+        }
       }
       prevUserRef.current = next;
     });
@@ -86,11 +93,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("pageshow", handlePageShow);
   }, []);
 
+  const getCleanRedirectUrl = () => {
+    const url = new URL(window.location.href);
+    url.hash = "";
+    return url.toString().replace(/\#$/, "");
+  };
+
   const signInWithGoogle = async () => {
     if (!supabase) return;
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.href },
+      options: { redirectTo: getCleanRedirectUrl() },
     });
   };
 
@@ -98,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase) return;
     await supabase.auth.signInWithOAuth({
       provider: "kakao",
-      options: { redirectTo: window.location.href },
+      options: { redirectTo: getCleanRedirectUrl() },
     });
   };
 
