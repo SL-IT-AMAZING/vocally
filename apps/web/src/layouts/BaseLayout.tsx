@@ -19,7 +19,7 @@ export function BaseLayout({ children, title, description }: BaseLayoutProps) {
   const DEFAULT_DESCRIPTION = intl.formatMessage({
     defaultMessage: "Type four times faster with a voice-first keyboard.",
   });
-  const FALLBACK_CANONICAL_ORIGIN = "https://vocally.com";
+  const FALLBACK_CANONICAL_ORIGIN = "https://vocally-web.vercel.app";
 
   const finalTitle = title ?? DEFAULT_TITLE;
   const finalDescription = description ?? DEFAULT_DESCRIPTION;
