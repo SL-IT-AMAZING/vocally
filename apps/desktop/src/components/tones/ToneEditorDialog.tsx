@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { Tone } from "@repo/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { setAppTargetTone } from "../../actions/app-target.actions";
 import {
   closeToneEditorDialog,
@@ -27,6 +27,7 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 const MAX_PROMPT_LEN = 1000;
 
 export const ToneEditorDialog = () => {
+  const intl = useIntl();
   const toneEditor = useAppStore((state) => state.toneEditor);
   const toneById = useAppStore((state) => state.toneById);
 
@@ -210,7 +211,9 @@ export const ToneEditorDialog = () => {
               value={name}
               onChange={(event) => setName(event.target.value)}
               fullWidth
-              placeholder="Casual, Formal, Business..."
+              placeholder={intl.formatMessage({
+                defaultMessage: "Casual, Formal, Business...",
+              })}
               inputProps={{ maxLength: 120 }}
             />
 
@@ -221,7 +224,10 @@ export const ToneEditorDialog = () => {
               multiline
               rows={12}
               fullWidth
-              placeholder="Make it sound like a professional but friendly email. Use jargon and fun words."
+              placeholder={intl.formatMessage({
+                defaultMessage:
+                  "Make it sound like a professional but friendly email. Use jargon and fun words.",
+              })}
               inputProps={{ maxLength: MAX_PROMPT_LEN }}
               helperText={
                 <Typography

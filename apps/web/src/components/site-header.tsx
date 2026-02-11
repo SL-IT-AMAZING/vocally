@@ -67,7 +67,9 @@ export function SiteHeader() {
           <button
             onClick={handleLocaleToggle}
             className={styles.langToggle}
-            aria-label="Switch language"
+            aria-label={intl.formatMessage({
+              defaultMessage: "Switch language",
+            })}
           >
             {locale === "ko" ? "EN" : "한국어"}
           </button>
@@ -76,7 +78,9 @@ export function SiteHeader() {
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className={styles.langToggle}
-                aria-label="User menu"
+                aria-label={intl.formatMessage({
+                  defaultMessage: "User menu",
+                })}
               >
                 {user.email?.[0]?.toUpperCase() ?? "U"}
               </button>

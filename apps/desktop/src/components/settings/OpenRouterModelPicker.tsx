@@ -17,7 +17,7 @@ import {
 import { OpenRouterModel } from "@repo/types";
 import { OPENROUTER_FAVORITE_MODELS } from "@repo/voice-ai";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Virtuoso } from "react-virtuoso";
 import {
   getOpenRouterConfigForKey,
@@ -130,6 +130,7 @@ export const OpenRouterModelPicker = ({
   onModelSelect,
   disabled = false,
 }: OpenRouterModelPickerProps) => {
+  const intl = useIntl();
   const [expanded, setExpanded] = useState(false);
   const models = useAppStore((state) => state.settings.openRouterModels);
   const modelsStatus = useAppStore(
@@ -296,7 +297,9 @@ export const OpenRouterModelPicker = ({
         <TextField
           fullWidth
           size="small"
-          placeholder="Search models..."
+          placeholder={intl.formatMessage({
+            defaultMessage: "Search models...",
+          })}
           value={searchQuery}
           onChange={handleSearchChange}
           autoFocus

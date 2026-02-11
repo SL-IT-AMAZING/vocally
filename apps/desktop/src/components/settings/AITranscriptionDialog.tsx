@@ -9,11 +9,12 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { produceAppState, useAppStore } from "../../store";
 import { AITranscriptionConfiguration } from "./AITranscriptionConfiguration";
 
 export const AITranscriptionDialog = () => {
+  const intl = useIntl();
   const open = useAppStore((state) => state.settings.aiTranscriptionDialogOpen);
 
   const closeDialog = () => {
@@ -27,7 +28,7 @@ export const AITranscriptionDialog = () => {
       <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
         <FormattedMessage defaultMessage="AI transcription" />
         <IconButton
-          aria-label="Close"
+          aria-label={intl.formatMessage({ defaultMessage: "Close" })}
           onClick={closeDialog}
           size="small"
           sx={{ ml: "auto" }}

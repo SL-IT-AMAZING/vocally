@@ -9,6 +9,7 @@ import {
   type Theme,
 } from "@mui/material";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { FormattedMessage } from "react-intl";
 import { Virtuoso, type VirtuosoProps } from "react-virtuoso";
 
 const COLLAPSE_DISTANCE_PX = 96;
@@ -182,10 +183,10 @@ export function VirtualizedListPage<Item>({
             {emptyState || (
               <Stack spacing={1} alignItems="center">
                 <Typography variant="h6" color="text.secondary">
-                  It's quiet in here
+                  <FormattedMessage defaultMessage="It's quiet in here" />
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  There are no items to display.
+                  <FormattedMessage defaultMessage="There are no items to display." />
                 </Typography>
               </Stack>
             )}

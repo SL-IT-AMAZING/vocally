@@ -26,7 +26,7 @@ function usePricingPlans(): PricingPlan[] {
   const intl = useIntl();
   return [
     {
-      name: "Personal",
+      name: intl.formatMessage({ defaultMessage: "Personal" }),
       description: intl.formatMessage({
         defaultMessage: "For individuals who want fast, local dictation.",
       }),
@@ -58,7 +58,7 @@ function usePricingPlans(): PricingPlan[] {
       isLifetime: true,
     },
     {
-      name: "Pro",
+      name: intl.formatMessage({ defaultMessage: "Pro" }),
       description: intl.formatMessage({
         defaultMessage:
           "Full power with cloud transcription and advanced integrations.",
@@ -183,6 +183,7 @@ function ProSubscribeButton({
 }
 
 export default function PricingSection() {
+  const intl = useIntl();
   const [isYearly, setIsYearly] = useState(true);
   const pricingPlans = usePricingPlans();
 
@@ -212,7 +213,9 @@ export default function PricingSection() {
           <button
             className={styles.toggleButton}
             onClick={() => setIsYearly(!isYearly)}
-            aria-label="Toggle billing period"
+            aria-label={intl.formatMessage({
+              defaultMessage: "Toggle billing period",
+            })}
           >
             <span
               className={`${styles.toggleKnob} ${isYearly ? styles.active : ""}`}

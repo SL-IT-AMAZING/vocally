@@ -2,7 +2,7 @@ import { Add, CancelOutlined, Close, RestartAlt } from "@mui/icons-material";
 import { Button, IconButton, Stack, Switch, Typography } from "@mui/material";
 import type { Hotkey } from "@repo/types";
 import type { ReactNode } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { showErrorSnackbar } from "../../actions/app.actions";
 import { getHotkeyRepo } from "../../repos";
 import { produceAppState, useAppStore } from "../../store";
@@ -31,6 +31,7 @@ export const HotkeySetting = ({
   enabled,
   onEnabledChange,
 }: HotkeySettingProps) => {
+  const intl = useIntl();
   const hasEnabledToggle = enabled !== undefined;
   const isEnabled = enabled ?? true;
   const hotkeys = useAppStore((state) =>
@@ -137,7 +138,9 @@ export const HotkeySetting = ({
               checked={isEnabled}
               onChange={handleToggle}
               inputProps={{
-                "aria-label": "Enable hotkey",
+                "aria-label": intl.formatMessage({
+                  defaultMessage: "Enable hotkey",
+                }),
               }}
             />
           )}
@@ -152,7 +155,9 @@ export const HotkeySetting = ({
               <IconButton
                 size="small"
                 onClick={handleDisable}
-                aria-label="Disable hotkey"
+                aria-label={intl.formatMessage({
+                  defaultMessage: "Disable hotkey",
+                })}
               >
                 <CancelOutlined color="disabled" />
               </IconButton>
@@ -171,7 +176,9 @@ export const HotkeySetting = ({
                   !isPrimaryUsingDefault && (
                     <IconButton
                       size="small"
-                      aria-label="Revert to default hotkey"
+                      aria-label={intl.formatMessage({
+                        defaultMessage: "Revert to default hotkey",
+                      })}
                       onClick={handleRevertPrimary}
                     >
                       <RestartAlt color="disabled" />

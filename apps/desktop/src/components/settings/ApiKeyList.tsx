@@ -44,7 +44,7 @@ import {
   TRANSCRIPTION_MODELS,
 } from "@repo/voice-ai";
 import { useCallback, useEffect, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import {
   createApiKey,
   deleteApiKey,
@@ -86,6 +86,7 @@ type AddApiKeyCardProps = {
 };
 
 const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
+  const intl = useIntl();
   const [name, setName] = useState("");
   const [provider, setProvider] = useState<SettingsApiKeyProvider>("groq");
   const [key, setKey] = useState("");
@@ -158,13 +159,18 @@ const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
       }}
     >
       <TextField
-        label={<FormattedMessage defaultMessage="Key name" />}
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        placeholder="e.g., My API Key"
+        label={<FormattedMessage defaultMessage="Ollama URL" />}
+        value={ollamaUrl}
+        onChange={(event) => setOllamaUrl(event.target.value)}
+        placeholder={intl.formatMessage({
+          defaultMessage: "http://127.0.0.1:11434",
+        })}
         size="small"
         fullWidth
         disabled={saving}
+        helperText={
+          <FormattedMessage defaultMessage="Leave empty to use the default URL" />
+        }
       />
       <TextField
         select
@@ -220,7 +226,9 @@ const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
               label={<FormattedMessage defaultMessage="Azure Region" />}
               value={azureRegion}
               onChange={(event) => setAzureRegion(event.target.value)}
-              placeholder="e.g., eastus, westus, northeurope"
+              placeholder={intl.formatMessage({
+                defaultMessage: "e.g., eastus, westus, northeurope",
+              })}
               size="small"
               fullWidth
               disabled={saving}
@@ -232,7 +240,9 @@ const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
               label={<FormattedMessage defaultMessage="Subscription Key" />}
               value={key}
               onChange={(event) => setKey(event.target.value)}
-              placeholder="Paste your Azure subscription key"
+              placeholder={intl.formatMessage({
+                defaultMessage: "Paste your Azure subscription key",
+              })}
               size="small"
               fullWidth
               type="password"
@@ -247,7 +257,9 @@ const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
               }
               value={azureOpenAIEndpoint}
               onChange={(event) => setAzureOpenAIEndpoint(event.target.value)}
-              placeholder="https://my-resource.openai.azure.com"
+              placeholder={intl.formatMessage({
+                defaultMessage: "https://my-resource.openai.azure.com",
+              })}
               size="small"
               fullWidth
               disabled={saving}
@@ -259,7 +271,9 @@ const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
               label={<FormattedMessage defaultMessage="API Key" />}
               value={key}
               onChange={(event) => setKey(event.target.value)}
-              placeholder="Paste your Azure OpenAI API key"
+              placeholder={intl.formatMessage({
+                defaultMessage: "Paste your Azure OpenAI API key",
+              })}
               size="small"
               fullWidth
               type="password"
@@ -273,7 +287,9 @@ const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
             label={<FormattedMessage defaultMessage="Ollama URL" />}
             value={ollamaUrl}
             onChange={(event) => setOllamaUrl(event.target.value)}
-            placeholder={OLLAMA_DEFAULT_URL}
+            placeholder={intl.formatMessage({
+              defaultMessage: "http://127.0.0.1:11434",
+            })}
             size="small"
             fullWidth
             disabled={saving}
@@ -285,7 +301,9 @@ const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
             label={<FormattedMessage defaultMessage="API key (optional)" />}
             value={key}
             onChange={(event) => setKey(event.target.value)}
-            placeholder="Leave empty if not required"
+            placeholder={intl.formatMessage({
+              defaultMessage: "Leave empty if not required",
+            })}
             size="small"
             fullWidth
             type="password"
@@ -300,7 +318,9 @@ const AddApiKeyCard = ({ onSave, onCancel, context }: AddApiKeyCardProps) => {
           label={<FormattedMessage defaultMessage="API key" />}
           value={key}
           onChange={(event) => setKey(event.target.value)}
-          placeholder="Paste your API key"
+          placeholder={intl.formatMessage({
+            defaultMessage: "Paste your API key",
+          })}
           size="small"
           fullWidth
           type="password"

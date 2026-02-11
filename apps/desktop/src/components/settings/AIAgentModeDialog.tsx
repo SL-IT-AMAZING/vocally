@@ -10,11 +10,12 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { produceAppState, useAppStore } from "../../store";
 import { AIAgentModeConfiguration } from "./AIAgentModeConfiguration";
 
 export const AIAgentModeDialog = () => {
+  const intl = useIntl();
   const open = useAppStore((state) => state.settings.agentModeDialogOpen);
 
   const handleClose = () => {
@@ -32,7 +33,7 @@ export const AIAgentModeDialog = () => {
           onClick={handleClose}
           size="small"
           sx={{ ml: "auto" }}
-          aria-label="Close"
+          aria-label={intl.formatMessage({ defaultMessage: "Close" })}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
