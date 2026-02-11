@@ -111,7 +111,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase) return;
     await supabase.auth.signInWithOAuth({
       provider: "kakao",
-      options: { redirectTo: getCleanRedirectUrl() },
+      options: {
+        redirectTo: getCleanRedirectUrl(),
+        queryParams: { prompt: "login" },
+      },
     });
   };
 

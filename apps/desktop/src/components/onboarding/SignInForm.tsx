@@ -171,12 +171,17 @@ export const SignInForm = () => {
           fullWidth
           variant="contained"
           sx={{
-            bgcolor: '#FEE500',
-            color: '#191919',
-            '&:hover': { bgcolor: '#FDD835' },
+            bgcolor: "#FEE500",
+            color: "#191919",
+            "&:hover": { bgcolor: "#FDD835" },
             fontWeight: 600,
           }}
-          onClick={() => supabase.auth.signInWithOAuth({ provider: 'kakao' })}
+          onClick={() =>
+            supabase.auth.signInWithOAuth({
+              provider: "kakao",
+              options: { queryParams: { prompt: "login" } },
+            })
+          }
           disabled={loginStatus === "loading"}
         >
           카카오로 계속하기
