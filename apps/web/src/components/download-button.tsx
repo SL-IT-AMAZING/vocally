@@ -16,6 +16,7 @@ type DownloadButtonProps = {
   href?: string;
   className?: string;
   trackingId?: string;
+  label?: string;
 };
 
 const BUTTON_ICON_SIZE = 20;
@@ -25,12 +26,13 @@ export function DownloadButton({
   href,
   className,
   trackingId,
+  label,
 }: DownloadButtonProps) {
   const classes = [styles.primaryButton, className].filter(Boolean).join(" ");
   const [platform, setPlatform] = useState<Platform>(DEFAULT_PLATFORM);
   const [downloadHref, setDownloadHref] = useState<string | undefined>(href);
   const [isCompact, setIsCompact] = useState(false);
-  const { label, shortLabel, Icon } = PLATFORM_CONFIG[platform];
+  const { label: platformLabel, shortLabel, Icon } = PLATFORM_CONFIG[platform];
   const isMobile = useMemo(() => isMobileDevice(), []);
 
   useEffect(() => {
@@ -93,7 +95,7 @@ export function DownloadButton({
     ? "iOS/Android coming soon"
     : isCompact
       ? shortLabel
-      : label;
+      : platformLabel;
 
   if (isMobile) {
     return (
@@ -112,7 +114,7 @@ export function DownloadButton({
   return (
     <a href={downloadHref} className={classes} onClick={handleClick}>
       <Icon className={styles.buttonIcon} size={BUTTON_ICON_SIZE} />
-      <span>{buttonLabel}</span>
+      <span>{label ?? buttonLabel}</span>
     </a>
   );
 }

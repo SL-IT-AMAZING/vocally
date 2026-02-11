@@ -3,6 +3,8 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import ScrollToTop from "./components/scroll-to-top";
 import { trackPageView } from "./utils/analytics.utils";
 import AuthConfirmedPage from "./pages/AuthConfirmedPage";
+import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
+import CheckoutCancelPage from "./pages/CheckoutCancelPage";
 import DownloadPage from "./pages/DownloadPage";
 import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -24,6 +26,8 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth/confirmed" element={<AuthConfirmedPage />} />
+        <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+        <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
         <Route path="/download" element={<DownloadPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

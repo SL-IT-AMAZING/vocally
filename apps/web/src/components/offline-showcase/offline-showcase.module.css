@@ -20,13 +20,7 @@
 .iconContainer {
   position: relative;
   animation: float 6s ease-in-out infinite;
-  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.2));
-}
-
-@media (prefers-color-scheme: dark) {
-  .iconContainer {
-    filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
-  }
+  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
 }
 
 .wifiSvg {
@@ -36,57 +30,29 @@
 
 /* Arc gradient stops - metallic bevel */
 .arcLight {
-  stop-color: #5c6370;
+  stop-color: #f5f7fb;
 }
 
 .arcMid {
-  stop-color: #3a3f4a;
+  stop-color: #d8dce6;
 }
 
 .arcDark {
-  stop-color: #1e2128;
+  stop-color: #c0c5d0;
 }
 
 /* Strike knockout - matches page background */
 .strikeKnockout {
-  stroke: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  .strikeKnockout {
-    stroke: #121212;
-  }
+  stroke: #121212;
 }
 
 /* Dot gradient stops */
 .dotLight {
-  stop-color: #484d58;
+  stop-color: #f8f9fc;
 }
 
 .dotDark {
-  stop-color: #1a1d22;
-}
-
-@media (prefers-color-scheme: dark) {
-  .arcLight {
-    stop-color: #f5f7fb;
-  }
-
-  .arcMid {
-    stop-color: #d8dce6;
-  }
-
-  .arcDark {
-    stop-color: #c0c5d0;
-  }
-
-  .dotLight {
-    stop-color: #f8f9fc;
-  }
-
-  .dotDark {
-    stop-color: #d0d4de;
-  }
+  stop-color: #d0d4de;
 }
 
 .srOnly {

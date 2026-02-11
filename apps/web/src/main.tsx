@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { IntlProvider } from "react-intl";
 import mixpanel from "mixpanel-browser";
 import App from "./App";
+import { AuthProvider } from "./context/auth-context";
 import { getIntlConfig } from "./i18n";
 import "./styles/global.css";
 
@@ -27,9 +28,11 @@ const RootApp = () => {
   return (
     <StrictMode>
       <IntlProvider {...intlConfig}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AuthProvider>
       </IntlProvider>
     </StrictMode>
   );

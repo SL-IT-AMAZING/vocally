@@ -15,32 +15,16 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(15, 18, 26, 0.12),
+    rgba(168, 191, 255, 0.15),
     transparent 70%
   );
   animation: pulse 8s ease-in-out infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  .halo {
-    background: radial-gradient(
-      circle,
-      rgba(168, 191, 255, 0.15),
-      transparent 70%
-    );
-  }
-}
-
 .lockContainer {
   position: relative;
   animation: float 6s ease-in-out infinite;
-  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.2));
-}
-
-@media (prefers-color-scheme: dark) {
-  .lockContainer {
-    filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
-  }
+  filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
 }
 
 .lockSvg {
@@ -50,71 +34,37 @@
 
 /* Shackle gradient stops - metallic bevel */
 .shackleLight {
-  stop-color: #5c6370;
+  stop-color: #f5f7fb;
 }
 
 .shackleMid {
-  stop-color: #3a3f4a;
+  stop-color: #d8dce6;
 }
 
 .shackleDark {
-  stop-color: #1e2128;
+  stop-color: #c0c5d0;
 }
 
 /* Body gradient stops - 3D effect */
 .bodyLight {
-  stop-color: #484d58;
+  stop-color: #f8f9fc;
 }
 
 .bodyMid {
-  stop-color: #2e323a;
+  stop-color: #e8ebf2;
 }
 
 .bodyDark {
-  stop-color: #1a1d22;
+  stop-color: #d0d4de;
 }
 
 /* Keyhole gradient stops */
 .keyholeLight {
-  stop-color: #ffffff;
+  stop-color: #2a2e38;
 }
 
 .keyholeDark {
-  stop-color: #e0e4ec;
-}
-
-@media (prefers-color-scheme: dark) {
-  .shackleLight {
-    stop-color: #f5f7fb;
-  }
-
-  .shackleMid {
-    stop-color: #d8dce6;
-  }
-
-  .shackleDark {
-    stop-color: #c0c5d0;
-  }
-
-  .bodyLight {
-    stop-color: #f8f9fc;
-  }
-
-  .bodyMid {
-    stop-color: #e8ebf2;
-  }
-
-  .bodyDark {
-    stop-color: #d0d4de;
-  }
-
-  .keyholeLight {
-    stop-color: #2a2e38;
-  }
-
-  .keyholeDark {
-    stop-color: #15171c;
-  }
+  stop-color: #15171c;
 }
 
 .srOnly {

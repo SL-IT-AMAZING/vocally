@@ -11,7 +11,7 @@ function PricingPage() {
       title={intl.formatMessage({ defaultMessage: "Pricing | Vocally" })}
       description={intl.formatMessage({
         defaultMessage:
-          "Simple, transparent pricing for Vocally. Free personal plan, $5/month Pro plan, and custom enterprise solutions.",
+          "Simple, transparent pricing for Vocally. Free personal plan, $5/month or $50/year Pro plan, and custom enterprise solutions.",
       })}
     >
       <PageLayout>

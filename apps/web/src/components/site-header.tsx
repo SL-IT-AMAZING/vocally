@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/auth-context";
 import { detectLocale, setStoredLocale } from "../i18n";
 import styles from "../styles/page.module.css";
 import DownloadButton from "./download-button";
 
 export function SiteHeader() {
   const intl = useIntl();
+  const { user, signInWithGoogle, signOut } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [locale, setLocale] = useState(() => detectLocale());
 
   const handleLocaleToggle = () => {
@@ -67,6 +70,35 @@ export function SiteHeader() {
           >
             {locale === "ko" ? "EN" : "한국어"}
           </button>
+          {user ? (
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className={styles.langToggle}
+                aria-label="User menu"
+              >
+                {user.email?.[0]?.toUpperCase() ?? "U"}
+              </button>
+              {showUserMenu && (
+                <div className={styles.userMenu}>
+                  <div className={styles.userMenuEmail}>{user.email}</div>
+                  <button
+                    className={styles.userMenuItem}
+                    onClick={() => {
+                      signOut();
+                      setShowUserMenu(false);
+                    }}
+                  >
+                    <FormattedMessage defaultMessage="Sign out" />
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button onClick={signInWithGoogle} className={styles.langToggle}>
+              <FormattedMessage defaultMessage="Sign in" />
+            </button>
+          )}
           <DownloadButton className={styles.headerCta} />
         </div>
         <button

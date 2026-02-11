@@ -34,13 +34,19 @@
 .word {
   position: relative;
   display: inline;
-  transition: opacity 0.3s ease, color 0.2s ease;
+  transition:
+    opacity 0.3s ease,
+    color 0.2s ease;
 }
 
 /* Flagged state - word is being marked for cleanup */
 .wordFlagged {
   color: var(--warning, #e67700);
-  background: linear-gradient(to bottom, transparent 60%, rgba(230, 119, 0, 0.15) 60%);
+  background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    rgba(230, 119, 0, 0.15) 60%
+  );
 }
 
 /* Removed state - filler/hesitation words that disappear */
@@ -234,17 +240,15 @@
   animation: rotate 2.5s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  .resultBoxPending::before {
-    background: conic-gradient(
-      from var(--angle, 0deg),
-      transparent 0deg,
-      rgba(96, 165, 250, 0.4) 40deg,
-      rgba(96, 165, 250, 0.7) 50deg,
-      rgba(96, 165, 250, 0.4) 60deg,
-      transparent 100deg
-    );
-  }
+.resultBoxPending::before {
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0deg,
+    rgba(96, 165, 250, 0.4) 40deg,
+    rgba(96, 165, 250, 0.7) 50deg,
+    rgba(96, 165, 250, 0.4) 60deg,
+    transparent 100deg
+  );
 }
 
 @property --angle {
@@ -262,16 +266,11 @@
 /* Complete state - solid blue outline with background */
 .resultBoxComplete {
   background: var(--level1);
-  border: 2px solid #3b82f6;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), var(--shadow-soft);
+  border: 2px solid #60a5fa;
+  box-shadow:
+    0 0 24px rgba(96, 165, 250, 0.2),
+    var(--shadow-soft);
   animation: boxPopIn 0.4s ease forwards;
-}
-
-@media (prefers-color-scheme: dark) {
-  .resultBoxComplete {
-    border-color: #60a5fa;
-    box-shadow: 0 0 24px rgba(96, 165, 250, 0.2), var(--shadow-soft);
-  }
 }
 
 @keyframes boxPopIn {

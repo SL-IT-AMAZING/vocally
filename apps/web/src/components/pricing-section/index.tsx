@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useAuth } from "../../context/auth-context";
+import { supabase } from "../../lib/supabase";
 import pageStyles from "../../styles/page.module.css";
 import { DownloadButton } from "../download-button";
 import styles from "./pricing-section.module.css";
+
+const POLAR_PRODUCT_MONTHLY = "25bf6350-bebc-4b9f-b896-66767ce9304a";
+const POLAR_PRODUCT_YEARLY = "d73b4531-65c2-4eb8-976d-b6fcc1ae99e5";
 
 type Feature = { text: string; deemphasized?: boolean };
 
@@ -59,7 +64,7 @@ function usePricingPlans(): PricingPlan[] {
           "Full power with cloud transcription and advanced integrations.",
       }),
       monthlyPrice: 5,
-      yearlyPrice: 5,
+      yearlyPrice: 50,
       features: [
         {
           text: intl.formatMessage({
@@ -80,7 +85,7 @@ function usePricingPlans(): PricingPlan[] {
           text: intl.formatMessage({ defaultMessage: "Priority support" }),
         },
       ],
-      cta: intl.formatMessage({ defaultMessage: "Download free" }),
+      cta: intl.formatMessage({ defaultMessage: "Get Pro" }),
       popular: true,
     },
   ];
@@ -122,19 +127,64 @@ function ShieldIcon({ className }: { className?: string }) {
   );
 }
 
+function ProSubscribeButton({
+  isYearly,
+  className,
+}: {
+  isYearly: boolean;
+  className?: string;
+}) {
+  const { user, signInWithGoogle } = useAuth();
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const intl = useIntl();
+
+  const handleSubscribe = async () => {
+    if (!user) {
+      await signInWithGoogle();
+      return;
+    }
+
+    if (!supabase) return;
+
+    setCheckoutLoading(true);
+    try {
+      const productId = isYearly ? POLAR_PRODUCT_YEARLY : POLAR_PRODUCT_MONTHLY;
+
+      const { data, error } = await supabase.functions.invoke(
+        "polar-checkout",
+        { body: { productId } },
+      );
+
+      if (error || !data?.checkoutUrl) {
+        console.error("Checkout error:", error);
+        return;
+      }
+
+      window.location.href = data.checkoutUrl;
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  const label = user
+    ? intl.formatMessage({ defaultMessage: "Subscribe" })
+    : intl.formatMessage({ defaultMessage: "Get Started" });
+
+  return (
+    <button
+      type="button"
+      className={className}
+      onClick={handleSubscribe}
+      disabled={checkoutLoading}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function PricingSection() {
   const [isYearly, setIsYearly] = useState(true);
   const pricingPlans = usePricingPlans();
-
-  const getPrice = (plan: PricingPlan): number | null => {
-    if (plan.isLifetime) return plan.monthlyPrice;
-    return isYearly ? plan.yearlyPrice : plan.monthlyPrice;
-  };
-
-  const getYearlyTotal = (plan: PricingPlan): number | null => {
-    if (!plan.yearlyPrice) return null;
-    return plan.yearlyPrice * 12;
-  };
 
   return (
     <section className={styles.section} id="pricing">
@@ -174,7 +224,7 @@ export default function PricingSection() {
             <FormattedMessage defaultMessage="Yearly" />
           </span>
           <span className={styles.saveBadge}>
-            <FormattedMessage defaultMessage="Save 33%" />
+            <FormattedMessage defaultMessage="Save 17%" />
           </span>
         </div>
 
@@ -200,8 +250,8 @@ export default function PricingSection() {
 
               {/* Price */}
               <div className={styles.priceContainer}>
-                {getPrice(plan) !== null ? (
-                  getPrice(plan) === 0 ? (
+                {plan.monthlyPrice !== null ? (
+                  plan.monthlyPrice === 0 ? (
                     <>
                       <span className={styles.price}>
                         <FormattedMessage defaultMessage="Free" />
@@ -213,19 +263,23 @@ export default function PricingSection() {
                   ) : (
                     <>
                       <div className={styles.priceRow}>
-                        <span className={styles.price}>${getPrice(plan)}</span>
+                        <span className={styles.price}>
+                          $
+                          {isYearly && plan.yearlyPrice
+                            ? plan.yearlyPrice
+                            : plan.monthlyPrice}
+                        </span>
                         <span className={styles.pricePeriod}>
-                          <FormattedMessage defaultMessage="/ month" />
+                          {isYearly && plan.yearlyPrice ? (
+                            <FormattedMessage defaultMessage="/ year" />
+                          ) : (
+                            <FormattedMessage defaultMessage="/ month" />
+                          )}
                         </span>
                       </div>
                       <div className={styles.billingNote}>
-                        {isYearly &&
-                        plan.yearlyPrice !== null &&
-                        plan.yearlyPrice > 0 ? (
-                          <FormattedMessage
-                            defaultMessage="Billed annually (${total}/year)"
-                            values={{ total: getYearlyTotal(plan) }}
-                          />
+                        {isYearly && plan.yearlyPrice ? (
+                          <FormattedMessage defaultMessage="Billed annually" />
                         ) : (
                           <FormattedMessage defaultMessage="Billed monthly" />
                         )}
@@ -236,12 +290,17 @@ export default function PricingSection() {
               </div>
 
               {/* CTA Button */}
-              <DownloadButton
-                className={
-                  plan.popular ? styles.ctaButton : styles.ctaButtonOutline
-                }
-                trackingId={`pricing-${plan.name.toLowerCase()}`}
-              />
+              {plan.popular ? (
+                <ProSubscribeButton
+                  isYearly={isYearly}
+                  className={styles.ctaButton}
+                />
+              ) : (
+                <DownloadButton
+                  className={styles.ctaButtonOutline}
+                  trackingId={`pricing-${plan.name.toLowerCase()}`}
+                />
+              )}
 
               {/* Features */}
               <div className={styles.featuresSection}>

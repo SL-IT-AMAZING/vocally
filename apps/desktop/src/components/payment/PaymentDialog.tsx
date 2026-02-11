@@ -7,122 +7,73 @@ import {
   CircularProgress,
   Stack,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FormattedMessage } from "react-intl";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { useOnExit } from "../../hooks/helper.hooks";
-import { produceAppState, useAppStore } from "../../store";
+import { getAppState, produceAppState, useAppStore } from "../../store";
 import { supabase } from "../../supabase";
 import { refreshMember } from "../../actions/member.actions";
 
-declare global {
-  interface Window {
-    Paddle?: {
-      Environment: {
-        set: (env: string) => void;
-      };
-      Initialize: (options: {
-        token: string;
-        eventCallback?: (event: PaddleEvent) => void;
-      }) => void;
-      Checkout: {
-        open: (options: {
-          items: Array<{ priceId: string; quantity: number }>;
-          customer?: { email: string };
-          customData?: Record<string, string>;
-        }) => void;
-      };
-    };
-  }
-}
-
-interface PaddleEvent {
-  name: string;
-  data?: {
-    transaction_id?: string;
-  };
-}
+const POLAR_PRODUCT_MONTHLY = "25bf6350-bebc-4b9f-b896-66767ce9304a";
+const POLAR_PRODUCT_YEARLY = "d73b4531-65c2-4eb8-976d-b6fcc1ae99e5";
+const POLL_INTERVAL_MS = 5000;
+const POLL_MAX_DURATION_MS = 5 * 60 * 1000;
 
 type Plan = "monthly" | "yearly";
+type DialogState = "idle" | "creating" | "waiting" | "success" | "error";
 
 export const PaymentDialog = () => {
-  const open = useAppStore((state) => state.payment.open);
+  const isOpen = useAppStore((state) => state.payment.open);
   const [selectedPlan, setSelectedPlan] = useState<Plan>("monthly");
-  const [loading, setLoading] = useState(false);
+  const [dialogState, setDialogState] = useState<DialogState>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [paddleLoaded, setPaddleLoaded] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollStartRef = useRef<number>(0);
+
+  const stopPolling = () => {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  };
+
+  const checkPaymentStatus = async () => {
+    await refreshMember();
+    const state = getAppState();
+    const userId = state.auth?.id;
+    if (!userId) return;
+    const member = state.memberById[userId];
+    if (member?.plan === "pro") {
+      stopPolling();
+      setDialogState("success");
+    }
+  };
+
+  const startPolling = () => {
+    stopPolling();
+    pollStartRef.current = Date.now();
+    pollRef.current = setInterval(async () => {
+      if (Date.now() - pollStartRef.current > POLL_MAX_DURATION_MS) {
+        stopPolling();
+        return;
+      }
+      await checkPaymentStatus();
+    }, POLL_INTERVAL_MS);
+  };
 
   useEffect(() => {
-    if (window.Paddle) {
-      setPaddleLoaded(true);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
-    script.async = true;
-    script.onload = () => {
-      if (window.Paddle) {
-        if (import.meta.env.DEV) {
-          window.Paddle.Environment.set("sandbox");
-        }
-
-        window.Paddle.Initialize({
-          token: import.meta.env.VITE_PADDLE_CLIENT_TOKEN ?? "",
-          eventCallback: async (event) => {
-            if (
-              event.name === "checkout.completed" &&
-              event.data?.transaction_id
-            ) {
-              try {
-                const { error: verifyError } = await supabase.functions.invoke(
-                  "paddle-verify",
-                  {
-                    body: { transactionId: event.data.transaction_id },
-                  },
-                );
-
-                if (verifyError) {
-                  setError(
-                    "Payment verification failed. Please contact support.",
-                  );
-                  return;
-                }
-
-                setSuccess(true);
-                await refreshMember();
-              } catch (err) {
-                setError(
-                  err instanceof Error
-                    ? err.message
-                    : "Payment verification failed.",
-                );
-              }
-            }
-          },
-        });
-
-        setPaddleLoaded(true);
-      }
-    };
-
-    document.head.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
+    return () => stopPolling();
   }, []);
 
   const handleClose = () => {
+    stopPolling();
     produceAppState((draft) => {
       draft.payment.open = false;
     });
     setSelectedPlan("monthly");
-    setLoading(false);
+    setDialogState("idle");
     setError(null);
-    setSuccess(false);
   };
 
   useOnExit(() => {
@@ -130,12 +81,7 @@ export const PaymentDialog = () => {
   });
 
   const handlePayment = async () => {
-    if (!paddleLoaded || !window.Paddle) {
-      setError("Loading payment system. Please try again shortly.");
-      return;
-    }
-
-    setLoading(true);
+    setDialogState("creating");
     setError(null);
 
     try {
@@ -145,34 +91,38 @@ export const PaymentDialog = () => {
 
       if (!user?.email || !user?.id) {
         setError("Unable to verify login. Please sign in again.");
+        setDialogState("error");
         return;
       }
 
-      const priceId =
+      const productId =
         selectedPlan === "monthly"
-          ? import.meta.env.VITE_PADDLE_PRICE_MONTHLY
-          : import.meta.env.VITE_PADDLE_PRICE_YEARLY;
+          ? POLAR_PRODUCT_MONTHLY
+          : POLAR_PRODUCT_YEARLY;
 
-      if (!priceId) {
-        setError("Payment is not configured. Please contact support.");
+      const { data, error: invokeError } = await supabase.functions.invoke(
+        "polar-checkout",
+        { body: { productId } },
+      );
+
+      if (invokeError || !data?.checkoutUrl) {
+        setError("Failed to create checkout. Please try again.");
+        setDialogState("error");
         return;
       }
 
-      window.Paddle.Checkout.open({
-        items: [{ priceId, quantity: 1 }],
-        customer: { email: user.email },
-        customData: { userId: user.id },
-      });
+      await openUrl(data.checkoutUrl);
+      setDialogState("waiting");
+      startPolling();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Payment failed.");
-    } finally {
-      setLoading(false);
+      setDialogState("error");
     }
   };
 
-  if (success) {
+  if (dialogState === "success") {
     return (
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
         <DialogContent>
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" sx={{ mb: 3 }}>
@@ -187,8 +137,34 @@ export const PaymentDialog = () => {
     );
   }
 
+  if (dialogState === "waiting") {
+    return (
+      <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
+        <DialogContent>
+          <Box sx={{ textAlign: "center", py: 4 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              <FormattedMessage defaultMessage="Complete your payment" />
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <FormattedMessage defaultMessage="Finish the checkout in your browser. We'll detect when it's done." />
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={checkPaymentStatus}
+              fullWidth
+              size="large"
+              sx={{ height: 48 }}
+            >
+              <FormattedMessage defaultMessage="Check Payment Status" />
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogContent>
         <Box sx={{ py: 2 }}>
           <Typography
@@ -304,12 +280,12 @@ export const PaymentDialog = () => {
           <Button
             variant="contained"
             onClick={handlePayment}
-            disabled={loading || !paddleLoaded}
+            disabled={dialogState === "creating"}
             fullWidth
             size="large"
             sx={{ height: 48 }}
           >
-            {loading ? (
+            {dialogState === "creating" ? (
               <CircularProgress size={24} />
             ) : (
               <FormattedMessage defaultMessage="Subscribe" />
