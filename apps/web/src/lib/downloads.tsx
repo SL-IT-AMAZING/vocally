@@ -43,8 +43,8 @@ const RELEASES_API_URL =
   "https://api.github.com/repos/SL-IT-AMAZING/vocally/releases";
 
 const RELEASE_TAG_PATTERNS = {
-  cpu: /^desktop-v\d/,
-  gpu: /^desktop-gpu-v\d/,
+  cpu: /^desktop-(?:dev-)?v\d/,
+  gpu: /^desktop-gpu-(?:dev-)?v\d/,
 };
 
 export function getPlatformConfig(
@@ -418,7 +418,7 @@ function normalizeVersion(tag?: string) {
   }
 
   if (/^desktop[-v]/i.test(trimmed)) {
-    return trimmed.replace(/^desktop[-v]*/i, "");
+    return trimmed.replace(/^desktop-(?:gpu-)?(?:dev-)?v?/i, "");
   }
 
   if (/^v\d/i.test(trimmed)) {

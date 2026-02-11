@@ -19,7 +19,11 @@ on:
           - prod
           - dev
       version:
-        description: "Semver version to promote (prod only, defaults to latest dev tag)"
+        description: "Dev tag version to promote (prod only, defaults to latest dev tag)"
+        required: false
+        type: string
+      prod_version:
+        description: "Override the prod release version (e.g. '1.0.0'). Uses the dev tag's commit but names the release with this version."
         required: false
         type: string
       release_context:
@@ -60,6 +64,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment || '' }}
           INPUT_VERSION: ${{ github.event.inputs.version || '' }}
+          INPUT_PROD_VERSION: ${{ github.event.inputs.prod_version || '' }}
         run: |
           set -euo pipefail
           git fetch --tags --force
@@ -133,7 +138,18 @@ jobs:
               fi
             fi
 
-            VERSION="${TARGET_VERSION}"
+            # Allow prod_version to override the release version while keeping
+            # the dev tag's commit SHA.  This lets you promote e.g. dev v0.0.387
+            # as prod v1.0.0.
+            if [[ -n "${INPUT_PROD_VERSION}" ]]; then
+              if [[ ! "${INPUT_PROD_VERSION}" =~ ${SEMVER_REGEX} ]]; then
+                echo "Provided prod_version '${INPUT_PROD_VERSION}' is not in x.y.z format." >&2
+                exit 1
+              fi
+              VERSION="${INPUT_PROD_VERSION}"
+            else
+              VERSION="${TARGET_VERSION}"
+            fi
             TAG_NAME="desktop-v${VERSION}"
             COMMIT_SHA="$(git rev-parse "${TARGET_DEV_TAG}^{commit}")"
             DEV_TAG_NAME="${TARGET_DEV_TAG}"
