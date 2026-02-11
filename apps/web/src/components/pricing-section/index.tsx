@@ -152,7 +152,7 @@ function ProSubscribeButton({
 
       const { data, error } = await supabase.functions.invoke(
         "polar-checkout",
-        { body: { productId } },
+        { body: { productId, locale: intl.locale } },
       );
 
       if (error || !data?.checkoutUrl) {

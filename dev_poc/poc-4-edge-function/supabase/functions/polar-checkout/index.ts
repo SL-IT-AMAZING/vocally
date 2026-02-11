@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
   const accessToken = Deno.env.get("POLAR_ACCESS_TOKEN");
   if (!accessToken) return errorResponse("Polar not configured", 500);
 
-  let body: { productId?: string };
+  let body: { productId?: string; locale?: string };
   try {
     body = await req.json();
   } catch {
@@ -29,6 +29,8 @@ Deno.serve(async (req) => {
   const { productId } = body;
   if (!productId) return errorResponse("productId is required", 400);
 
+  const locale = body.locale || "en";
+
   const checkoutBody = {
     product_id: productId,
     payment_processor: "stripe",
@@ -36,6 +38,7 @@ Deno.serve(async (req) => {
     metadata: { supabase_user_id: user.id },
     success_url: "https://vocally-web.vercel.app/checkout/success",
     allow_discount_codes: true,
+    locale,
   };
 
   const polarRes = await fetch(`${POLAR_API_BASE}/v1/checkouts/custom/`, {
