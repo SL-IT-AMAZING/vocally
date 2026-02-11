@@ -2,22 +2,24 @@ use sqlx::{Row, SqlitePool};
 
 use crate::domain::Tone;
 
-pub async fn insert_tone(pool: SqlitePool, tone: &Tone) -> Result<Tone, sqlx::Error> {
+pub async fn insert_tone(pool: SqlitePool, tone: &Tone, user_id: &str) -> Result<Tone, sqlx::Error> {
     sqlx::query(
         "INSERT INTO tones (
              id,
              name,
              prompt_template,
              created_at,
-             sort_order
+             sort_order,
+             user_id
          )
-         VALUES (?1, ?2, ?3, ?4, ?5)",
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
     )
     .bind(&tone.id)
     .bind(&tone.name)
     .bind(&tone.prompt_template)
     .bind(tone.created_at)
     .bind(tone.sort_order)
+    .bind(user_id)
     .execute(&pool)
     .await?;
 
@@ -70,12 +72,14 @@ pub async fn fetch_tone_by_id(pool: SqlitePool, id: &str) -> Result<Option<Tone>
     Ok(tone)
 }
 
-pub async fn fetch_all_tones(pool: SqlitePool) -> Result<Vec<Tone>, sqlx::Error> {
+pub async fn fetch_all_tones(pool: SqlitePool, user_id: &str) -> Result<Vec<Tone>, sqlx::Error> {
     let rows = sqlx::query(
         "SELECT id, name, prompt_template, created_at, sort_order
          FROM tones
+         WHERE user_id = ?1
          ORDER BY sort_order ASC, created_at ASC",
     )
+    .bind(user_id)
     .fetch_all(&pool)
     .await?;
 
@@ -93,16 +97,20 @@ pub async fn fetch_all_tones(pool: SqlitePool) -> Result<Vec<Tone>, sqlx::Error>
     Ok(tones)
 }
 
-pub async fn count_tones(pool: SqlitePool) -> Result<i64, sqlx::Error> {
-    let row = sqlx::query("SELECT COUNT(*) as count FROM tones")
+pub async fn count_tones(pool: SqlitePool, user_id: &str) -> Result<i64, sqlx::Error> {
+    let row = sqlx::query("SELECT COUNT(*) as count FROM tones WHERE user_id = ?1")
+        .bind(user_id)
         .fetch_one(&pool)
         .await?;
 
     Ok(row.get::<i64, _>("count"))
 }
 
-pub async fn delete_all_tones(pool: SqlitePool) -> Result<(), sqlx::Error> {
-    sqlx::query("DELETE FROM tones").execute(&pool).await?;
+pub async fn delete_all_tones(pool: SqlitePool, user_id: &str) -> Result<(), sqlx::Error> {
+    sqlx::query("DELETE FROM tones WHERE user_id = ?1")
+        .bind(user_id)
+        .execute(&pool)
+        .await?;
 
     Ok(())
 }

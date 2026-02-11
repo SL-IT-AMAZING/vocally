@@ -1,5 +1,7 @@
 import { Tone } from "@repo/types";
 import { invoke } from "@tauri-apps/api/core";
+import { getAppState } from "../store";
+import { getMyEffectiveUserId } from "../utils/user.utils";
 import { BaseRepo } from "./base.repo";
 import { getDefaultSystemTones } from "../utils/tone.utils";
 
@@ -46,7 +48,8 @@ export abstract class BaseToneRepo extends BaseRepo {
 
 export class LocalToneRepo extends BaseToneRepo {
   async listTones(): Promise<Tone[]> {
-    const tones = await invoke<LocalTone[]>("tone_list");
+    const userId = getMyEffectiveUserId(getAppState());
+    const tones = await invoke<LocalTone[]>("tone_list", { userId });
     const userTones = tones.map(fromLocalTone);
     return mergeSystemTones(userTones);
   }
@@ -66,8 +69,10 @@ export class LocalToneRepo extends BaseToneRepo {
       throw new Error("System tones cannot be modified.");
     }
 
+    const userId = getMyEffectiveUserId(getAppState());
     const upserted = await invoke<LocalTone>("tone_upsert", {
       tone: toLocalTone(tone),
+      userId,
     });
     return fromLocalTone(upserted);
   }

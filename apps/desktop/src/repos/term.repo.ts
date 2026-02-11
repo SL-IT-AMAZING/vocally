@@ -1,6 +1,8 @@
 import { Term } from "@repo/types";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
+import { getAppState } from "../store";
+import { getMyEffectiveUserId } from "../utils/user.utils";
 import { BaseRepo } from "./base.repo";
 
 type LocalTerm = {
@@ -16,7 +18,7 @@ type LocalTerm = {
 const toLocalTerm = (term: Term): LocalTerm => ({
   id: term.id,
   createdAt: dayjs(term.createdAt).valueOf(),
-  createdByUserId: "",
+  createdByUserId: getMyEffectiveUserId(getAppState()),
   sourceValue: term.sourceValue,
   destinationValue: term.destinationValue,
   isReplacement: term.isReplacement,
@@ -40,7 +42,8 @@ export abstract class BaseTermRepo extends BaseRepo {
 
 export class LocalTermRepo extends BaseTermRepo {
   async listTerms(): Promise<Term[]> {
-    const terms = await invoke<LocalTerm[]>("term_list");
+    const userId = getMyEffectiveUserId(getAppState());
+    const terms = await invoke<LocalTerm[]>("term_list", { userId });
     return terms.map(fromLocalTerm);
   }
 

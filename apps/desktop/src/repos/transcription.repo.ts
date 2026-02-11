@@ -120,8 +120,10 @@ export class LocalTranscriptionRepo extends BaseTranscriptionRepo {
   async createTranscription(
     transcription: Transcription,
   ): Promise<Transcription> {
+    const userId = getMyEffectiveUserId(getAppState());
     const stored = await invoke<LocalTranscription>("transcription_create", {
       transcription: toLocalTranscription(transcription),
+      userId,
     });
 
     return fromLocalTranscription(stored);
@@ -133,9 +135,10 @@ export class LocalTranscriptionRepo extends BaseTranscriptionRepo {
     const limit = Math.max(0, Math.trunc(params.limit ?? 20));
     const offset = Math.max(0, Math.trunc(params.offset ?? 0));
 
+    const userId = getMyEffectiveUserId(getAppState());
     const transcriptions = await invoke<LocalTranscription[]>(
       "transcription_list",
-      { limit, offset },
+      { limit, offset, userId },
     );
 
     return transcriptions.map(fromLocalTranscription);

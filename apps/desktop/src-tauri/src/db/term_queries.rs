@@ -20,13 +20,14 @@ pub async fn insert_term(pool: SqlitePool, term: &Term) -> Result<Term, sqlx::Er
     Ok(term.clone())
 }
 
-pub async fn fetch_terms(pool: SqlitePool) -> Result<Vec<Term>, sqlx::Error> {
+pub async fn fetch_terms(pool: SqlitePool, user_id: &str) -> Result<Vec<Term>, sqlx::Error> {
     let rows = sqlx::query(
         "SELECT id, created_at, created_by_user_id, source_value, destination_value, is_replacement, is_deleted
          FROM terms
-         WHERE is_deleted = 0
+         WHERE is_deleted = 0 AND created_by_user_id = ?1
          ORDER BY created_at DESC",
     )
+    .bind(user_id)
     .fetch_all(&pool)
     .await?;
 

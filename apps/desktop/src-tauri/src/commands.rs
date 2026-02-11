@@ -307,9 +307,10 @@ pub async fn app_target_list(
 #[tauri::command]
 pub async fn transcription_create(
     transcription: crate::domain::Transcription,
+    user_id: String,
     database: State<'_, crate::state::OptionKeyDatabase>,
 ) -> Result<crate::domain::Transcription, String> {
-    crate::db::transcription_queries::insert_transcription(database.pool(), &transcription)
+    crate::db::transcription_queries::insert_transcription(database.pool(), &transcription, &user_id)
         .await
         .map_err(|err| err.to_string())
 }
@@ -318,12 +319,13 @@ pub async fn transcription_create(
 pub async fn transcription_list(
     limit: Option<u32>,
     offset: Option<u32>,
+    user_id: String,
     database: State<'_, crate::state::OptionKeyDatabase>,
 ) -> Result<Vec<crate::domain::Transcription>, String> {
     let limit = limit.unwrap_or(20);
     let offset = offset.unwrap_or(0);
 
-    crate::db::transcription_queries::fetch_transcriptions(database.pool(), limit, offset)
+    crate::db::transcription_queries::fetch_transcriptions(database.pool(), limit, offset, &user_id)
         .await
         .map_err(|err| err.to_string())
 }
@@ -428,9 +430,10 @@ pub async fn term_update(
 
 #[tauri::command]
 pub async fn term_list(
+    user_id: String,
     database: State<'_, crate::state::OptionKeyDatabase>,
 ) -> Result<Vec<crate::domain::Term>, String> {
-    crate::db::term_queries::fetch_terms(database.pool())
+    crate::db::term_queries::fetch_terms(database.pool(), &user_id)
         .await
         .map_err(|err| err.to_string())
 }
@@ -570,6 +573,7 @@ pub async fn api_key_update(
 #[tauri::command]
 pub async fn tone_upsert(
     tone: crate::domain::Tone,
+    user_id: String,
     database: State<'_, crate::state::OptionKeyDatabase>,
 ) -> Result<crate::domain::Tone, String> {
     let pool = database.pool();
@@ -598,16 +602,17 @@ pub async fn tone_upsert(
 
     let new_tone = crate::domain::Tone { created_at, ..tone };
 
-    crate::db::tone_queries::insert_tone(pool, &new_tone)
+    crate::db::tone_queries::insert_tone(pool, &new_tone, &user_id)
         .await
         .map_err(|err| err.to_string())
 }
 
 #[tauri::command]
 pub async fn tone_list(
+    user_id: String,
     database: State<'_, crate::state::OptionKeyDatabase>,
 ) -> Result<Vec<crate::domain::Tone>, String> {
-    crate::db::tone_queries::fetch_all_tones(database.pool())
+    crate::db::tone_queries::fetch_all_tones(database.pool(), &user_id)
         .await
         .map_err(|err| err.to_string())
 }

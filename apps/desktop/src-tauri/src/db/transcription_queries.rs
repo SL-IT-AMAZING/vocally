@@ -50,6 +50,7 @@ fn row_to_transcription(row: SqliteRow) -> Result<Transcription, sqlx::Error> {
 pub async fn insert_transcription(
     pool: SqlitePool,
     transcription: &Transcription,
+    user_id: &str,
 ) -> Result<Transcription, sqlx::Error> {
     sqlx::query(
         "INSERT INTO transcriptions (
@@ -71,9 +72,10 @@ pub async fn insert_transcription(
              post_process_device,
              transcription_duration_ms,
              postprocess_duration_ms,
-             warnings_json
+             warnings_json,
+             user_id
          )
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)",
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20)",
     )
     .bind(&transcription.id)
     .bind(&transcription.transcript)
@@ -99,6 +101,7 @@ pub async fn insert_transcription(
     .bind(transcription.transcription_duration_ms)
     .bind(transcription.postprocess_duration_ms)
     .bind(serialize_warnings(&transcription.warnings))
+    .bind(user_id)
     .execute(&pool)
     .await?;
 
@@ -109,6 +112,7 @@ pub async fn fetch_transcriptions(
     pool: SqlitePool,
     limit: u32,
     offset: u32,
+    user_id: &str,
 ) -> Result<Vec<Transcription>, sqlx::Error> {
     let rows = sqlx::query(
         "SELECT id,
@@ -131,11 +135,13 @@ pub async fn fetch_transcriptions(
                 postprocess_duration_ms,
                 warnings_json
          FROM transcriptions
+         WHERE user_id = ?3
          ORDER BY timestamp DESC
          LIMIT ?1 OFFSET ?2",
     )
     .bind(limit as i64)
     .bind(offset as i64)
+    .bind(user_id)
     .fetch_all(&pool)
     .await?;
 
