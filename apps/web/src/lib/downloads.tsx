@@ -42,6 +42,11 @@ export const DEFAULT_PLATFORM: Platform = "mac";
 const RELEASES_API_URL =
   "https://api.github.com/repos/SL-IT-AMAZING/vocally/releases";
 
+const CPU_LATEST_MANIFEST_URL =
+  "https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-prod/latest.json";
+const GPU_LATEST_MANIFEST_URL =
+  "https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-gpu-prod/latest.json";
+
 const RELEASE_TAG_PATTERNS = {
   cpu: /^desktop-(?:dev-)?v\d/,
   gpu: /^desktop-gpu-(?:dev-)?v\d/,
@@ -246,11 +251,36 @@ const ASSET_KEY_MAPPINGS: Array<{
 
 export async function fetchReleaseManifest(signal?: AbortSignal) {
   try {
+    const [cpuManifest, gpuManifest] = await Promise.all([
+      fetchChannelManifest(CPU_LATEST_MANIFEST_URL, signal),
+      fetchChannelManifest(GPU_LATEST_MANIFEST_URL, signal),
+    ]);
+
+    if (cpuManifest || gpuManifest) {
+      const merged: ReleaseManifest = {
+        version: cpuManifest?.version ?? gpuManifest?.version ?? "latest",
+        notes: cpuManifest?.notes ?? gpuManifest?.notes ?? "",
+        pub_date:
+          cpuManifest?.pub_date ??
+          gpuManifest?.pub_date ??
+          new Date().toISOString(),
+        platforms: {
+          ...(cpuManifest?.platforms ?? {}),
+          ...(gpuManifest?.platforms ?? {}),
+        },
+      };
+
+      if (Object.keys(merged.platforms).length > 0) {
+        return merged;
+      }
+    }
+
     const response = await fetch(RELEASES_API_URL, {
       signal,
       headers: {
         Accept: "application/vnd.github+json",
       },
+      cache: "no-store",
     });
     if (!response.ok) return undefined;
 
@@ -280,6 +310,28 @@ export async function fetchReleaseManifest(signal?: AbortSignal) {
   } catch {
     return undefined;
   }
+}
+
+async function fetchChannelManifest(url: string, signal?: AbortSignal) {
+  const response = await fetch(url, {
+    signal,
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return undefined;
+  }
+
+  const manifest = (await response.json()) as ReleaseManifest;
+  if (!manifest || typeof manifest !== "object") {
+    return undefined;
+  }
+
+  if (!manifest.platforms || Object.keys(manifest.platforms).length === 0) {
+    return undefined;
+  }
+
+  return manifest;
 }
 
 export async function selectPlatformUrl(

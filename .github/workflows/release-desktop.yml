@@ -330,7 +330,7 @@ jobs:
         include:
           - label: macOS (universal)
             os: macos-14
-            args: "--target universal-apple-darwin"
+            args: "--target universal-apple-darwin --bundles app"
             rust_targets: "aarch64-apple-darwin,x86_64-apple-darwin"
             tauri_platform: macos
             node_platform: darwin
