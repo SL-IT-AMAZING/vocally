@@ -1,13 +1,38 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createHmac, timingSafeEqual } from "node:crypto";
 import { createServiceClient } from "../_shared/supabase.ts";
 import { jsonResponse, errorResponse } from "../_shared/response.ts";
 
-function verifyWebhookSignature(
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+function uint8ArrayToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary);
+}
+
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
+async function verifyWebhookSignature(
   body: string,
   headers: Headers,
   secret: string,
-): boolean {
+): Promise<boolean> {
   const webhookId = headers.get("webhook-id");
   const webhookTimestamp = headers.get("webhook-timestamp");
   const webhookSignature = headers.get("webhook-signature");
@@ -15,25 +40,33 @@ function verifyWebhookSignature(
   if (!webhookId || !webhookTimestamp || !webhookSignature) return false;
 
   const rawSecret = secret.replace(/^(whsec_|polar_whs_)/, "");
-  const secretBytes = Buffer.from(rawSecret, "base64");
+  const secretBytes = base64ToUint8Array(rawSecret);
 
   const signedContent = `${webhookId}.${webhookTimestamp}.${body}`;
-  const computed = createHmac("sha256", secretBytes)
-    .update(signedContent)
-    .digest("base64");
+  const encoder = new TextEncoder();
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    secretBytes,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+
+  const signatureBytes = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    encoder.encode(signedContent),
+  );
+
+  const computed = uint8ArrayToBase64(new Uint8Array(signatureBytes));
 
   const signatures = webhookSignature.split(" ");
   for (const sig of signatures) {
     const [version, hash] = sig.split(",");
     if (version !== "v1") continue;
 
-    const computedBuf = Buffer.from(computed, "utf8");
-    const expectedBuf = Buffer.from(hash, "utf8");
-
-    if (
-      computedBuf.length === expectedBuf.length &&
-      timingSafeEqual(computedBuf, expectedBuf)
-    ) {
+    if (constantTimeEqual(computed, hash)) {
       return true;
     }
   }
@@ -45,7 +78,7 @@ async function ensureMemberExists(
   supabase: ReturnType<typeof createServiceClient>,
   userId: string,
 ) {
-  await supabase.from("members").upsert(
+  const { error } = await supabase.from("members").upsert(
     {
       id: userId,
       type: "user",
@@ -60,6 +93,9 @@ async function ensureMemberExists(
     },
     { onConflict: "id", ignoreDuplicates: true },
   );
+  if (error) {
+    console.error("ensureMemberExists failed:", error);
+  }
 }
 
 function extractUserId(event: Record<string, unknown>): string | null {
@@ -89,7 +125,8 @@ Deno.serve(async (req) => {
 
   const rawBody = await req.text();
 
-  if (!verifyWebhookSignature(rawBody, req.headers, secret)) {
+  if (!(await verifyWebhookSignature(rawBody, req.headers, secret))) {
+    console.error("Polar webhook: invalid signature");
     return errorResponse("Invalid signature", 401);
   }
 
@@ -101,12 +138,19 @@ Deno.serve(async (req) => {
 
   if (eventType === "checkout.updated" || eventType === "order.created") {
     const userId = extractUserId(event);
-    if (!userId) return jsonResponse({ received: true });
+    console.log(`[${eventType}] userId:`, userId);
+    if (!userId) {
+      console.warn(
+        `[${eventType}] No supabase_user_id found in event metadata`,
+      );
+      return jsonResponse({ received: true });
+    }
 
     const data = event.data as Record<string, unknown>;
     const status = data.status as string;
 
     if (eventType === "checkout.updated" && status !== "succeeded") {
+      console.log(`[checkout.updated] status=${status}, skipping`);
       return jsonResponse({ received: true });
     }
 
@@ -123,12 +167,27 @@ Deno.serve(async (req) => {
       updateData.polar_subscription_id = subscriptionId;
     }
 
-    await supabase.from("members").update(updateData).eq("id", userId);
+    const { error } = await supabase
+      .from("members")
+      .update(updateData)
+      .eq("id", userId);
+
+    if (error) {
+      console.error(`[${eventType}] Failed to update member:`, error);
+    } else {
+      console.log(`[${eventType}] Updated member ${userId} to pro`);
+    }
   }
 
   if (eventType === "subscription.active") {
     const userId = extractUserId(event);
-    if (!userId) return jsonResponse({ received: true });
+    console.log("[subscription.active] userId:", userId);
+    if (!userId) {
+      console.warn(
+        "[subscription.active] No supabase_user_id found in event metadata",
+      );
+      return jsonResponse({ received: true });
+    }
 
     const data = event.data as Record<string, unknown>;
     const subscriptionId = data.id as string;
@@ -144,7 +203,16 @@ Deno.serve(async (req) => {
       updateData.polar_subscription_id = subscriptionId;
     }
 
-    await supabase.from("members").update(updateData).eq("id", userId);
+    const { error } = await supabase
+      .from("members")
+      .update(updateData)
+      .eq("id", userId);
+
+    if (error) {
+      console.error("[subscription.active] Failed to update member:", error);
+    } else {
+      console.log(`[subscription.active] Updated member ${userId} to pro`);
+    }
   }
 
   if (
@@ -155,17 +223,32 @@ Deno.serve(async (req) => {
     const subscriptionId = data.id as string;
 
     if (subscriptionId) {
-      await supabase
+      const { error } = await supabase
         .from("members")
         .update({ plan: "free", polar_subscription_id: null })
         .eq("polar_subscription_id", subscriptionId);
+
+      if (error) {
+        console.error(`[${eventType}] Failed to downgrade member:`, error);
+      } else {
+        console.log(`[${eventType}] Downgraded subscription ${subscriptionId}`);
+      }
     }
   }
 
   if (eventType === "order.refunded") {
     const userId = extractUserId(event);
     if (userId) {
-      await supabase.from("members").update({ plan: "free" }).eq("id", userId);
+      const { error } = await supabase
+        .from("members")
+        .update({ plan: "free" })
+        .eq("id", userId);
+
+      if (error) {
+        console.error("[order.refunded] Failed to downgrade member:", error);
+      } else {
+        console.log(`[order.refunded] Downgraded member ${userId}`);
+      }
     }
   }
 
