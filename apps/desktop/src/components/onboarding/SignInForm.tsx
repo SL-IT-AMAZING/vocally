@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { signOut, submitSignInWithGoogle } from "../../actions/login.actions";
-import { supabase } from "../../supabase";
+import { submitSignInWithKakao } from "../../actions/kakao-login.actions";
 import {
   goToOnboardingPage,
   setAwaitingSignInNavigation,
@@ -176,12 +176,10 @@ export const SignInForm = () => {
             "&:hover": { bgcolor: "#FDD835" },
             fontWeight: 600,
           }}
-          onClick={() =>
-            supabase.auth.signInWithOAuth({
-              provider: "kakao",
-              options: { queryParams: { prompt: "login" } },
-            })
-          }
+          onClick={() => {
+            setAwaitingSignInNavigation(true);
+            void submitSignInWithKakao();
+          }}
           disabled={loginStatus === "loading"}
         >
           카카오로 계속하기

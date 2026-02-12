@@ -229,6 +229,11 @@ pub async fn start_google_sign_in(
 }
 
 #[tauri::command]
+pub async fn start_kakao_sign_in(app_handle: AppHandle) -> Result<u16, String> {
+    crate::system::kakao_oauth::start_kakao_oauth_listener(&app_handle)
+}
+
+#[tauri::command]
 pub fn list_microphones() -> Vec<crate::platform::audio::InputDeviceDescriptor> {
     crate::platform::audio::list_input_devices()
 }
