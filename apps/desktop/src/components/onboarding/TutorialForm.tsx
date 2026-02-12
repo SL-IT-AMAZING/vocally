@@ -158,12 +158,17 @@ export const TutorialForm = () => {
     defaultMessage: "Bagels are the breakfast of champions.",
   });
 
-  const step2Placeholder = `Hey Bob,
+  const step2Placeholder = intl.formatMessage(
+    {
+      defaultMessage: `Hey Bob,
 
 Great meeting you yesterday! Looking forward to next steps.
 
 Best,
-${userName}`;
+{userName}`,
+    },
+    { userName },
+  );
 
   const form = (
     <OnboardingFormLayout
@@ -278,7 +283,7 @@ ${userName}`;
             fontWeight={600}
             sx={{ color: "#f1f5f9" }}
           >
-            Chat
+            {intl.formatMessage({ defaultMessage: "Chat" })}
           </Typography>
         </Box>
         <Box sx={{ p: 2 }}>
@@ -295,7 +300,9 @@ ${userName}`;
                 flexShrink: 0,
               }}
             >
-              <Typography sx={{ color: "#fff", fontWeight: 600 }}>J</Typography>
+              <Typography sx={{ color: "#fff", fontWeight: 600 }}>
+                {intl.formatMessage({ defaultMessage: "J" })}
+              </Typography>
             </Box>
             <Box>
               <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
@@ -304,14 +311,16 @@ ${userName}`;
                   fontWeight={600}
                   sx={{ color: "#f1f5f9" }}
                 >
-                  Jordan
+                  {intl.formatMessage({ defaultMessage: "Jordan" })}
                 </Typography>
                 <Typography variant="caption" sx={{ color: "#94a3b8" }}>
-                  Today at 10:32 AM
+                  {intl.formatMessage({ defaultMessage: "Today at 10:32 AM" })}
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ color: "#cbd5e1", mt: 0.5 }}>
-                What&apos;s your favorite breakfast?
+                {intl.formatMessage({
+                  defaultMessage: "What's your favorite breakfast?",
+                })}
               </Typography>
             </Box>
           </Box>
@@ -386,7 +395,7 @@ ${userName}`;
             fontWeight={600}
             sx={{ color: "#202124" }}
           >
-            Email
+            {intl.formatMessage({ defaultMessage: "Email" })}
           </Typography>
         </Box>
         <Box sx={{ p: 2 }}>
@@ -402,10 +411,10 @@ ${userName}`;
               }}
             >
               <Typography variant="caption" sx={{ color: "#5f6368" }}>
-                To:
+                {intl.formatMessage({ defaultMessage: "To:" })}
               </Typography>
               <Typography variant="body2" sx={{ color: "#202124" }}>
-                sarah@company.com
+                {intl.formatMessage({ defaultMessage: "sarah@company.com" })}
               </Typography>
             </Box>
             <Box
@@ -418,10 +427,12 @@ ${userName}`;
               }}
             >
               <Typography variant="caption" sx={{ color: "#5f6368" }}>
-                Subject:
+                {intl.formatMessage({ defaultMessage: "Subject:" })}
               </Typography>
               <Typography variant="body2" sx={{ color: "#202124" }}>
-                Great chatting yesterday! 🎉
+                {intl.formatMessage({
+                  defaultMessage: "Great chatting yesterday! 🎉",
+                })}
               </Typography>
             </Box>
           </Box>
