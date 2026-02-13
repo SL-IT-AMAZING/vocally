@@ -30,38 +30,29 @@ async function resolveCustomerId(
   email: string,
   accessToken: string,
 ): Promise<string | null> {
-  // 1) Try by external ID
-  const byExternal = await polarFetch(
-    `/v1/customers/?external_id=${encodeURIComponent(userId)}&limit=1`,
+  const queryRes = await polarFetch(
+    `/v1/customers/?query=${encodeURIComponent(userId)}&limit=1`,
     accessToken,
   );
-  if (byExternal.ok) {
-    const data = await byExternal.json();
+  if (queryRes.ok) {
+    const data = await queryRes.json();
     const items = (data as { items?: { id: string }[] }).items;
     if (items && items.length > 0) {
       return items[0].id;
     }
   }
 
-  // 2) Fall back to email
-  const byEmail = await polarFetch(
-    `/v1/customers/?email=${encodeURIComponent(email)}&limit=1`,
-    accessToken,
-  );
-  if (byEmail.ok) {
-    const data = await byEmail.json();
-    const items = (data as { items?: { id: string }[] }).items;
-    if (items && items.length > 0) {
-      const customerId = items[0].id;
-      // Backfill external_id so future lookups are fast
-      await polarFetch(`/v1/customers/${customerId}`, accessToken, {
-        method: "PATCH",
-        body: JSON.stringify({ external_id: userId }),
-      });
-      console.log(
-        `Backfilled external_id for customer ${customerId} (user ${userId})`,
-      );
-      return customerId;
+  if (email) {
+    const emailRes = await polarFetch(
+      `/v1/customers/?email=${encodeURIComponent(email)}&limit=1`,
+      accessToken,
+    );
+    if (emailRes.ok) {
+      const data = await emailRes.json();
+      const items = (data as { items?: { id: string }[] }).items;
+      if (items && items.length > 0) {
+        return items[0].id;
+      }
     }
   }
 
