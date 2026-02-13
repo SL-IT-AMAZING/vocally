@@ -8,7 +8,6 @@ import {
   groqTranscribeAudio,
   openaiTranscribeAudio,
   OpenAITranscriptionModel,
-  TranscriptionModel,
 } from "@repo/voice-ai";
 import { invoke } from "@tauri-apps/api/core";
 import { supabase } from "../supabase";
@@ -302,7 +301,8 @@ export class CloudTranscribeAudioRepo extends BaseTranscribeAudioRepo {
     }
     if (
       data?.error &&
-      (String(data.error).includes("limit reached") || String(data.status) === "429")
+      (String(data.error).includes("limit reached") ||
+        String(data.status) === "429")
     ) {
       const limitError = new Error(String(data.error));
       limitError.name = "WordLimitExceeded";
@@ -321,12 +321,12 @@ export class CloudTranscribeAudioRepo extends BaseTranscribeAudioRepo {
 
 export class GroqTranscribeAudioRepo extends BaseTranscribeAudioRepo {
   private groqApiKey: string;
-  private model: TranscriptionModel;
+  private model: string | null;
 
   constructor(apiKey: string, model: string | null) {
     super();
     this.groqApiKey = apiKey;
-    this.model = (model as TranscriptionModel) ?? "whisper-large-v3-turbo";
+    this.model = model;
   }
 
   // Groq has 25MB limit, 60s segments are well within that
@@ -348,9 +348,21 @@ export class GroqTranscribeAudioRepo extends BaseTranscribeAudioRepo {
   ): Promise<TranscribeAudioOutput> {
     const wavBuffer = buildWaveFile(input.samples, input.sampleRate);
 
+    const normalizedLanguage = (input.language ?? "").trim().toLowerCase();
+    const selectedModel =
+      this.model === "whisper-large-v3" ||
+      this.model === "whisper-large-v3-turbo"
+        ? this.model
+        : undefined;
+    const effectiveModel =
+      selectedModel ??
+      (normalizedLanguage === "ko" || normalizedLanguage.startsWith("ko-")
+        ? "whisper-large-v3"
+        : "whisper-large-v3-turbo");
+
     const { text: transcript } = await groqTranscribeAudio({
       apiKey: this.groqApiKey,
-      model: this.model,
+      model: effectiveModel,
       blob: wavBuffer,
       ext: "wav",
       prompt: input.prompt ?? undefined,
@@ -361,7 +373,7 @@ export class GroqTranscribeAudioRepo extends BaseTranscribeAudioRepo {
       text: transcript,
       metadata: {
         inferenceDevice: "API • Groq",
-        modelSize: this.model,
+        modelSize: effectiveModel,
         transcriptionMode: "api",
       },
     };

@@ -14,8 +14,40 @@ export const GENERATE_TEXT_MODELS = [
 ] as const;
 export type GenerateTextModel = (typeof GENERATE_TEXT_MODELS)[number];
 
-export const TRANSCRIPTION_MODELS = ["whisper-large-v3-turbo"] as const;
+export const TRANSCRIPTION_MODELS = [
+  "whisper-large-v3-turbo",
+  "whisper-large-v3",
+] as const;
 export type TranscriptionModel = (typeof TRANSCRIPTION_MODELS)[number];
+
+const DEFAULT_GROQ_TRANSCRIPTION_MODEL: TranscriptionModel =
+  "whisper-large-v3-turbo";
+const KOREAN_GROQ_TRANSCRIPTION_MODEL: TranscriptionModel = "whisper-large-v3";
+
+const isSupportedTranscriptionModel = (
+  model: string,
+): model is TranscriptionModel =>
+  (TRANSCRIPTION_MODELS as readonly string[]).includes(model);
+
+export const resolveGroqTranscriptionModel = ({
+  language,
+  userSelectedModel,
+}: {
+  language?: string;
+  userSelectedModel?: string | null;
+}): TranscriptionModel => {
+  const normalizedSelectedModel = (userSelectedModel ?? "").trim();
+  if (isSupportedTranscriptionModel(normalizedSelectedModel)) {
+    return normalizedSelectedModel;
+  }
+
+  const normalizedLanguage = (language ?? "").trim().toLowerCase();
+  if (normalizedLanguage === "ko" || normalizedLanguage.startsWith("ko-")) {
+    return KOREAN_GROQ_TRANSCRIPTION_MODEL;
+  }
+
+  return DEFAULT_GROQ_TRANSCRIPTION_MODEL;
+};
 
 const contentToString = (
   content: string | ChatCompletionContentPart[] | null | undefined,
@@ -48,7 +80,7 @@ const createClient = (apiKey: string) => {
 
 export type GroqTranscriptionArgs = {
   apiKey: string;
-  model?: TranscriptionModel;
+  model?: string | null;
   blob: ArrayBuffer | Buffer;
   ext: string;
   prompt?: string;
@@ -58,16 +90,22 @@ export type GroqTranscriptionArgs = {
 export type GroqTranscribeAudioOutput = {
   text: string;
   wordsUsed: number;
+  model: TranscriptionModel;
 };
 
 export const groqTranscribeAudio = async ({
   apiKey,
-  model = "whisper-large-v3-turbo",
+  model,
   blob,
   ext,
   prompt,
   language,
 }: GroqTranscriptionArgs): Promise<GroqTranscribeAudioOutput> => {
+  const resolvedModel = resolveGroqTranscriptionModel({
+    language,
+    userSelectedModel: model,
+  });
+
   return retry({
     retries: 3,
     fn: async () => {
@@ -76,7 +114,7 @@ export const groqTranscribeAudio = async ({
       const file = await toFile(blob, `audio.${ext}`);
       const response = await client.audio.transcriptions.create({
         file,
-        model,
+        model: resolvedModel,
         prompt,
         language: language ?? "en",
       });
@@ -85,7 +123,11 @@ export const groqTranscribeAudio = async ({
         throw new Error("Transcription failed");
       }
 
-      return { text: response.text, wordsUsed: countWords(response.text) };
+      return {
+        text: response.text,
+        wordsUsed: countWords(response.text),
+        model: resolvedModel,
+      };
     },
   });
 };
