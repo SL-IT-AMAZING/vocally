@@ -98,20 +98,39 @@ async function ensureMemberExists(
   }
 }
 
-function extractUserId(event: Record<string, unknown>): string | null {
+function extractUserId(
+  event: Record<string, unknown>,
+  eventType?: string,
+): string | null {
   const data = event.data as Record<string, unknown> | undefined;
   if (!data) return null;
 
   const metadata = data.metadata as Record<string, string> | undefined;
   if (metadata?.supabase_user_id) return metadata.supabase_user_id;
 
-  const customer = data.customer as Record<string, unknown> | undefined;
-  const customerMetadata = customer?.metadata as
+  const customerMetadata = data.customerMetadata as
     | Record<string, string>
     | undefined;
   if (customerMetadata?.supabase_user_id)
     return customerMetadata.supabase_user_id;
 
+  const customer = data.customer as Record<string, unknown> | undefined;
+  const custMeta = customer?.metadata as Record<string, string> | undefined;
+  if (custMeta?.supabase_user_id) return custMeta.supabase_user_id;
+
+  if (typeof customer?.externalId === "string" && customer.externalId) {
+    return customer.externalId;
+  }
+  if (typeof customer?.external_id === "string" && customer.external_id) {
+    return customer.external_id;
+  }
+
+  console.warn(
+    `[${eventType}] extractUserId: no user ID found. data keys:`,
+    Object.keys(data),
+    "customer keys:",
+    customer ? Object.keys(customer) : "none",
+  );
   return null;
 }
 
@@ -209,7 +228,7 @@ Deno.serve(async (req) => {
   const supabase = createServiceClient();
 
   if (eventType === "checkout.updated" || eventType === "order.paid") {
-    const userId = extractUserId(event);
+    const userId = extractUserId(event, eventType);
     console.log(`[${eventType}] userId:`, userId);
     if (!userId) {
       console.warn(
@@ -231,7 +250,7 @@ Deno.serve(async (req) => {
   }
 
   if (eventType === "subscription.active") {
-    const userId = extractUserId(event);
+    const userId = extractUserId(event, eventType);
     console.log("[subscription.active] userId:", userId);
     if (!userId) {
       console.warn(
@@ -250,7 +269,7 @@ Deno.serve(async (req) => {
     eventType === "subscription.updated" ||
     eventType === "subscription.past_due"
   ) {
-    const userId = extractUserId(event);
+    const userId = extractUserId(event, eventType);
     const data = event.data as Record<string, unknown>;
     const subscriptionId = data.id as string | undefined;
     const status = data.status as string | undefined;
@@ -285,7 +304,7 @@ Deno.serve(async (req) => {
     eventType === "subscription.revoked"
   ) {
     const data = event.data as Record<string, unknown>;
-    const userId = extractUserId(event);
+    const userId = extractUserId(event, eventType);
     const subscriptionId = data.id as string | undefined;
     const status = data.status as string | undefined;
     const cancelAtPeriodEnd = Boolean(data.cancel_at_period_end);
@@ -305,7 +324,7 @@ Deno.serve(async (req) => {
   }
 
   if (eventType === "order.refunded") {
-    const userId = extractUserId(event);
+    const userId = extractUserId(event, eventType);
     if (userId) {
       await downgradeToFree(supabase, undefined, userId, eventType);
     }

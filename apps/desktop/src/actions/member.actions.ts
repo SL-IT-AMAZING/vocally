@@ -12,6 +12,10 @@ export async function refreshMember(): Promise<void> {
 
   try {
     const res = await supabase.functions.invoke("member-get", { body: {} });
+    if (res.error) {
+      console.error("member-get returned error:", res.error);
+      return;
+    }
     const member = res.data?.member;
     produceAppState((draft) => {
       registerMembers(draft, listify(member));

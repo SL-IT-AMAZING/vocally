@@ -11,7 +11,10 @@ interface PolarOrder {
   status: string;
   subscription_id?: string;
   metadata?: Record<string, string>;
+  external_customer_id?: string;
   customer?: {
+    external_id?: string;
+    externalId?: string;
     metadata?: Record<string, string>;
   };
 }
@@ -28,6 +31,9 @@ function extractUserId(order: PolarOrder): string | null {
   if (order.metadata?.supabase_user_id) return order.metadata.supabase_user_id;
   if (order.customer?.metadata?.supabase_user_id)
     return order.customer.metadata.supabase_user_id;
+  if (order.customer?.external_id) return order.customer.external_id;
+  if (order.customer?.externalId) return order.customer.externalId;
+  if (order.external_customer_id) return order.external_customer_id;
   return null;
 }
 
