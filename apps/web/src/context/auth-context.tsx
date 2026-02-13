@@ -38,7 +38,9 @@ const AuthContext = createContext<AuthContextValue>({
 
 function initMember() {
   if (!supabase) return;
-  supabase.functions.invoke("member-init", { body: {} }).catch(() => {});
+  supabase.functions.invoke("member-init", { body: {} }).catch((error) => {
+    console.error("Failed to initialize member", error);
+  });
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

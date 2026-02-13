@@ -73,7 +73,7 @@ export const DeleteAccountDialog = () => {
             <FormattedMessage defaultMessage="Permanently delete all your data" />
           </Typography>
           <Typography component="li" variant="body2">
-            <FormattedMessage defaultMessage="Cancel any active subscriptions" />
+            <FormattedMessage defaultMessage="Not automatically cancel active subscriptions (cancel in billing first)" />
           </Typography>
           <Typography component="li" variant="body2">
             <FormattedMessage defaultMessage="Remove access to all premium features" />

@@ -2,6 +2,7 @@ import {
   ArrowOutwardRounded,
   AutoAwesomeOutlined,
   AutoFixHighOutlined,
+  CreditCardOutlined,
   DeleteForeverOutlined,
   DescriptionOutlined,
   GraphicEqOutlined,
@@ -35,6 +36,7 @@ import {
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { ChangeEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { showErrorSnackbar } from "../../actions/app.actions";
 import { setAutoLaunchEnabled } from "../../actions/settings.actions";
 import { loadTones } from "../../actions/tone.actions";
 import {
@@ -45,6 +47,7 @@ import { detectLocale, setStoredLocale } from "../../i18n";
 import type { Locale } from "../../i18n";
 import { getAuthRepo } from "../../repos";
 import { produceAppState, useAppStore } from "../../store";
+import { supabase } from "../../supabase";
 import {
   DICTATION_LANGUAGE_OPTIONS,
   WHISPER_LANGUAGES,
@@ -62,6 +65,8 @@ import { DashboardEntryLayout } from "../dashboard/DashboardEntryLayout";
 export default function SettingsPage() {
   const hasEmailProvider = useAppStore(getHasEmailProvider);
   const isSignedIn = useAppStore(getIsSignedIn);
+  const [openingSubscriptionPortal, setOpeningSubscriptionPortal] =
+    useState(false);
   const [autoLaunchEnabled, autoLaunchStatus] = useAppStore((state) => [
     state.settings.autoLaunchEnabled,
     state.settings.autoLaunchStatus,
@@ -185,6 +190,36 @@ export default function SettingsPage() {
 
   const handleSignOut = async () => {
     await getAuthRepo().signOut();
+  };
+
+  const openSubscriptionPortal = async () => {
+    if (openingSubscriptionPortal) {
+      return;
+    }
+
+    setOpeningSubscriptionPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("polar-portal", {
+        body: {},
+      });
+
+      const portalUrl = (data as { portalUrl?: string } | null)?.portalUrl;
+      if (error || !portalUrl) {
+        throw error ?? new Error("Missing portal URL");
+      }
+
+      await openUrl(portalUrl);
+    } catch (error) {
+      console.error("Failed to open subscription portal", error);
+      showErrorSnackbar(
+        intl.formatMessage({
+          defaultMessage:
+            "Could not open subscription management. Please contact support@vocally.so.",
+        }),
+      );
+    } finally {
+      setOpeningSubscriptionPortal(false);
+    }
   };
 
   const general = (
@@ -427,15 +462,29 @@ export default function SettingsPage() {
           onClick={openChangePasswordDialog}
         />
       )}
+      {isSignedIn && (
+        <ListTile
+          title={<FormattedMessage defaultMessage="Billing & subscription" />}
+          subtitle={
+            <FormattedMessage defaultMessage="Cancel plan and view billing details" />
+          }
+          onClick={() => {
+            void openSubscriptionPortal();
+          }}
+          disabled={openingSubscriptionPortal}
+          trailing={<ArrowOutwardRounded />}
+          leading={<CreditCardOutlined />}
+        />
+      )}
       <ListTile
         title={<FormattedMessage defaultMessage="Terms & conditions" />}
-        onClick={() => openUrl("https://vocally.com/terms")}
+        onClick={() => openUrl("https://vocally-web.vercel.app/terms")}
         trailing={<ArrowOutwardRounded />}
         leading={<DescriptionOutlined />}
       />
       <ListTile
         title={<FormattedMessage defaultMessage="Privacy policy" />}
-        onClick={() => openUrl("https://vocally.com/privacy")}
+        onClick={() => openUrl("https://vocally-web.vercel.app/privacy")}
         trailing={<ArrowOutwardRounded />}
         leading={<PrivacyTipOutlined />}
       />

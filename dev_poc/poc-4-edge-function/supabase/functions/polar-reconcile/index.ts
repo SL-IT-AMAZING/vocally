@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
   let page = 1;
   let totalReconciled = 0;
   let totalOrders = 0;
+  let totalPaidOrders = 0;
   const errors: string[] = [];
   const reconciled: string[] = [];
 
@@ -72,6 +73,11 @@ Deno.serve(async (req) => {
 
     for (const order of orders) {
       totalOrders++;
+      if (order.status !== "paid") {
+        continue;
+      }
+      totalPaidOrders++;
+
       const userId = extractUserId(order);
 
       if (!userId) {
@@ -148,11 +154,12 @@ Deno.serve(async (req) => {
   }
 
   console.log(
-    `Reconciliation complete: ${totalReconciled} fixed out of ${totalOrders} orders`,
+    `Reconciliation complete: ${totalReconciled} fixed out of ${totalPaidOrders} paid orders (${totalOrders} total orders scanned)`,
   );
 
   return jsonResponse({
     totalOrders,
+    totalPaidOrders,
     totalReconciled,
     reconciledUserIds: reconciled,
     errors,

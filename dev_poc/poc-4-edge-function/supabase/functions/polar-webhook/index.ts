@@ -40,7 +40,7 @@ async function verifyWebhookSignature(
   if (!webhookId || !webhookTimestamp || !webhookSignature) return false;
 
   const rawSecret = secret.replace(/^(whsec_|polar_whs_)/, "");
-  const secretBytes = base64ToUint8Array(rawSecret);
+  const secretBytes = Uint8Array.from(base64ToUint8Array(rawSecret));
 
   const signedContent = `${webhookId}.${webhookTimestamp}.${body}`;
   const encoder = new TextEncoder();
@@ -115,6 +115,78 @@ function extractUserId(event: Record<string, unknown>): string | null {
   return null;
 }
 
+async function promoteToPro(
+  supabase: ReturnType<typeof createServiceClient>,
+  userId: string,
+  subscriptionId: string | undefined,
+  eventType: string,
+) {
+  await ensureMemberExists(supabase, userId);
+
+  const updateData: Record<string, unknown> = {
+    plan: "pro",
+    is_on_trial: false,
+  };
+
+  if (subscriptionId) {
+    updateData.polar_subscription_id = subscriptionId;
+  }
+
+  const { error } = await supabase
+    .from("members")
+    .update(updateData)
+    .eq("id", userId);
+
+  if (error) {
+    console.error(`[${eventType}] Failed to update member:`, error);
+  } else {
+    console.log(`[${eventType}] Updated member ${userId} to pro`);
+  }
+}
+
+async function downgradeToFree(
+  supabase: ReturnType<typeof createServiceClient>,
+  subscriptionId: string | undefined,
+  userId: string | null,
+  eventType: string,
+) {
+  const updateData = { plan: "free", polar_subscription_id: null };
+
+  if (subscriptionId) {
+    const { error } = await supabase
+      .from("members")
+      .update(updateData)
+      .eq("polar_subscription_id", subscriptionId);
+
+    if (error) {
+      console.error(
+        `[${eventType}] Failed to downgrade member by subscription:`,
+        error,
+      );
+      return;
+    }
+
+    console.log(`[${eventType}] Downgraded subscription ${subscriptionId}`);
+    return;
+  }
+
+  if (userId) {
+    const { error } = await supabase
+      .from("members")
+      .update(updateData)
+      .eq("id", userId);
+
+    if (error) {
+      console.error(
+        `[${eventType}] Failed to downgrade member by user id:`,
+        error,
+      );
+    } else {
+      console.log(`[${eventType}] Downgraded member ${userId}`);
+    }
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return errorResponse("Method not allowed", 405);
@@ -136,7 +208,7 @@ Deno.serve(async (req) => {
 
   const supabase = createServiceClient();
 
-  if (eventType === "checkout.updated" || eventType === "order.created") {
+  if (eventType === "checkout.updated" || eventType === "order.paid") {
     const userId = extractUserId(event);
     console.log(`[${eventType}] userId:`, userId);
     if (!userId) {
@@ -155,28 +227,7 @@ Deno.serve(async (req) => {
     }
 
     const subscriptionId = data.subscription_id as string | undefined;
-
-    await ensureMemberExists(supabase, userId);
-
-    const updateData: Record<string, unknown> = {
-      plan: "pro",
-      is_on_trial: false,
-    };
-
-    if (subscriptionId) {
-      updateData.polar_subscription_id = subscriptionId;
-    }
-
-    const { error } = await supabase
-      .from("members")
-      .update(updateData)
-      .eq("id", userId);
-
-    if (error) {
-      console.error(`[${eventType}] Failed to update member:`, error);
-    } else {
-      console.log(`[${eventType}] Updated member ${userId} to pro`);
-    }
+    await promoteToPro(supabase, userId, subscriptionId, eventType);
   }
 
   if (eventType === "subscription.active") {
@@ -192,26 +243,40 @@ Deno.serve(async (req) => {
     const data = event.data as Record<string, unknown>;
     const subscriptionId = data.id as string;
 
-    await ensureMemberExists(supabase, userId);
+    await promoteToPro(supabase, userId, subscriptionId, eventType);
+  }
 
-    const updateData: Record<string, unknown> = {
-      plan: "pro",
-      is_on_trial: false,
-    };
+  if (
+    eventType === "subscription.updated" ||
+    eventType === "subscription.past_due"
+  ) {
+    const userId = extractUserId(event);
+    const data = event.data as Record<string, unknown>;
+    const subscriptionId = data.id as string | undefined;
+    const status = data.status as string | undefined;
 
-    if (subscriptionId) {
-      updateData.polar_subscription_id = subscriptionId;
+    console.log(`[${eventType}] status=${status} userId=${userId}`);
+
+    if (status === "active") {
+      if (!userId) {
+        console.warn(
+          `[${eventType}] No supabase_user_id found for active subscription`,
+        );
+        return jsonResponse({ received: true });
+      }
+      await promoteToPro(supabase, userId, subscriptionId, eventType);
+      return jsonResponse({ received: true });
     }
 
-    const { error } = await supabase
-      .from("members")
-      .update(updateData)
-      .eq("id", userId);
-
-    if (error) {
-      console.error("[subscription.active] Failed to update member:", error);
-    } else {
-      console.log(`[subscription.active] Updated member ${userId} to pro`);
+    if (
+      status === "past_due" ||
+      status === "canceled" ||
+      status === "revoked" ||
+      status === "incomplete" ||
+      status === "incomplete_expired"
+    ) {
+      await downgradeToFree(supabase, subscriptionId, userId, eventType);
+      return jsonResponse({ received: true });
     }
   }
 
@@ -220,35 +285,29 @@ Deno.serve(async (req) => {
     eventType === "subscription.revoked"
   ) {
     const data = event.data as Record<string, unknown>;
-    const subscriptionId = data.id as string;
+    const userId = extractUserId(event);
+    const subscriptionId = data.id as string | undefined;
+    const status = data.status as string | undefined;
+    const cancelAtPeriodEnd = Boolean(data.cancel_at_period_end);
 
-    if (subscriptionId) {
-      const { error } = await supabase
-        .from("members")
-        .update({ plan: "free", polar_subscription_id: null })
-        .eq("polar_subscription_id", subscriptionId);
-
-      if (error) {
-        console.error(`[${eventType}] Failed to downgrade member:`, error);
-      } else {
-        console.log(`[${eventType}] Downgraded subscription ${subscriptionId}`);
-      }
+    if (
+      eventType === "subscription.canceled" &&
+      status === "active" &&
+      cancelAtPeriodEnd
+    ) {
+      console.log(
+        "[subscription.canceled] scheduled at period end; keeping pro until revoked",
+      );
+      return jsonResponse({ received: true });
     }
+
+    await downgradeToFree(supabase, subscriptionId, userId, eventType);
   }
 
   if (eventType === "order.refunded") {
     const userId = extractUserId(event);
     if (userId) {
-      const { error } = await supabase
-        .from("members")
-        .update({ plan: "free" })
-        .eq("id", userId);
-
-      if (error) {
-        console.error("[order.refunded] Failed to downgrade member:", error);
-      } else {
-        console.log(`[order.refunded] Downgraded member ${userId}`);
-      }
+      await downgradeToFree(supabase, undefined, userId, eventType);
     }
   }
 

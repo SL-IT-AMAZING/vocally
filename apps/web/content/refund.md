@@ -19,7 +19,7 @@ Vocally offers the following paid subscription plans:
 - **Monthly Plan**: $5.00 USD per month
 - **Yearly Plan**: $50.00 USD per year
 
-All subscriptions are billed automatically at the start of each billing cycle through our payment processor, Paddle.
+All subscriptions are billed automatically at the start of each billing cycle through our payment processor, Polar.
 
 ## 3. Free Trial
 

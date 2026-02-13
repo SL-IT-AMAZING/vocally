@@ -114,7 +114,7 @@ We may update these Terms from time to time. Changes will be posted on this page
 
 ## 14. Payment and Subscriptions
 
-Vocally offers optional paid subscription plans. Payments are processed by **Paddle**, our merchant of record. By purchasing a subscription, you also agree to Paddle's terms of service. All prices are listed in USD. You may cancel your subscription at any time. Please refer to our [Refund Policy](/refund) for details on refunds.
+Vocally offers optional paid subscription plans. Payments are processed by **Polar**, our merchant of record. By purchasing a subscription, you also agree to Polar's terms of service. All prices are listed in USD. You may cancel your subscription at any time. Please refer to our [Refund Policy](/refund) for details on refunds.
 
 ## 15. Governing Law
 

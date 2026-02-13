@@ -16,7 +16,7 @@ export async function refreshMember(): Promise<void> {
     produceAppState((draft) => {
       registerMembers(draft, listify(member));
     });
-  } catch {
-    // No-op on failure
+  } catch (error) {
+    console.error("Failed to refresh member", error);
   }
 }
