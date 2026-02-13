@@ -28,6 +28,38 @@ function constantTimeEqual(a: string, b: string): boolean {
   return result === 0;
 }
 
+function padBase64(s: string): string {
+  const pad = (4 - (s.length % 4)) % 4;
+  return s + "=".repeat(pad);
+}
+
+async function tryVerify(
+  secretBytes: Uint8Array,
+  signedContent: string,
+  receivedSignatures: string[],
+): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    secretBytes,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signatureBytes = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    encoder.encode(signedContent),
+  );
+  const computed = uint8ArrayToBase64(new Uint8Array(signatureBytes));
+  for (const received of receivedSignatures) {
+    if (constantTimeEqual(computed, received)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 async function verifyWebhookSignature(
   body: string,
   headers: Headers,
@@ -37,40 +69,55 @@ async function verifyWebhookSignature(
   const webhookTimestamp = headers.get("webhook-timestamp");
   const webhookSignature = headers.get("webhook-signature");
 
-  if (!webhookId || !webhookTimestamp || !webhookSignature) return false;
-
-  const rawSecret = secret.replace(/^(whsec_|polar_whs_)/, "");
-  const secretBytes = Uint8Array.from(base64ToUint8Array(rawSecret));
+  if (!webhookId || !webhookTimestamp || !webhookSignature) {
+    console.error("Missing webhook headers:", {
+      webhookId: !!webhookId,
+      webhookTimestamp: !!webhookTimestamp,
+      webhookSignature: !!webhookSignature,
+    });
+    return false;
+  }
 
   const signedContent = `${webhookId}.${webhookTimestamp}.${body}`;
-  const encoder = new TextEncoder();
+  const receivedSignatures = webhookSignature
+    .split(" ")
+    .filter((s) => s.startsWith("v1,"))
+    .map((s) => s.slice(3));
 
-  const key = await crypto.subtle.importKey(
-    "raw",
-    secretBytes,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
+  if (receivedSignatures.length === 0) {
+    console.error("No v1 signatures found in:", webhookSignature);
+    return false;
+  }
 
-  const signatureBytes = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    encoder.encode(signedContent),
-  );
+  const stripped = secret.replace(/^(whsec_|polar_whs_)/, "");
+  const secretVariants: Uint8Array[] = [
+    base64ToUint8Array(padBase64(stripped)),
+    base64ToUint8Array(stripped),
+    new TextEncoder().encode(stripped),
+    new TextEncoder().encode(secret),
+  ];
 
-  const computed = uint8ArrayToBase64(new Uint8Array(signatureBytes));
-
-  const signatures = webhookSignature.split(" ");
-  for (const sig of signatures) {
-    const [version, hash] = sig.split(",");
-    if (version !== "v1") continue;
-
-    if (constantTimeEqual(computed, hash)) {
-      return true;
+  for (let i = 0; i < secretVariants.length; i++) {
+    try {
+      if (
+        await tryVerify(secretVariants[i], signedContent, receivedSignatures)
+      ) {
+        if (i > 0) console.log(`Webhook signature matched on variant ${i}`);
+        return true;
+      }
+    } catch {
+      continue;
     }
   }
 
+  console.error(
+    "Webhook signature mismatch. Secret length:",
+    secret.length,
+    "Stripped length:",
+    stripped.length,
+    "Received sigs:",
+    receivedSignatures.length,
+  );
   return false;
 }
 
