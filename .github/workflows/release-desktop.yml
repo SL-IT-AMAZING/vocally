@@ -1,13 +1,6 @@
 name: Release Desktop
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "apps/desktop/**"
-      - "packages/**"
-      - ".github/workflows/release-desktop.yml"
   workflow_dispatch:
     inputs:
       environment:
