@@ -199,8 +199,10 @@ export default function SettingsPage() {
 
     setOpeningSubscriptionPortal(true);
     try {
+      const currentLocale = detectLocale();
+      const portalLocale = currentLocale === "ko" ? "ko-KR" : "en-US";
       const { data, error } = await supabase.functions.invoke("polar-portal", {
-        body: {},
+        body: { locale: portalLocale },
       });
 
       const portalUrl = (data as { portalUrl?: string } | null)?.portalUrl;
