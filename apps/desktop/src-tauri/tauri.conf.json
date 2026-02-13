@@ -30,6 +30,7 @@
   },
   "bundle": {
     "active": true,
+    "publisher": "SL:IT",
     "targets": "all",
     "createUpdaterArtifacts": true,
     "icon": [
