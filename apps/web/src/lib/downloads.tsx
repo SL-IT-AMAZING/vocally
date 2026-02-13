@@ -48,8 +48,8 @@ const GPU_LATEST_MANIFEST_URL =
   "https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-gpu-prod/latest.json";
 
 const RELEASE_TAG_PATTERNS = {
-  cpu: /^desktop-(?:dev-)?v\d/,
-  gpu: /^desktop-gpu-(?:dev-)?v\d/,
+  cpu: /^desktop-v\d/,
+  gpu: /^desktop-gpu-v\d/,
 };
 
 export function getPlatformConfig(
@@ -313,25 +313,29 @@ export async function fetchReleaseManifest(signal?: AbortSignal) {
 }
 
 async function fetchChannelManifest(url: string, signal?: AbortSignal) {
-  const response = await fetch(url, {
-    signal,
-    cache: "no-store",
-  });
+  try {
+    const response = await fetch(url, {
+      signal,
+      cache: "no-store",
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return undefined;
+    }
+
+    const manifest = (await response.json()) as ReleaseManifest;
+    if (!manifest || typeof manifest !== "object") {
+      return undefined;
+    }
+
+    if (!manifest.platforms || Object.keys(manifest.platforms).length === 0) {
+      return undefined;
+    }
+
+    return manifest;
+  } catch {
     return undefined;
   }
-
-  const manifest = (await response.json()) as ReleaseManifest;
-  if (!manifest || typeof manifest !== "object") {
-    return undefined;
-  }
-
-  if (!manifest.platforms || Object.keys(manifest.platforms).length === 0) {
-    return undefined;
-  }
-
-  return manifest;
 }
 
 export async function selectPlatformUrl(
