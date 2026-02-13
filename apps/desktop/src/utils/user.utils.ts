@@ -34,6 +34,10 @@ export const getIsDictationUnlocked = (state: AppState): boolean => {
 };
 
 export const getHasCloudAccess = (state: AppState): boolean => {
+  if (state.auth?.id) {
+    return true;
+  }
+
   const effectivePlan = getEffectivePlan(state);
   return effectivePlan === "pro" || effectivePlan === "free";
 };
@@ -42,9 +46,9 @@ export const getMyCloudUserId = (state: AppState): Nullable<string> =>
   state.auth?.id ?? null;
 
 export const getMyEffectiveUserId = (state: AppState): string => {
-  const isCloud = getHasCloudAccess(state);
-  if (isCloud) {
-    return getMyCloudUserId(state) ?? LOCAL_USER_ID;
+  const cloudUserId = getMyCloudUserId(state);
+  if (cloudUserId) {
+    return cloudUserId;
   }
 
   return LOCAL_USER_ID;
