@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 100" fill="none">
+  <!-- Waveform mark -->
+  <path d="M 10 60 L 29 60 C 37 60 40 48 45 40 C 50 31 53 42 58 54 L 72 92 L 150 8" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Wordmark -->
+  <text x="170" y="72" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="58" font-weight="700" fill="#ffffff" letter-spacing="-2">vocally</text>
+</svg>
