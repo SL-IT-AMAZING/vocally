@@ -79,7 +79,7 @@ export const createDefaultPreferences = (): UserPreferences => ({
   ignoreUpdateDialog: false,
   incognitoModeEnabled: false,
   incognitoModeIncludeInStats: false,
-  dictationPillVisibility: "while_active",
+  dictationPillVisibility: "persistent",
 });
 
 const updateUserPreferences = async (

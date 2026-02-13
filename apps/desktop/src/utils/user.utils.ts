@@ -314,5 +314,5 @@ export const getEffectivePillVisibility = (
     return visibility;
   }
 
-  return "while_active";
+  return "persistent";
 };

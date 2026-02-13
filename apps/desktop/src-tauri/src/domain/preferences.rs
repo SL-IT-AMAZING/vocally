@@ -55,5 +55,5 @@ pub struct UserPreferences {
 }
 
 fn default_dictation_pill_visibility() -> String {
-    "while_active".to_string()
+    "persistent".to_string()
 }

@@ -89,6 +89,8 @@ pub const TRANSCRIPTION_SANITIZED_TRANSCRIPT_MIGRATION_SQL: &str =
     include_str!("migrations/047_transcription_sanitized_transcript.sql");
 pub const USER_SCOPED_DATA_MIGRATION_SQL: &str =
     include_str!("migrations/048_user_scoped_data.sql");
+pub const PILL_VISIBILITY_PERSISTENT_DEFAULT_MIGRATION_SQL: &str =
+    include_str!("migrations/049_pill_visibility_persistent_default.sql");
 
 pub fn migrations() -> Vec<tauri_plugin_sql::Migration> {
     vec![
@@ -378,6 +380,12 @@ pub fn migrations() -> Vec<tauri_plugin_sql::Migration> {
             version: 48,
             description: "add_user_scoped_data",
             sql: USER_SCOPED_DATA_MIGRATION_SQL,
+            kind: tauri_plugin_sql::MigrationKind::Up,
+        },
+        tauri_plugin_sql::Migration {
+            version: 49,
+            description: "set_pill_visibility_persistent_default",
+            sql: PILL_VISIBILITY_PERSISTENT_DEFAULT_MIGRATION_SQL,
             kind: tauri_plugin_sql::MigrationKind::Up,
         },
     ]
