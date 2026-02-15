@@ -1,0 +1,121 @@
+═══════════════════════════════════════════════════════════════════════════════
+PAYMENT PROMOTION FLOW - QUICK REFERENCE
+═══════════════════════════════════════════════════════════════════════════════
+
+1️⃣  SUCCESSFUL PAYMENT → PRO PROMOTION (AUTOMATIC ✅)
+────────────────────────────────────────────────────────────────────────────
+Flow:    User pays → Polar webhook → polar-webhook/index.ts → members.plan="pro"
+Events:  checkout.updated | order.created | subscription.active
+Updates: plan="pro", is_on_trial=false, polar_subscription_id=stored
+File:    dev_poc/poc-4-edge-function/supabase/functions/polar-webhook/index.ts
+Lines:   118-256 (webhook), 101-116 (userId extract), 161-173 (pro update)
+
+
+2️⃣  ALREADY-MISSED USERS BACKFILL (MANUAL ⚠️ NOT AUTOMATIC)
+────────────────────────────────────────────────────────────────────────────
+Status:   ❌ REQUIRES MANUAL RECOVERY
+Why:      No scheduled job exists to automatically backfill old Polar orders
+Tool:     polar-reconcile edge function
+How:      POST /functions/v1/polar-reconcile (requires auth)
+File:     dev_poc/poc-4-edge-function/supabase/functions/polar-reconcile/index.ts
+Lines:    34-160 (reconcile logic), 56-148 (Polar API pagination)
+
+⚠️  ACTION REQUIRED: Setup scheduled job to call reconcile daily/weekly
+
+
+3️⃣  KEY FILES & LINE NUMBERS
+────────────────────────────────────────────────────────────────────────────
+PROMOTION LOGIC:
+  polar-webhook/index.ts
+    L31-75   Webhook signature verification (HMAC-SHA256)
+    L77-99   ensureMemberExists() - creates free member
+    L101-116 extractUserId() - gets user from metadata
+    L139-180 checkout.updated & order.created → pro
+    L182-216 subscription.active → pro
+    L218-237 subscription.canceled/revoked → free
+    L239-253 order.refunded → free
+
+RECOVERY LOGIC:
+  polar-reconcile/index.ts
+    L34-49   Auth & setup
+    L50-69   Polar API pagination loop
+    L73-118  Process orders, create missing pro members
+    L120-143 Upgrade non-pro members to pro
+    L150-160 Return summary results
+
+SUPPORTING:
+  member-init/index.ts (L7-35) - Creates free member on first sign-in
+  member-get/index.ts (L7-47) - Returns user's member record
+  20260211000000_add_polar_columns.sql - Schema: adds polar_subscription_id
+
+
+4️⃣  CRITICAL ISSUES
+────────────────────────────────────────────────────────────────────────────
+❌ ISSUE #1: No Scheduled Backfill
+   - polar-reconcile exists but is NOT automatically invoked
+   - Missed users (webhook failures, old orders) remain stuck as "free"
+   - FIX: Add cron job to call reconcile daily/weekly
+
+❌ ISSUE #2: Metadata Must Be Present
+   - If checkout doesn't attach supabase_user_id to metadata → no promotion
+   - Verify checkout code sets: metadata: { supabase_user_id: user.id }
+
+❌ ISSUE #3: Webhook Secret Must Be Configured
+   - If POLAR_WEBHOOK_SECRET not set → all webhooks rejected silently (401)
+   - Verify env var is set in production
+
+
+5️⃣  EXACT PROMOTION LOGIC (SIMPLIFIED)
+────────────────────────────────────────────────────────────────────────────
+// When webhook arrives with event supabase_user_id in metadata:
+
+1. Verify signature with POLAR_WEBHOOK_SECRET
+2. Extract userId from event.data.metadata.supabase_user_id
+3. Ensure member row exists: 
+   INSERT members (id, plan, ...) VALUES (userId, 'free', ...)
+   ON CONFLICT DO NOTHING
+4. Upgrade to pro:
+   UPDATE members SET plan='pro', is_on_trial=false WHERE id=userId
+
+That's it. User is now pro.
+
+
+6️⃣  TESTING CHECKLIST
+────────────────────────────────────────────────────────────────────────────
+[ ] POLAR_WEBHOOK_SECRET configured in production
+[ ] POLAR_ACCESS_TOKEN configured for reconcile
+[ ] Checkout attaches metadata with supabase_user_id
+[ ] Pay → webhook → member promoted to pro
+[ ] Cancel subscription → member downgraded to free
+[ ] Run reconcile on old Polar orders
+[ ] Verify old users backfilled to pro
+[ ] ADD SCHEDULED RECONCILE JOB (URGENT)
+
+
+7️⃣  COMMANDS FOR MANUAL RECOVERY
+────────────────────────────────────────────────────────────────────────────
+# Call reconcile manually (from authenticated client):
+POST /functions/v1/polar-reconcile
+
+Response: {
+  "totalOrders": 42,
+  "totalReconciled": 3,
+  "reconciledUserIds": ["user-1", "user-2", "user-3"],
+  "errors": ["Order XYZ: no supabase_user_id in metadata"]
+}
+
+
+8️⃣  PRODUCTION READINESS
+────────────────────────────────────────────────────────────────────────────
+Real-time Promotion:     ✅ READY (webhook → pro automatic)
+Automatic Backfill:      ❌ MISSING (no scheduled recovery job)
+Manual Recovery Tool:    ✅ READY (reconcile endpoint exists)
+
+Overall Status: ⚠️  PARTIALLY PRODUCTION-READY
+  
+Next Steps:
+  1. [URGENT] Add cron job to call /polar-reconcile daily
+  2. Verify webhook secret & access token configuration
+  3. Verify checkout metadata attachment
+  4. Test end-to-end: pay → webhook → pro promotion
+  5. Run manual reconcile to backfill any missed users from dev/beta
