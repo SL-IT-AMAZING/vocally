@@ -647,10 +647,6 @@ export const RootSideEffects = () => {
     debouncedToggle("dictation", dictationController);
   });
 
-  useTauriListen<void>("pill-hide-request", () => {
-    void setDictationPillVisibility("hidden");
-  });
-
   useTauriListen<void>("toggle-floating-bar", () => {
     const currentVisibility = getEffectivePillVisibility(
       getAppState().userPrefs?.dictationPillVisibility,

@@ -117,12 +117,6 @@ export const PillOverlayRoot = () => {
     emitTo("main", "on-click-dictate", {}).catch(console.error);
   };
 
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    emitTo("main", "pill-hide-request", {}).catch(console.error);
-  };
-
   return (
     <Box
       sx={{
@@ -203,7 +197,6 @@ export const PillOverlayRoot = () => {
       >
         <Box
           onMouseDown={handleMouseDownDictate}
-          onDoubleClick={handleDoubleClick}
           sx={{
             position: "relative",
             width: isExpanded ? EXPANDED_PILL_WIDTH : MIN_PILL_WIDTH,
