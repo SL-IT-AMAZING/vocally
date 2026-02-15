@@ -133,6 +133,11 @@ export const addWordsToCurrentUser = async (
     "Unable to update usage. User not found.",
     "Failed to update usage metrics. Please try again.",
   );
+
+  const { reportWordUsage } = await import("./member.actions");
+  reportWordUsage(wordCount).catch((err) =>
+    console.error("Failed to sync word usage to server:", err),
+  );
 };
 
 export const refreshCurrentUser = async (): Promise<void> => {

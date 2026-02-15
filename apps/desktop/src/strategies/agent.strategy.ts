@@ -48,7 +48,7 @@ export class AgentStrategy extends BaseStrategy {
       };
     }
 
-    if (agentMode === "cloud" && getMemberExceedsLimitByState(state)) {
+    if (getMemberExceedsLimitByState(state)) {
       return {
         title: getIntl().formatMessage({
           defaultMessage: "Word limit reached",

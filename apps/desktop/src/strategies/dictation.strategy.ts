@@ -29,10 +29,7 @@ export class DictationStrategy extends BaseStrategy {
   validateAvailability(): Nullable<StrategyValidationError> {
     const state = getAppState();
 
-    const transcriptionMode = state.settings.aiTranscription.mode;
-    const generativeMode = state.settings.aiPostProcessing.mode;
-    const isCloud = transcriptionMode === "cloud" || generativeMode === "cloud";
-    if (isCloud && getMemberExceedsLimitByState(state)) {
+    if (getMemberExceedsLimitByState(state)) {
       return {
         title: getIntl().formatMessage({
           defaultMessage: "Word limit reached",
