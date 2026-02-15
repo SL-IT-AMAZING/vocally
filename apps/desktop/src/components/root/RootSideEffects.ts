@@ -94,6 +94,11 @@ type KeysHeldPayload = {
   keys: string[];
 };
 
+type KeyboardListenerErrorPayload = {
+  message: string;
+  consecutive_failures: number;
+};
+
 type OverlayPhasePayload = {
   phase: OverlayPhase;
 };
@@ -255,7 +260,7 @@ export const RootSideEffects = () => {
       strategyRef.current = strategy;
     }
 
-    const validationError = strategy.validateAvailability();
+    const validationError = await strategy.validateAvailability();
     if (validationError) {
       playAlertSound();
       showToast({
@@ -579,6 +584,15 @@ export const RootSideEffects = () => {
       draft.keysHeld = payload.keys;
     });
   });
+
+  useTauriListen<KeyboardListenerErrorPayload>(
+    "keyboard_listener_error",
+    (payload) => {
+      console.warn(
+        `Keyboard listener error (attempt ${payload.consecutive_failures}): ${payload.message}`,
+      );
+    },
+  );
 
   useTauriListen<OverlayPhasePayload>("overlay_phase", (payload) => {
     produceAppState((draft) => {

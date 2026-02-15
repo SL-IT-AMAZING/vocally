@@ -10,7 +10,7 @@ import type {
 export abstract class BaseStrategy {
   constructor(protected context: StrategyContext) {}
 
-  abstract validateAvailability(): Nullable<StrategyValidationError>;
+  abstract validateAvailability(): Promise<Nullable<StrategyValidationError>>;
   abstract onBeforeStart(): Promise<void>;
   abstract setPhase(phase: OverlayPhase): Promise<void>;
   abstract handleTranscript(

@@ -33,7 +33,7 @@ export class AgentStrategy extends BaseStrategy {
     return false;
   }
 
-  validateAvailability(): Nullable<StrategyValidationError> {
+  async validateAvailability(): Promise<Nullable<StrategyValidationError>> {
     const state = getAppState();
     const agentMode = state.settings.agentMode.mode;
     if (agentMode === "none") {
@@ -48,7 +48,10 @@ export class AgentStrategy extends BaseStrategy {
       };
     }
 
-    if (getMemberExceedsLimitByState(state)) {
+    const { refreshMember } = await import("../actions/member.actions");
+    await refreshMember();
+    const freshState = getAppState();
+    if (getMemberExceedsLimitByState(freshState)) {
       return {
         title: getIntl().formatMessage({
           defaultMessage: "Word limit reached",

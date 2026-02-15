@@ -26,7 +26,9 @@ export class DictationStrategy extends BaseStrategy {
     return true;
   }
 
-  validateAvailability(): Nullable<StrategyValidationError> {
+  async validateAvailability(): Promise<Nullable<StrategyValidationError>> {
+    const { refreshMember } = await import("../actions/member.actions");
+    await refreshMember();
     const state = getAppState();
 
     if (getMemberExceedsLimitByState(state)) {
@@ -35,7 +37,7 @@ export class DictationStrategy extends BaseStrategy {
           defaultMessage: "Word limit reached",
         }),
         body: getIntl().formatMessage({
-          defaultMessage: "You've used all your free words for today.",
+          defaultMessage: "Upgrade to Pro for unlimited words.",
         }),
         action: "upgrade",
       };
