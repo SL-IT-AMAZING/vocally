@@ -349,16 +349,16 @@ export class GroqTranscribeAudioRepo extends BaseTranscribeAudioRepo {
     const wavBuffer = buildWaveFile(input.samples, input.sampleRate);
 
     const normalizedLanguage = (input.language ?? "").trim().toLowerCase();
+    const isKorean =
+      normalizedLanguage === "ko" || normalizedLanguage.startsWith("ko-");
     const selectedModel =
       this.model === "whisper-large-v3" ||
       this.model === "whisper-large-v3-turbo"
         ? this.model
         : undefined;
-    const effectiveModel =
-      selectedModel ??
-      (normalizedLanguage === "ko" || normalizedLanguage.startsWith("ko-")
-        ? "whisper-large-v3"
-        : "whisper-large-v3-turbo");
+    const effectiveModel = isKorean
+      ? "whisper-large-v3"
+      : (selectedModel ?? "whisper-large-v3-turbo");
 
     const { text: transcript } = await groqTranscribeAudio({
       apiKey: this.groqApiKey,

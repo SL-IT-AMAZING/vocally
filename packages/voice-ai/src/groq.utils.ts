@@ -36,14 +36,15 @@ export const resolveGroqTranscriptionModel = ({
   language?: string;
   userSelectedModel?: string | null;
 }): TranscriptionModel => {
-  const normalizedSelectedModel = (userSelectedModel ?? "").trim();
-  if (isSupportedTranscriptionModel(normalizedSelectedModel)) {
-    return normalizedSelectedModel;
-  }
-
+  // Korean always uses large-v3 for better accuracy, regardless of user selection
   const normalizedLanguage = (language ?? "").trim().toLowerCase();
   if (normalizedLanguage === "ko" || normalizedLanguage.startsWith("ko-")) {
     return KOREAN_GROQ_TRANSCRIPTION_MODEL;
+  }
+
+  const normalizedSelectedModel = (userSelectedModel ?? "").trim();
+  if (isSupportedTranscriptionModel(normalizedSelectedModel)) {
+    return normalizedSelectedModel;
   }
 
   return DEFAULT_GROQ_TRANSCRIPTION_MODEL;
