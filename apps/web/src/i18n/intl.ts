@@ -52,25 +52,6 @@ export const detectLocale = (): Locale => {
     return stored;
   }
 
-  if (typeof navigator === "undefined") {
-    return DEFAULT_LOCALE;
-  }
-
-  const candidates = Array.isArray(navigator.languages)
-    ? [...navigator.languages]
-    : [];
-
-  if (navigator.language) {
-    candidates.push(navigator.language);
-  }
-
-  for (const candidate of candidates) {
-    const match = matchSupportedLocale(candidate);
-    if (match != null) {
-      return match;
-    }
-  }
-
   return DEFAULT_LOCALE;
 };
 
