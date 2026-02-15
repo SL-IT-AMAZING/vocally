@@ -4,7 +4,7 @@ import type { LoginMode } from "../state/login.state";
 import type { GoogleAuthPayload } from "../types/google-auth.types";
 import { GOOGLE_AUTH_COMMAND } from "../types/google-auth.types";
 import { getAppState, produceAppState } from "../store";
-import { getAuthRepo } from "../repos";
+import { getAuthRepo, getUserPreferencesRepo } from "../repos";
 import {
   validateEmail,
   validatePassword,
@@ -12,6 +12,7 @@ import {
 } from "../utils/login.utils";
 import { registerMembers } from "../utils/app.utils";
 import { listify } from "@repo/utilities";
+import { createDefaultPreferences } from "./user.actions";
 
 const tryInit = async () => {
   try {
@@ -159,5 +160,17 @@ export const setMode = (mode: LoginMode): void => {
 };
 
 export const signOut = async (): Promise<void> => {
+  // Reset local preferences to defaults before signing out.
+  // Without this, the next user to sign in would inherit stale preferences
+  // (e.g. dictation_pill_visibility: "hidden") from the previous session,
+  // because all preferences are stored under a single LOCAL_USER_ID row.
+  try {
+    await getUserPreferencesRepo().setUserPreferences(
+      createDefaultPreferences(),
+    );
+  } catch (error) {
+    console.error("Failed to reset local preferences on sign-out", error);
+  }
+
   await getAuthRepo().signOut();
 };

@@ -317,6 +317,10 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
                     (x, y)
                 }
             };
+            #[cfg(target_os = "windows")]
+            crate::platform::window::move_overlay_topmost(window, x, y);
+
+            #[cfg(target_os = "linux")]
             let _ =
                 window.set_position(tauri::Position::Logical(tauri::LogicalPosition::new(x, y)));
         };
@@ -350,7 +354,10 @@ fn update_cursor_follower(app: &tauri::AppHandle, state: &CursorFollowerState) {
             primary_height,
         );
 
-        #[cfg(not(target_os = "macos"))]
+        #[cfg(target_os = "windows")]
+        crate::platform::window::move_overlay_topmost(&pill_window, pill_x, pill_y);
+
+        #[cfg(target_os = "linux")]
         let _ = pill_window.set_position(tauri::Position::Logical(tauri::LogicalPosition::new(
             pill_x, pill_y,
         )));

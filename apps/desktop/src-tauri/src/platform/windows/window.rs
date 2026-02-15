@@ -12,7 +12,12 @@ use windows::Win32::UI::WindowsAndMessaging::{
 fn set_layered_window_attributes(hwnd: HWND, alpha: u8) {
     use windows::Win32::UI::WindowsAndMessaging::SetLayeredWindowAttributes;
     unsafe {
-        let _ = SetLayeredWindowAttributes(hwnd, windows::Win32::Foundation::COLORREF(0), alpha, LWA_ALPHA);
+        let _ = SetLayeredWindowAttributes(
+            hwnd,
+            windows::Win32::Foundation::COLORREF(0),
+            alpha,
+            LWA_ALPHA,
+        );
     }
 }
 
@@ -112,7 +117,10 @@ pub fn show_overlay_no_focus(window: &WebviewWindow) -> Result<(), String> {
     result
 }
 
-pub fn set_overlay_click_through(window: &WebviewWindow, click_through: bool) -> Result<(), String> {
+pub fn set_overlay_click_through(
+    window: &WebviewWindow,
+    click_through: bool,
+) -> Result<(), String> {
     if !click_through {
         save_foreground_window();
     }
@@ -200,6 +208,29 @@ pub fn configure_overlay_non_activating(window: &WebviewWindow) -> Result<(), St
 
     rx.recv()
         .map_err(|_| "failed to configure overlay as non-activating on main thread".to_string())?
+}
+
+pub fn move_overlay_topmost(window: &WebviewWindow, logical_x: f64, logical_y: f64) {
+    let window_clone = window.clone();
+    let _ = window.run_on_main_thread(move || {
+        let Ok(hwnd) = window_clone.hwnd() else {
+            return;
+        };
+        let scale = window_clone.scale_factor().unwrap_or(1.0);
+        let physical_x = (logical_x * scale) as i32;
+        let physical_y = (logical_y * scale) as i32;
+        unsafe {
+            let _ = SetWindowPos(
+                hwnd,
+                Some(HWND_TOPMOST),
+                physical_x,
+                physical_y,
+                0,
+                0,
+                SWP_NOSIZE | SWP_NOACTIVATE,
+            );
+        }
+    });
 }
 
 pub fn save_foreground_window() {
