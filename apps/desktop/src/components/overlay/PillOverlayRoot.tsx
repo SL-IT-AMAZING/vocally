@@ -277,7 +277,7 @@ export const PillOverlayRoot = () => {
                 levels={levels}
                 active={isListening}
                 processing={isProcessing}
-                strokeColor={theme.palette.common.white}
+                strokeColor="#90CAF9"
                 width={EXPANDED_PILL_WIDTH}
                 height={EXPANDED_PILL_HEIGHT}
                 baselineOffset={0}

@@ -79,7 +79,7 @@ export const RecordingStatusWidget = () => {
             levels={levels}
             active={isListening}
             processing={isProcessing}
-            strokeColor={theme.palette.common.white}
+            strokeColor="#90CAF9"
             width={120}
             height={36}
             baselineOffset={3}
