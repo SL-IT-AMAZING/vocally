@@ -56,6 +56,29 @@ export const buildWaveFile = (
 export const normalizeSamples = (samples: AudioSamples): number[] =>
   Array.isArray(samples) ? samples : Array.from(samples ?? []);
 
+const MIN_RECORDING_DURATION_SEC = 0.3;
+const SILENCE_RMS_THRESHOLD = 0.01;
+
+export function isAudioEffectivelySilent(
+  samples: number[] | Float32Array,
+  sampleRate: number,
+): boolean {
+  const sampleCount = samples.length;
+  if (sampleCount === 0) return true;
+
+  const durationSec = sampleCount / sampleRate;
+  if (durationSec < MIN_RECORDING_DURATION_SEC) return true;
+
+  let sumSquared = 0;
+  for (let i = 0; i < sampleCount; i++) {
+    const v = samples[i] ?? 0;
+    sumSquared += v * v;
+  }
+  const rms = Math.sqrt(sumSquared / sampleCount);
+
+  return rms < SILENCE_RMS_THRESHOLD;
+}
+
 export type AudioClip =
   | "start_recording_clip"
   | "stop_recording_clip"
@@ -92,4 +115,24 @@ function getAlertClip(): AudioClip {
 export function playAlertSound(): void {
   const clip = getAlertClip();
   tryPlayAudioChime(clip);
+}
+
+const WHISPER_HALLUCINATION_PATTERNS = [
+  /^\s*thanks?\s*(you\s*)?(for\s+)?(watching|listening|viewing)\s*[.!]?\s*$/i,
+  /^\s*subscribe\s*(and\s+)?(like\s+)?(the\s+)?(video|channel)?\s*[.!]?\s*$/i,
+  /^\s*please\s+subscribe\s*[.!]?\s*$/i,
+  /^\s*like\s+and\s+subscribe\s*[.!]?\s*$/i,
+  /^\s*\.\s*$/,
+  /^\s*시청해\s*주셔서\s*감사합니다\.?\s*$/,
+  /^\s*구독\s*(과|하고)\s*좋아요\s*[.!]?\s*$/,
+  /^\s*MBC\s*뉴스\s*$/i,
+  /^\s*[.…·,]+\s*$/,
+];
+
+export function isWhisperHallucination(text: string): boolean {
+  const trimmed = text.trim();
+  if (!trimmed) return true;
+  return WHISPER_HALLUCINATION_PATTERNS.some((pattern) =>
+    pattern.test(trimmed),
+  );
 }

@@ -27,8 +27,11 @@ export class DictationStrategy extends BaseStrategy {
   }
 
   async validateAvailability(): Promise<Nullable<StrategyValidationError>> {
-    const { refreshMember } = await import("../actions/member.actions");
-    await refreshMember();
+    // Use cached member data to avoid blocking on a network call.
+    // Member data is refreshed every hour in the background and also after
+    // each transcription completes, so it stays reasonably fresh.
+    // If the user truly exceeds limits, the cloud/API transcription will
+    // reject with a 429 anyway — no need to gate recording start on a fetch.
     const state = getAppState();
 
     if (getMemberExceedsLimitByState(state)) {
