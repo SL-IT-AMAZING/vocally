@@ -1,4 +1,6 @@
-use crate::domain::{KeysHeldPayload, EVT_KEYS_HELD};
+use crate::domain::{
+    KeyboardListenerErrorPayload, KeysHeldPayload, EVT_KEYBOARD_LISTENER_ERROR, EVT_KEYS_HELD,
+};
 use rdev::{Event, EventType, Key as RdevKey};
 use std::collections::HashSet;
 use std::env;
@@ -78,6 +80,19 @@ impl KeyEventEmitter {
     fn emit(&self, payload: KeysHeldPayload) {
         if let Err(err) = self.app.emit_to(EventTarget::any(), EVT_KEYS_HELD, payload) {
             eprintln!("Failed to emit keys-held event: {err}");
+        }
+    }
+
+    fn emit_error(&self, message: String, consecutive_failures: u32) {
+        let payload = KeyboardListenerErrorPayload {
+            message,
+            consecutive_failures,
+        };
+        if let Err(err) = self
+            .app
+            .emit_to(EventTarget::any(), EVT_KEYBOARD_LISTENER_ERROR, payload)
+        {
+            eprintln!("Failed to emit keyboard-listener-error event: {err}");
         }
     }
 }
@@ -185,24 +200,42 @@ fn start_external_listener(
     Ok((handle, running))
 }
 
+const BACKOFF_INITIAL_MS: u64 = 50;
+const BACKOFF_MAX_MS: u64 = 5000;
+
 fn run_listener_thread(
     listener: TcpListener,
     port: u16,
     running: Arc<AtomicBool>,
     emitter: Arc<KeyEventEmitter>,
 ) {
+    let mut consecutive_failures: u32 = 0;
+    let mut backoff_ms: u64 = BACKOFF_INITIAL_MS;
+
     while running.load(Ordering::SeqCst) {
         if let Err(err) = ensure_listener_child(port) {
-            eprintln!("Keyboard listener child error: {err}");
-            thread::sleep(Duration::from_millis(500));
+            consecutive_failures = consecutive_failures.saturating_add(1);
+            eprintln!(
+                "Keyboard listener child error (attempt {}): {err}",
+                consecutive_failures
+            );
+            emitter.emit_error(err, consecutive_failures);
+            thread::sleep(Duration::from_millis(backoff_ms));
+            backoff_ms = (backoff_ms * 2).min(BACKOFF_MAX_MS);
             continue;
         }
 
         match listener.accept() {
             Ok((stream, _addr)) => {
+                consecutive_failures = 0;
+                backoff_ms = BACKOFF_INITIAL_MS;
+
                 if let Err(err) = pump_stream(stream, emitter.clone()) {
                     eprintln!("Keyboard listener stream error: {err}");
                 }
+                // Child disconnected or stream ended — clear stale key state
+                // so phantom "held" keys don't persist across reconnects.
+                emitter.reset();
             }
             Err(err) if err.kind() == ErrorKind::WouldBlock => {
                 thread::sleep(Duration::from_millis(50));

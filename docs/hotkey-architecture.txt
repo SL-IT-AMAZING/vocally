@@ -1,0 +1,241 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                      VOCALLY HOTKEY SYSTEM ARCHITECTURE                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                USER ACTION                                    │
+│                   User presses Fn key (or hotkey combo)                       │
+└──────────────────────────────────────────────────────┬───────────────────────┘
+                                                       │
+                                                       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                        KEYBOARD LISTENER PROCESS                              │
+│                  (Separate child process - runs rdev)                         │
+│                                                                               │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │ rdev::listen()                                                         │  │
+│  │ └─ Captures ALL keyboard events globally (system-wide)                │  │
+│  │                                                                        │  │
+│  │    Event: KeyPress(Function) or KeyRelease(Function)                 │  │
+│  │            or Unknown(63) if unmapped by rdev                        │  │
+│  └───────────────────────┬──────────────────────────────────────────────┘  │
+│                          │                                                   │
+│                          ▼                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │ key_to_label() - Convert rdev Key to String                          │  │
+│  │                                                                        │  │
+│  │  Input:  Key::Function                                               │  │
+│  │  Output: "Function" (using Debug formatter)                          │  │
+│  │                                                                        │  │
+│  │  Key::Unknown(code) → "Unknown(63)"                                  │  │
+│  └───────────────────────┬──────────────────────────────────────────────┘  │
+│                          │                                                   │
+│                          ▼                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │ Serialize to JSON                                                     │  │
+│  │ {                                                                      │  │
+│  │   "kind": "Press",                                                    │  │
+│  │   "key_label": "Function",                                            │  │
+│  │   "raw_code": null,                                                   │  │
+│  │   "scan_code": 0  ← Windows: 0 = injected, skip; others: ignore      │  │
+│  │ }                                                                      │  │
+│  └───────────────────────┬──────────────────────────────────────────────┘  │
+│                          │                                                   │
+└──────────────────────────┼───────────────────────────────────────────────────┘
+                           │
+                           │ TCP:127.0.0.1:RANDOM_PORT
+                           │ (Line-delimited JSON)
+                           │
+┌──────────────────────────┼───────────────────────────────────────────────────┐
+│                          ▼                                                   │
+│           MAIN TAURI PROCESS - Receiver Thread                              │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │ pump_stream() - Read from TCP socket                                 │  │
+│  │                                                                       │  │
+│  │ Read line: {"kind":"Press","key_label":"Function",...}               │  │
+│  │ Deserialize JSON → KeyboardEventPayload                              │  │
+│  │                                                                       │  │
+│  │ [Windows only]                                                        │  │
+│  │ if scan_code == 0: continue  // Skip injected events                 │  │
+│  └───────────────────────┬───────────────────────────────────────────────┘  │
+│                          │                                                   │
+│                          ▼                                                   │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │ KeyEventEmitter::handle_event()                                      │  │
+│  │                                                                       │  │
+│  │ Update pressed_keys HashSet<String>:                                 │  │
+│  │   - On KeyPress: insert("Function")                                  │  │
+│  │   - On KeyRelease: remove("Function")                                │  │
+│  │                                                                       │  │
+│  │ If changed:                                                           │  │
+│  │   Create snapshot: vec!["Function"]                                  │  │
+│  │   Sort it (for consistency)                                          │  │
+│  │   Emit EVT_KEYS_HELD event to UI                                    │  │
+│  └───────────────────────┬───────────────────────────────────────────────┘  │
+│                          │                                                   │
+└──────────────────────────┼───────────────────────────────────────────────────┘
+                           │
+                           │ Tauri Event: "keys_held"
+                           │ {keys: ["Function"]}
+                           │
+┌──────────────────────────┼───────────────────────────────────────────────────┐
+│                          ▼                                                   │
+│           REACT COMPONENT - RootSideEffects.tsx                             │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │ useTauriListen("keys_held", (event) => {                             │  │
+│  │   produceAppState(draft => {                                         │  │
+│  │     draft.keysHeld = ["Function"]  // Update Zustand state           │  │
+│  │   })                                                                  │  │
+│  │ })                                                                    │  │
+│  └───────────────────────┬───────────────────────────────────────────────┘  │
+│                          │                                                   │
+└──────────────────────────┼───────────────────────────────────────────────────┘
+                           │
+                           │ State changed: keysHeld = ["Function"]
+                           │
+┌──────────────────────────┼───────────────────────────────────────────────────┐
+│                          ▼                                                   │
+│              HOTKEY MATCHING HOOKS                                          │
+│                                                                             │
+│  useHotkeyHold({ actionName: "dictate", controller })                      │
+│    │                                                                        │
+│    ├─ Runs when keysHeld changes                                           │
+│    │                                                                        │
+│    ├─ Get available combos for "dictate":                                  │
+│    │  getHotkeyCombosForAction(state, "dictate")                          │
+│    │  └─ Looks in state.hotkeyById for matching hotkeys                   │
+│    │     Or returns DEFAULT_HOTKEY_COMBOS["dictate"]                      │
+│    │     macOS: [["Function"]]                                            │
+│    │                                                                        │
+│    ├─ Normalize & Match:                                                   │
+│    │  const normalize = (key) => key.toLowerCase()                        │
+│    │  held = ["function"] (normalized)                                    │
+│    │  combo = ["function"] (normalized)                                   │
+│    │  ✓ MATCH!                                                             │
+│    │                                                                        │
+│    ├─ On press (was not pressed → now pressed):                           │
+│    │  controller.handlePress()                                            │
+│    │  └─ START RECORDING                                                  │
+│    │                                                                        │
+│    └─ On release (was pressed → now not pressed):                         │
+│       controller.handleRelease()                                           │
+│       └─ STOP RECORDING                                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                            DATA FLOW SUMMARY                               ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+1. KEYBOARD EVENT
+   rdev captures system keyboard → Key enum (e.g., Key::Function)
+
+2. SERIALIZATION
+   key_to_label() → String (e.g., "Function")
+   Serialize to JSON → TCP stream to main process
+
+3. RECEPTION
+   Main process receives JSON → deserialize → KeyboardEventPayload
+
+4. EVENT EMISSION
+   KeyEventEmitter tracks HashSet<String> of pressed keys
+   Emits EVT_KEYS_HELD with snapshot when state changes
+
+5. REACT STATE UPDATE
+   useTauriListen updates Zustand: keysHeld = ["Function", ...]
+
+6. HOTKEY MATCHING
+   useHotkeyHold() hook:
+   - Compares keysHeld against configured hotkey combos
+   - Case-insensitive normalization
+   - Handles press/release events
+   - Triggers recording start/stop
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        KEY CONFIGURATION FLOW                             ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+USER SETS HOTKEY IN SETTINGS
+      │
+      ├─ UI: getPrettyKeyName("Function") → "Fn"  (display only!)
+      │
+      ▼
+SAVE TO DATABASE (important: store rdev format, not pretty name!)
+      │
+      ├─ Should store: ["Function"]  ✅
+      ├─ NOT: ["Fn"]  ❌
+      ├─ NOT: ["function"]  ✅ (will be normalized to lowercase anyway)
+      │
+      ▼
+ON APP START: loadHotkeys()
+      │
+      ├─ Fetch from DB: hotkeyById["dictate"] = {keys: ["Function"]}
+      │
+      ├─ Store in Zustand state
+      │
+      └─ getHotkeyCombosForAction(state, "dictate") returns ["Function"]
+
+INCOMING KEY EVENT
+      │
+      ├─ rdev sends: "Function"
+      ├─ Normalize: "function"
+      │
+      └─ Stored combo: ["Function"]
+         Normalize: ["function"]
+         
+         MATCH! ✅
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    PERMISSION REQUIREMENTS BY OS                          ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+macOS:
+  ✓ Accessibility Permission (privacy: input monitoring)
+  ✓ Input Monitoring Permission (new, required for Fn key!)
+  
+Windows:
+  ✓ No special permissions needed (rdev works system-wide)
+  
+Linux:
+  ✓ No special permissions needed
+  ⚠️  X11 threading must be initialized (XInitThreads)
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                      KNOWN GOTCHAS                                         ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+1. Fn Key as Unknown(63):
+   - Some keyboard layouts report Fn as Unknown(63) instead of Function
+   - Debug mode will show: [keys] event: KeyPress(Unknown(63))
+   - Database may store: ["Unknown(63)"]
+   - This is CORRECT and expected!
+
+2. String Normalization:
+   - Stored: "Function" → normalized: "function"
+   - Received: "Function" → normalized: "function"
+   - ✓ Comparison works
+   
+   BUT if stored as "Fn":
+   - Stored: "Fn" → normalized: "fn"
+   - Received: "Function" → normalized: "function"
+   - ❌ Comparison FAILS ("fn" ≠ "function")
+
+3. macOS Input Monitoring:
+   - App needs Input Monitoring permission for Fn key listening
+   - Accessibility alone is NOT enough
+   - Without it: keyboard listener silently fails (no error!)
+   - User must manually grant in System Settings
+
+4. Windows Injected Events:
+   - Paste operations trigger synthetic Ctrl+V
+   - scan_code == 0 filters these out
+   - On macOS/Linux: NOT FILTERED (re-triggering risk!)
+
+5. Multiple Hotkey Entries:
+   - If duplicate action_names exist, all are tried
+   - Example: dictate-1 and dictate-2 both set to "dictate"
+   - Both combos will trigger
+   - Database should have only ONE per action
+
