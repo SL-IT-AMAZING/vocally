@@ -48,7 +48,10 @@ export class AgentStrategy extends BaseStrategy {
       };
     }
 
-    if (getMemberExceedsLimitByState(state)) {
+    const { refreshMember } = await import("../actions/member.actions");
+    await refreshMember();
+    const freshState = getAppState();
+    if (getMemberExceedsLimitByState(freshState)) {
       return {
         title: getIntl().formatMessage({
           defaultMessage: "Word limit reached",

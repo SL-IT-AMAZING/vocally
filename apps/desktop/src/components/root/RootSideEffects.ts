@@ -57,12 +57,7 @@ import {
   trackAppUsed,
   trackDictationStart,
 } from "../../utils/analytics.utils";
-import {
-  isAudioEffectivelySilent,
-  isWhisperHallucination,
-  playAlertSound,
-  tryPlayAudioChime,
-} from "../../utils/audio.utils";
+import { playAlertSound, tryPlayAudioChime } from "../../utils/audio.utils";
 import {
   AGENT_DICTATE_HOTKEY,
   DICTATE_HOTKEY,
@@ -444,21 +439,6 @@ export const RootSideEffects = () => {
 
     try {
       if (session && audio) {
-        const rate = audio.sampleRate ?? 16000;
-        if (isAudioEffectivelySilent(audio.samples, rate)) {
-          if (loadingToken && overlayLoadingTokenRef.current === loadingToken) {
-            overlayLoadingTokenRef.current = null;
-            await invoke<void>("set_phase", { phase: "idle" });
-          }
-          session.cleanup();
-          await strategy.cleanup();
-          strategyRef.current = null;
-          produceAppState((draft) => {
-            draft.activeRecordingMode = null;
-          });
-          return;
-        }
-
         const [currentApp, transcribeResult] = await Promise.all([
           tryRegisterCurrentAppTarget(),
           session.finalize(audio),
@@ -472,10 +452,7 @@ export const RootSideEffects = () => {
         let postProcessMetadata = {};
         let postProcessWarnings: string[] = [];
 
-        const hasValidTranscript =
-          !!rawTranscript && !isWhisperHallucination(rawTranscript);
-
-        if (hasValidTranscript) {
+        if (rawTranscript) {
           const result = await strategy.handleTranscript({
             rawTranscript,
             toneId,
