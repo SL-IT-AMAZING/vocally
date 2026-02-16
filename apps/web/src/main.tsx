@@ -24,7 +24,11 @@ if (!container) {
 }
 
 const RootApp = () => {
-  const intlConfig = useMemo(() => getIntlConfig(), []);
+  const intlConfig = useMemo(() => {
+    const config = getIntlConfig();
+    document.documentElement.lang = config.locale;
+    return config;
+  }, []);
   return (
     <StrictMode>
       <IntlProvider {...intlConfig}>

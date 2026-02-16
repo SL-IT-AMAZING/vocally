@@ -140,7 +140,7 @@ export function SiteHeader() {
         </button>
       </header>
       {isMobileMenuOpen && (
-        <div className={styles.header} style={{ marginTop: "8px" }}>
+        <div className={styles.mobileMenuPanel}>
           <nav className={styles.mobileNav}>
             {navLinks.map(({ href, label }) => (
               <Link
@@ -154,6 +154,38 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className={styles.mobileMenuActions}>
+            <div className={styles.mobileMenuRow}>
+              <button
+                onClick={handleLocaleToggle}
+                className={styles.langToggle}
+                aria-label={intl.formatMessage({
+                  defaultMessage: "Switch language",
+                })}
+              >
+                {locale === "ko" ? "EN" : "한국어"}
+              </button>
+              {user ? (
+                <button
+                  className={styles.langToggle}
+                  onClick={() => {
+                    signOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <FormattedMessage defaultMessage="Sign out" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    openSignInModal();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={styles.langToggle}
+                >
+                  <FormattedMessage defaultMessage="Sign in" />
+                </button>
+              )}
+            </div>
             <DownloadButton />
           </div>
         </div>
