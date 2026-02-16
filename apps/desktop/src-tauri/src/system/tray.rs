@@ -15,11 +15,21 @@ pub fn setup_tray(app: &mut tauri::App) -> tauri::Result<()> {
     use tauri::{Emitter, Manager};
 
     let open_item = MenuItem::with_id(app, "open-dashboard", "Open Dashboard", true, None::<&str>)?;
-    let register_current_app_item =
-        MenuItem::with_id(app, "register-current-app", "Register this app", true, None::<&str>)?;
-    let toggle_floating_bar_item =
-        MenuItem::with_id(app, "toggle-floating-bar", "Show Floating Bar", true, None::<&str>)?;
-    let quit_item = MenuItem::with_id(app, "quit-voquill", "Quit Voquill", true, None::<&str>)?;
+    let register_current_app_item = MenuItem::with_id(
+        app,
+        "register-current-app",
+        "Register this app",
+        true,
+        None::<&str>,
+    )?;
+    let toggle_floating_bar_item = MenuItem::with_id(
+        app,
+        "toggle-floating-bar",
+        "Show Floating Bar",
+        true,
+        None::<&str>,
+    )?;
+    let quit_item = MenuItem::with_id(app, "quit-voquill", "Quit Vocally", true, None::<&str>)?;
 
     let menu = MenuBuilder::new(app)
         .item(&open_item)
@@ -34,7 +44,7 @@ pub fn setup_tray(app: &mut tauri::App) -> tauri::Result<()> {
     #[allow(unused_mut)]
     let mut tray_builder = TrayIconBuilder::with_id("main")
         .menu(&menu)
-        .tooltip("Voquill")
+        .tooltip("Vocally")
         .icon(tray_icon_image)
         .on_menu_event(|app, event| match event.id().as_ref() {
             "open-dashboard" => {
