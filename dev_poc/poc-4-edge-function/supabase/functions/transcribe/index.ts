@@ -73,6 +73,10 @@ Deno.serve(async (req) => {
     const groqModel =
       baseLanguage === "ko" ? "whisper-large-v3" : "whisper-large-v3-turbo";
 
+    console.log(
+      `[transcribe] language=${JSON.stringify(language)} baseLanguage=${baseLanguage} model=${groqModel}`,
+    );
+
     const formData = new FormData();
     formData.append("file", blob, `audio.${ext}`);
     formData.append("model", groqModel);
@@ -108,7 +112,7 @@ Deno.serve(async (req) => {
       p_tokens: 0,
     });
 
-    return jsonResponse({ text });
+    return jsonResponse({ text, model: groqModel });
   } catch (err) {
     return errorResponse(err.message, 500);
   }

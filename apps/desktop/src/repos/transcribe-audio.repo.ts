@@ -310,9 +310,14 @@ export class CloudTranscribeAudioRepo extends BaseTranscribeAudioRepo {
     }
     const response = data;
 
+    if (response.model) {
+      console.log(`[Cloud Transcribe] model=${response.model}`);
+    }
+
     return {
       text: response.text,
       metadata: {
+        modelSize: response.model ?? null,
         transcriptionMode: "cloud",
       },
     };
