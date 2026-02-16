@@ -1,156 +1,90 @@
 <div align="center">
 
-<img src="docs/graphic.png" alt="Vocally Logo" width="400" />
+<img src="docs/vocally-logo.png" alt="Vocally" width="280" />
 
-# Your keyboard is holding you back.
+### Your keyboard is holding you back.
 
-### Make voice your new keyboard. Type four times faster by using your voice.
+Make voice your new keyboard. Type four times faster by using your voice.
 
 <br/>
 
-**[Visit our website →](https://vocally-web.vercel.app)**
+**[Website](https://vocally-web.vercel.app)** &nbsp;&middot;&nbsp; **[Download](https://vocally-web.vercel.app/download)**
 
 </div>
 
-Vocally is an open-source, cross-platform speech-to-text workspace that lets you dictate into any desktop application, clean the transcript with AI, and keep your personal glossary in sync. The repo bundles the production desktop app, marketing site, Supabase backend, and all shared packages in a single Turborepo.
+---
+
+Vocally is an open-source, cross-platform speech-to-text app. Dictate into any desktop application, clean the transcript with AI, and keep your personal glossary in sync. The repo bundles the desktop app, marketing site, Supabase backend, and shared packages in a single Turborepo.
 
 ## Highlights
 
-- Voice input everywhere: overlay, hotkeys, and system integrations work across macOS, Windows, and Linux.
-- Choose your engine: run Whisper locally (with optional GPU acceleration) or point to Groq's hosted Whisper via your own API key.
-- AI text cleanup: remove filler words and false starts automatically with the post-processing pipeline in `@repo/voice-ai`.
-- Personal dictionary: create glossary terms and replacement rules so recurring names and phrases stay accurate.
-- Multi-auth sign-in: Google, Kakao, and email/password authentication via Supabase Auth.
-- Pro subscriptions: monthly and yearly plans powered by Polar with webhook-driven plan management.
-- Per-user data isolation: transcriptions, tones, and dictionary terms are scoped to each signed-in user.
-- Batteries included: Tauri auto-updates, Supabase Edge Functions for server transcription and billing, and shared utilities/types that keep every surface consistent.
+- **Voice input everywhere** &mdash; overlay, hotkeys, and system integrations across macOS, Windows, and Linux.
+- **Choose your engine** &mdash; run Whisper locally (with optional GPU acceleration) or use Groq's hosted Whisper.
+- **AI text cleanup** &mdash; automatically remove filler words and false starts via the `@repo/voice-ai` pipeline.
+- **Personal dictionary** &mdash; glossary terms and replacement rules keep recurring names and phrases accurate.
+- **Multi-auth sign-in** &mdash; Google, Kakao, and email/password via Supabase Auth.
+- **Pro subscriptions** &mdash; monthly and yearly plans powered by Polar with webhook-driven management.
+- **Works offline** &mdash; local Whisper inference means no internet required.
 
 ## Monorepo Layout
 
-| Path                                                                  | Description                                                                                                 |
-| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `apps/desktop`                                                        | Tauri desktop app (Vite + React + Zustand) controlling UI, state, and business logic.                       |
-| `apps/desktop/src-tauri`                                              | Rust API layer invoked from TypeScript for native capabilities, SQLite storage, and Whisper inference.      |
-| `apps/web`                                                            | Marketing site deployed to Vercel at [vocally-web.vercel.app](https://vocally-web.vercel.app).              |
-| `dev_poc/poc-4-edge-function/supabase/functions`                      | Supabase Edge Functions handling server transcription (Groq), payments (Polar), and user/member management. |
-| `packages/voice-ai`                                                   | Audio chunking + Groq client used for transcription and transcript cleanup.                                 |
-| `packages/types`                                                      | Shared domain models (users, transcriptions, dictionary terms, members, config, etc.).                      |
-| `packages/pricing`                                                    | Subscription price definitions and plan metadata.                                                           |
-| `packages/utilities`                                                  | Reusable utilities including usage-limit checks and collection helpers.                                     |
-| `packages/ui`, `packages/eslint-config`, `packages/typescript-config` | UI primitives, lint rules, and TypeScript configuration consumed by every app.                              |
-| `docs`                                                                | Architecture notes, release guides, and reference material.                                                 |
-| `scripts`                                                             | Automation and helper scripts (for example Linux dependency setup).                                         |
-
-### Supabase Edge Functions
-
-| Function                | Purpose                                                                                           |
-| ----------------------- | ------------------------------------------------------------------------------------------------- |
-| `transcribe`            | Accepts base64 audio, calls Groq Whisper API, enforces monthly word limits (500 free / 100k pro). |
-| `generate-text`         | AI-powered post-processing and tone application via Groq.                                         |
-| `polar-checkout`        | Creates Polar checkout sessions for Pro subscriptions.                                            |
-| `polar-webhook`         | Handles Polar payment events to activate/deactivate Pro plans.                                    |
-| `member-init`           | Initializes a member record on first sign-in.                                                     |
-| `member-get`            | Returns the current member's plan and usage stats.                                                |
-| `user-get` / `user-set` | Reads and writes user profile data.                                                               |
-
-## Architecture Overview
-
-The desktop app follows a TypeScript-first design: Zustand maintains a single global store, while pure utility functions in `apps/desktop/src/utils` read and mutate state. Actions compose those utilities and may call out to repositories. Repos abstract whether persistence happens locally (SQLite through Tauri commands) or remotely (Supabase).
-
 ```
-User input / system events
-        ↓
-React + Zustand state (TypeScript)
-        ↓
-Repos choose local vs. remote storage
-        ↓
-Tauri commands (Rust API bridge)
-        ↓
-SQLite, Whisper models, or Supabase Edge Functions
+apps/
+  desktop/          Tauri desktop app (Vite + React + Zustand)
+    src-tauri/      Rust API layer — audio, Whisper, SQLite, native integrations
+  web/              Marketing site (Vite + React), deployed to Vercel
+
+packages/
+  voice-ai/         Audio chunking + Groq client for transcription & cleanup
+  types/            Shared domain models
+  pricing/          Subscription plan definitions
+  utilities/        Reusable helpers (usage limits, collections)
+  ui/               UI primitives
+  eslint-config/    Shared lint rules
+  typescript-config/ Shared TS config
+
+docs/               Architecture notes, release guides, reference material
 ```
-
-Rust stays focused on native integrations — audio capture, keyboard injection, updater, encryption, GPU enumeration, filesystem paths. TypeScript owns business logic, routing, and UI. The same shared packages are imported by the desktop app, edge functions, and the marketing site, which keeps the product vocabulary in sync.
-
-See `docs/desktop-architecture.md` for the full tour.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ and npm 10+.
-- Rust toolchain with `cargo`, `rustup`, and the Tauri CLI (`cargo install tauri-cli`).
-- Platform dependencies for Tauri (GTK/WebKit/AppIndicator/etc.). On Linux you can run `apps/desktop/scripts/setup-linux.sh`. On Windows use `powershell -ExecutionPolicy Bypass -File apps/desktop/scripts/setup-windows.ps1` (add `-EnableGpu` to pull the Vulkan SDK for GPU builds).
-- A Groq API key if you plan to use hosted transcription or transcript cleanup (`GROQ_API_KEY`).
-- [Supabase CLI](https://supabase.com/docs/guides/cli) when working on edge functions.
+- **Node.js 18+** and **npm 10+**
+- **Rust toolchain** with `cargo`, `rustup`, and the Tauri CLI (`cargo install tauri-cli`)
+- Platform dependencies for Tauri (see platform-specific notes below)
+- **Groq API key** (optional) for hosted transcription
 
-### Install dependencies
+### Install & Build
 
 ```sh
 npm install
-```
-
-### Build everything
-
-Use the prepared `turbo` task instead of manually invoking `turbo dev`.
-
-```sh
 npm run build
 ```
 
-### Run the desktop app
-
-Pick the platform-specific script; avoid `turbo dev` since the desktop app manages its own watcher.
+### Run the Desktop App
 
 ```sh
-# Mac
+# macOS
 npm run dev:mac --workspace apps/desktop
 
 # Windows
 npm run dev:windows --workspace apps/desktop
 
-# Linux (CPU)
+# Linux
 npm run dev:linux --workspace apps/desktop
 
 # Linux with Vulkan GPU acceleration
 npm run dev:linux:gpu --workspace apps/desktop
 ```
 
-During local development you can override platform detection by exporting `VOQUILL_DESKTOP_PLATFORM` (`darwin`, `win32`, or `linux`).
-
-### Running on Windows
-
-```powershell
-# 1) Make sure MSVC is initialized
-# (Skip this if you're already in "Developer PowerShell for VS 2022")
-& "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-
-# 2) Required for whisper.cpp / ggml Vulkan builds
-$env:WHISPER_CMAKE_ARGS = '-DGGML_VULKAN=ON -DCMAKE_INSTALL_PREFIX=C:/w'
-
-# (Optional but recommended) shorten build paths on Windows
-$env:CARGO_TARGET_DIR = 'C:\cargo'
-
-# 3) Build
-npm run dev
-```
-
-### Run the marketing site
+### Run the Marketing Site
 
 ```sh
 npm run dev --workspace apps/web
 ```
 
-### Deploy edge functions
-
-Edge functions live in `dev_poc/poc-4-edge-function/supabase/functions/`. Deploy with:
-
-```sh
-supabase functions deploy <function-name> --no-verify-jwt
-```
-
-Secrets such as `GROQ_API_KEY` and `POLAR_WEBHOOK_SECRET` are managed via `supabase secrets set`.
-
-### Quality checks
+### Quality Checks
 
 ```sh
 npm run lint
@@ -158,42 +92,45 @@ npm run check-types
 npm run test
 ```
 
-Individual workspaces expose the same commands if you need a narrower scope.
+## Architecture
 
-## Run in prod mode
+The desktop app follows a TypeScript-first design. Zustand manages a single global store, pure utility functions read and mutate state, and actions compose those utilities with API calls. Repos abstract local (SQLite via Tauri) vs. remote (Supabase) persistence.
 
-1. Comment out devUrl in `apps/desktop/src-tauri/tauri.conf.json`.
-2. cd /apps/desktop
-3. npm run build
-4. VITE_FLAVOR=prod npx tauri dev --no-dev-server
+```
+User input / system events
+        ↓
+React + Zustand (TypeScript)
+        ↓
+Repos → local or remote storage
+        ↓
+Tauri commands (Rust)
+        ↓
+SQLite, Whisper, or Supabase Edge Functions
+```
 
-## Environment Reference
+Rust handles native integrations (audio capture, keyboard injection, updater, encryption, GPU). TypeScript owns business logic, routing, and UI.
 
-| Variable                                                         | Purpose                                                                                                |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `VITE_SUPABASE_URL`                                              | Supabase project URL used by the desktop app and marketing site.                                       |
-| `VITE_SUPABASE_ANON_KEY`                                         | Supabase anonymous key for client-side auth and API calls.                                             |
-| `VOQUILL_API_KEY_SECRET`                                         | Secret used by the desktop app to encrypt API keys stored on disk.                                     |
-| `VOQUILL_WHISPER_MODEL_URL` / `VOQUILL_WHISPER_MODEL_URL_<SIZE>` | Override download locations for Whisper models when running locally.                                   |
-| `VOQUILL_WHISPER_DISABLE_GPU`                                    | Force the desktop app to avoid GPU inference, useful for debugging.                                    |
-| `VOQUILL_GOOGLE_CLIENT_ID` / `VOQUILL_GOOGLE_CLIENT_SECRET`      | Google OAuth credentials for desktop app sign-in.                                                      |
-| `GROQ_API_KEY`                                                   | Enables Groq-backed transcription/cleanup in edge functions and in the desktop API transcription mode. |
-| `POLAR_ACCESS_TOKEN`                                             | Polar API token for creating checkout sessions.                                                        |
-| `POLAR_WEBHOOK_SECRET`                                           | Polar webhook signing secret for verifying payment events.                                             |
+See [`docs/desktop-architecture.md`](docs/desktop-architecture.md) for the full tour.
 
-## Releases & CI
+## Environment Variables
 
-- Desktop builds are produced by `.github/workflows/release-desktop.yml`. The workflow bumps a channel tag, builds all three platforms, and publishes assets plus `latest.json` manifests. Promo runs handle dev → prod promotion. See `docs/desktop-release.md` for step-by-step instructions.
-- The marketing site is deployed to Vercel automatically on push to `main`.
-- Turbo caching is configured in `turbo.json`; CI jobs call `npm run build`, `npm run lint`, and other workspace-scoped commands.
+| Variable                              | Purpose                             |
+| ------------------------------------- | ----------------------------------- |
+| `VITE_SUPABASE_URL`                   | Supabase project URL                |
+| `VITE_SUPABASE_ANON_KEY`              | Supabase anonymous key              |
+| `VOQUILL_API_KEY_SECRET`              | Encrypts API keys stored on disk    |
+| `VOQUILL_WHISPER_MODEL_URL`           | Override Whisper model download URL |
+| `VOQUILL_WHISPER_DISABLE_GPU`         | Force CPU-only inference            |
+| `VOQUILL_GOOGLE_CLIENT_ID` / `SECRET` | Google OAuth credentials            |
+| `GROQ_API_KEY`                        | Groq transcription & cleanup        |
+| `POLAR_ACCESS_TOKEN`                  | Polar checkout sessions             |
+| `POLAR_WEBHOOK_SECRET`                | Polar webhook verification          |
 
-## Documentation
+## Releases
 
-- Desktop architecture: `docs/desktop-architecture.md`
-- Release playbook: `docs/desktop-release.md`
-- Additional resources and inspiration: `docs/resources.md`
-- Contributor conventions and workspace notes: `AGENTS.md`
+- **Desktop**: `.github/workflows/release-desktop.yml` builds all platforms and publishes assets. See [`docs/desktop-release.md`](docs/desktop-release.md).
+- **Marketing site**: auto-deployed to Vercel on push to `main`.
 
 ## License
 
-Unless otherwise noted, Vocally is released under the AGPLv3. See `LICENCE` for the complete terms and third-party attributions.
+AGPLv3. See [`LICENCE`](LICENCE) for details.
