@@ -48,8 +48,7 @@ export class AgentStrategy extends BaseStrategy {
       };
     }
 
-    const { refreshMember } = await import("../actions/member.actions");
-    await refreshMember();
+    // Use cached state — refreshMember() blocks hotkey response for 200-1000ms.
     const freshState = getAppState();
     if (getMemberExceedsLimitByState(freshState)) {
       return {

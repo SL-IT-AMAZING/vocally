@@ -31,7 +31,7 @@ export function SiteFooter() {
           <a href="https://vocally-web.vercel.app/refund">
             <FormattedMessage defaultMessage="Refund Policy" />
           </a>
-          <a href="mailto:support@vocally.so">
+          <a href="mailto:slit.amazing@gmail.com">
             <FormattedMessage defaultMessage="Contact" />
           </a>
         </div>

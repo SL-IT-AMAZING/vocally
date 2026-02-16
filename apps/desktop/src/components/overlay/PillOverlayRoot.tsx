@@ -95,19 +95,27 @@ export const PillOverlayRoot = () => {
   });
 
   useEffect(() => {
-    emitTo("main", "overlay_ready", { windowLabel: "pill-overlay" }).catch(
-      console.error,
-    );
+    const sendReady = () =>
+      emitTo("main", "overlay_ready", { windowLabel: "pill-overlay" }).catch(
+        console.error,
+      );
+    sendReady();
+    const retryId = setTimeout(sendReady, 1000);
+    return () => clearTimeout(retryId);
   }, []);
 
   const dictationPillVisibility = useAppStore((state) =>
     getEffectivePillVisibility(state.userPrefs?.dictationPillVisibility),
   );
   const isDictationUnlocked = useAppStore(getIsDictationUnlocked);
+  const isAuthenticatedWithoutUserData = useAppStore((state) => {
+    const uid = state.auth?.id;
+    return !!uid && !state.userById[uid];
+  });
 
   const isOverlayActive = !isIdle;
   const isVisible =
-    isDictationUnlocked &&
+    (isDictationUnlocked || isAuthenticatedWithoutUserData) &&
     dictationPillVisibility !== "hidden" &&
     (isOverlayActive || dictationPillVisibility !== "while_active");
 

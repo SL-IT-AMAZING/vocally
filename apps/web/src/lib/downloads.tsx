@@ -40,12 +40,15 @@ export type PlatformDownload = {
 export const DEFAULT_PLATFORM: Platform = "mac";
 
 const RELEASES_API_URL =
-  "https://api.github.com/repos/SL-IT-AMAZING/vocally/releases";
+  "https://api.github.com/repos/SL-IT-AMAZING/vocally/releases?per_page=100";
+const RELEASES_TAG_API_URL =
+  "https://api.github.com/repos/SL-IT-AMAZING/vocally/releases/tags";
 
 const CPU_LATEST_MANIFEST_URL =
   "https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-prod/latest.json";
 const GPU_LATEST_MANIFEST_URL =
   "https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-gpu-prod/latest.json";
+type ReleaseChannelTag = "desktop-prod" | "desktop-gpu-prod";
 
 const RELEASE_TAG_PATTERNS = {
   cpu: /^desktop-v\d/,
@@ -174,6 +177,7 @@ export const PLATFORM_ORDER: Platform[] = ["mac", "windows", "linux"];
 type GithubReleaseAsset = {
   name: string;
   browser_download_url: string;
+  url?: string;
   content_type?: string;
   size?: number;
 };
@@ -185,6 +189,25 @@ type GithubRelease = {
   published_at?: string;
   assets?: GithubReleaseAsset[];
 };
+
+function newestReleaseFirst(a: GithubRelease, b: GithubRelease) {
+  const aTime = Date.parse(a.published_at ?? "");
+  const bTime = Date.parse(b.published_at ?? "");
+
+  if (!Number.isNaN(aTime) && !Number.isNaN(bTime)) {
+    return bTime - aTime;
+  }
+
+  if (Number.isNaN(aTime) && Number.isNaN(bTime)) {
+    return 0;
+  }
+
+  if (Number.isNaN(aTime)) {
+    return 1;
+  }
+
+  return -1;
+}
 
 const ASSET_KEY_MAPPINGS: Array<{
   match: (name: string, contentType?: string) => boolean;
@@ -256,17 +279,35 @@ export async function fetchReleaseManifest(signal?: AbortSignal) {
       fetchChannelManifest(GPU_LATEST_MANIFEST_URL, signal),
     ]);
 
-    if (cpuManifest || gpuManifest) {
+    let finalCpuManifest = cpuManifest;
+    let finalGpuManifest = gpuManifest;
+
+    if (!finalCpuManifest || !finalGpuManifest) {
+      const [cpuTaggedManifest, gpuTaggedManifest] = await Promise.all([
+        finalCpuManifest
+          ? Promise.resolve(undefined)
+          : fetchTaggedChannelManifest("desktop-prod", signal),
+        finalGpuManifest
+          ? Promise.resolve(undefined)
+          : fetchTaggedChannelManifest("desktop-gpu-prod", signal),
+      ]);
+
+      finalCpuManifest = finalCpuManifest ?? cpuTaggedManifest;
+      finalGpuManifest = finalGpuManifest ?? gpuTaggedManifest;
+    }
+
+    if (finalCpuManifest || finalGpuManifest) {
       const merged: ReleaseManifest = {
-        version: cpuManifest?.version ?? gpuManifest?.version ?? "latest",
-        notes: cpuManifest?.notes ?? gpuManifest?.notes ?? "",
+        version:
+          finalCpuManifest?.version ?? finalGpuManifest?.version ?? "latest",
+        notes: finalCpuManifest?.notes ?? finalGpuManifest?.notes ?? "",
         pub_date:
-          cpuManifest?.pub_date ??
-          gpuManifest?.pub_date ??
+          finalCpuManifest?.pub_date ??
+          finalGpuManifest?.pub_date ??
           new Date().toISOString(),
         platforms: {
-          ...(cpuManifest?.platforms ?? {}),
-          ...(gpuManifest?.platforms ?? {}),
+          ...(finalCpuManifest?.platforms ?? {}),
+          ...(finalGpuManifest?.platforms ?? {}),
         },
       };
 
@@ -286,12 +327,14 @@ export async function fetchReleaseManifest(signal?: AbortSignal) {
 
     const allReleases = (await response.json()) as GithubRelease[];
 
-    const latestCpu = allReleases.find(
-      (r) => r.tag_name && RELEASE_TAG_PATTERNS.cpu.test(r.tag_name),
-    );
-    const latestGpu = allReleases.find(
-      (r) => r.tag_name && RELEASE_TAG_PATTERNS.gpu.test(r.tag_name),
-    );
+    const latestCpu = allReleases
+      .filter((r) => r.tag_name && RELEASE_TAG_PATTERNS.cpu.test(r.tag_name))
+      .slice()
+      .sort(newestReleaseFirst)[0];
+    const latestGpu = allReleases
+      .filter((r) => r.tag_name && RELEASE_TAG_PATTERNS.gpu.test(r.tag_name))
+      .slice()
+      .sort(newestReleaseFirst)[0];
 
     const validReleases = [latestCpu, latestGpu].filter(
       (r): r is GithubRelease => r !== undefined,
@@ -324,6 +367,59 @@ async function fetchChannelManifest(url: string, signal?: AbortSignal) {
     }
 
     const manifest = (await response.json()) as ReleaseManifest;
+    if (!manifest || typeof manifest !== "object") {
+      return undefined;
+    }
+
+    if (!manifest.platforms || Object.keys(manifest.platforms).length === 0) {
+      return undefined;
+    }
+
+    return manifest;
+  } catch {
+    return undefined;
+  }
+}
+
+async function fetchTaggedChannelManifest(
+  tag: ReleaseChannelTag,
+  signal?: AbortSignal,
+) {
+  try {
+    const tagResponse = await fetch(`${RELEASES_TAG_API_URL}/${tag}`, {
+      signal,
+      headers: {
+        Accept: "application/vnd.github+json",
+      },
+      cache: "no-store",
+    });
+
+    if (!tagResponse.ok) {
+      return undefined;
+    }
+
+    const release = (await tagResponse.json()) as GithubRelease;
+    const manifestAsset = release.assets?.find(
+      (asset) => asset.name.toLowerCase() === "latest.json",
+    );
+
+    if (!manifestAsset?.url) {
+      return undefined;
+    }
+
+    const manifestResponse = await fetch(manifestAsset.url, {
+      signal,
+      headers: {
+        Accept: "application/octet-stream",
+      },
+      cache: "no-store",
+    });
+
+    if (!manifestResponse.ok) {
+      return undefined;
+    }
+
+    const manifest = (await manifestResponse.json()) as ReleaseManifest;
     if (!manifest || typeof manifest !== "object") {
       return undefined;
     }

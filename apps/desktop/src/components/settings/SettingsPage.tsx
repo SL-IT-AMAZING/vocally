@@ -2,9 +2,11 @@ import {
   ArrowOutwardRounded,
   AutoAwesomeOutlined,
   AutoFixHighOutlined,
+  BugReportOutlined,
   CreditCardOutlined,
   DeleteForeverOutlined,
   DescriptionOutlined,
+  FeedbackOutlined,
   GraphicEqOutlined,
   KeyboardAltOutlined,
   LanguageOutlined,
@@ -33,8 +35,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { showErrorSnackbar } from "../../actions/app.actions";
 import { setAutoLaunchEnabled } from "../../actions/settings.actions";
@@ -52,6 +55,7 @@ import {
   DICTATION_LANGUAGE_OPTIONS,
   WHISPER_LANGUAGES,
 } from "../../utils/language.utils";
+import { getPlatform } from "../../utils/platform.utils";
 import {
   getDetectedSystemLocale,
   getHasEmailProvider,
@@ -75,6 +79,11 @@ export default function SettingsPage() {
   const intl = useIntl();
 
   const [appLocale, setAppLocale] = useState<Locale>(detectLocale());
+  const [appVersion, setAppVersion] = useState("");
+
+  useEffect(() => {
+    void getVersion().then(setAppVersion);
+  }, []);
 
   const handleLocaleToggle = () => {
     const next: Locale = appLocale === "ko" ? "en" : "ko";
@@ -216,7 +225,7 @@ export default function SettingsPage() {
       showErrorSnackbar(
         intl.formatMessage({
           defaultMessage:
-            "Could not open subscription management. Please contact support@vocally.so.",
+            "Could not open subscription management. Please contact slit.amazing@gmail.com.",
         }),
       );
     } finally {
@@ -500,6 +509,62 @@ export default function SettingsPage() {
     </Section>
   );
 
+  const helpAndSupport = (
+    <Section
+      title={<FormattedMessage defaultMessage="Help & Support" />}
+      description={
+        <FormattedMessage defaultMessage="Get help, report issues, or share your feedback." />
+      }
+    >
+      <ListTile
+        title={<FormattedMessage defaultMessage="Report a bug" />}
+        subtitle={
+          <FormattedMessage defaultMessage="Let us know about any issues you've encountered" />
+        }
+        leading={<BugReportOutlined />}
+        trailing={<ArrowOutwardRounded />}
+        onClick={() => {
+          const platform = getPlatform();
+          const subject = encodeURIComponent(
+            intl.formatMessage(
+              { defaultMessage: "Bug Report - Vocally v{version}" },
+              { version: appVersion },
+            ),
+          );
+          const body = encodeURIComponent(
+            intl.formatMessage(
+              {
+                defaultMessage:
+                  "Platform: {platform}\nVersion: {version}\n\nDescribe the issue:\n",
+              },
+              { platform, version: appVersion },
+            ),
+          );
+          void openUrl(
+            `mailto:slit.amazing@gmail.com?subject=${subject}&body=${body}`,
+          );
+        }}
+      />
+      <ListTile
+        title={<FormattedMessage defaultMessage="Send feedback" />}
+        subtitle={
+          <FormattedMessage defaultMessage="Share ideas or suggestions to improve Vocally" />
+        }
+        leading={<FeedbackOutlined />}
+        trailing={<ArrowOutwardRounded />}
+        onClick={() => {
+          const subject = encodeURIComponent(
+            intl.formatMessage(
+              { defaultMessage: "Feedback - Vocally v{version}" },
+              { version: appVersion },
+            ),
+          );
+          void openUrl(`mailto:slit.amazing@gmail.com?subject=${subject}`);
+        }}
+      />
+    </Section>
+  );
+
   const dangerZone = (
     <Section
       title={<FormattedMessage defaultMessage="Danger zone" />}
@@ -539,6 +604,9 @@ export default function SettingsPage() {
         </Paper>
         <Paper variant="flat" sx={{ p: 2, borderRadius: 3, mb: 3 }}>
           {advanced}
+        </Paper>
+        <Paper variant="flat" sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+          {helpAndSupport}
         </Paper>
         <Paper variant="flat" sx={{ p: 2, borderRadius: 3 }}>
           {dangerZone}

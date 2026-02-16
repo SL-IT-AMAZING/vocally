@@ -47,6 +47,14 @@ const useOverlaySync = <T>(
 };
 
 export const OverlaySyncSideEffects = () => {
+  useEffect(() => {
+    const state = getAppState();
+    const fullPayload = buildFullSyncPayload(state);
+    for (const target of OVERLAY_TARGETS) {
+      emitTo(target, "overlay_sync", fullPayload).catch(console.error);
+    }
+  }, []);
+
   useTauriListen<OverlayReadyPayload>("overlay_ready", (payload) => {
     const { windowLabel } = payload;
     if (!OVERLAY_TARGETS.includes(windowLabel)) {

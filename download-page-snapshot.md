@@ -1,0 +1,95 @@
+- generic [ref=e3]:
+  - banner [ref=e5]:
+    - link "Vocally" [ref=e6] [cursor=pointer]:
+      - /url: /
+      - img "Vocally" [ref=e7]
+    - navigation "주요 탐색" [ref=e8]:
+      - link "데모" [ref=e9] [cursor=pointer]:
+        - /url: /#demo
+      - link "목적" [ref=e10] [cursor=pointer]:
+        - /url: /#speed
+      - link "보안" [ref=e11] [cursor=pointer]:
+        - /url: /#privacy
+      - link "요금제" [ref=e12] [cursor=pointer]:
+        - /url: /#pricing
+    - generic [ref=e13]:
+      - button "언어 변경" [ref=e14] [cursor=pointer]: EN
+      - button "로그인" [ref=e15] [cursor=pointer]
+      - link "무료 다운로드" [ref=e16] [cursor=pointer]:
+        - /url: /download
+        - generic [ref=e18]: 무료 다운로드
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - heading "음성을 새로운 키보드로 만드세요." [level=1] [ref=e23]
+        - paragraph [ref=e24]: 음성으로 4배 빠르게 받아쓰기하세요.
+        - generic [ref=e25]:
+          - link "무료 다운로드" [ref=e26] [cursor=pointer]:
+            - /url: "#download-options"
+            - generic [ref=e28]: 무료 다운로드
+          - generic [ref=e29]: macOS 1.0.9 (권장)
+      - region "모든 다운로드 옵션" [ref=e30]:
+        - article [ref=e31]:
+          - generic [ref=e35]:
+            - heading "macOS" [level=3] [ref=e36]
+            - paragraph [ref=e37]: 직접 설치 파일
+          - list [ref=e71]:
+            - listitem [ref=e72]:
+              - link "macOS (유니버설) 모든 macOS 아키텍처용 설치 파일" [ref=e73] [cursor=pointer]:
+                - /url: https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-v1.0.9/Vocally_1.0.9_universal.dmg
+                - generic [ref=e74]: macOS (유니버설)
+                - generic [ref=e75]: 모든 macOS 아키텍처용 설치 파일
+        - article [ref=e39]:
+          - generic [ref=e43]:
+            - heading "Windows" [level=3] [ref=e44]
+            - paragraph [ref=e45]: 직접 설치 파일
+          - list [ref=e76]:
+            - listitem [ref=e77]:
+              - link "Windows (x64) .msi 설치 파일" [ref=e78] [cursor=pointer]:
+                - /url: https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-v1.0.9/Vocally_1.0.9_x64_en-US.msi
+                - generic [ref=e79]: Windows (x64)
+                - generic [ref=e80]: .msi 설치 파일
+            - listitem [ref=e81]:
+              - link "Windows X86 64 Msi" [ref=e82] [cursor=pointer]:
+                - /url: https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-v1.0.9/Vocally_1.0.9_x64_en-US.msi
+                - generic [ref=e83]: Windows X86 64 Msi
+            - listitem [ref=e84]:
+              - link "Windows X86 64 Nsis" [ref=e85] [cursor=pointer]:
+                - /url: https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-v1.0.9/Vocally_1.0.9_x64-setup.exe
+                - generic [ref=e86]: Windows X86 64 Nsis
+        - article [ref=e47]:
+          - generic [ref=e51]:
+            - heading "Linux" [level=3] [ref=e52]
+            - paragraph [ref=e53]: 직접 설치 파일
+          - list [ref=e87]:
+            - listitem [ref=e88]:
+              - link "Linux (x86_64) AppImage" [ref=e89] [cursor=pointer]:
+                - /url: https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-v1.0.9/Vocally_1.0.9_amd64.AppImage
+                - generic [ref=e90]: Linux (x86_64)
+                - generic [ref=e91]: AppImage
+            - listitem [ref=e92]:
+              - link "Linux X86 64 Appimage" [ref=e93] [cursor=pointer]:
+                - /url: https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-v1.0.9/Vocally_1.0.9_amd64.AppImage
+                - generic [ref=e94]: Linux X86 64 Appimage
+            - listitem [ref=e95]:
+              - link "Linux X86 64 Deb" [ref=e96] [cursor=pointer]:
+                - /url: https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-v1.0.9/Vocally_1.0.9_amd64.deb
+                - generic [ref=e97]: Linux X86 64 Deb
+      - button "고급 옵션 보기 (GPU, .deb, .rpm)" [ref=e56] [cursor=pointer]
+  - contentinfo [ref=e57]:
+    - generic [ref=e58]:
+      - heading "타이핑을 멈출 준비가 되셨나요?" [level=2] [ref=e59]
+      - link "무료 다운로드" [ref=e61] [cursor=pointer]:
+        - /url: /download
+        - generic [ref=e63]: 무료 다운로드
+    - navigation "법적 고지" [ref=e64]:
+      - generic [ref=e65]: © 2026 SL:IT
+      - generic [ref=e66]:
+        - link "개인정보 보호정책" [ref=e67] [cursor=pointer]:
+          - /url: https://vocally-web.vercel.app/privacy
+        - link "서비스 이용약관" [ref=e68] [cursor=pointer]:
+          - /url: https://vocally-web.vercel.app/terms
+        - link "환불 정책" [ref=e69] [cursor=pointer]:
+          - /url: https://vocally-web.vercel.app/refund
+        - link "문의" [ref=e70] [cursor=pointer]:
+          - /url: mailto:support@vocally.so
