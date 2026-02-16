@@ -41,14 +41,11 @@ export const DEFAULT_PLATFORM: Platform = "mac";
 
 const RELEASES_API_URL =
   "https://api.github.com/repos/SL-IT-AMAZING/vocally/releases?per_page=100";
-const RELEASES_TAG_API_URL =
-  "https://api.github.com/repos/SL-IT-AMAZING/vocally/releases/tags";
 
 const CPU_LATEST_MANIFEST_URL =
   "https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-prod/latest.json";
 const GPU_LATEST_MANIFEST_URL =
   "https://github.com/SL-IT-AMAZING/vocally/releases/download/desktop-gpu-prod/latest.json";
-type ReleaseChannelTag = "desktop-prod" | "desktop-gpu-prod";
 
 const RELEASE_TAG_PATTERNS = {
   cpu: /^desktop-v\d/,
@@ -274,40 +271,25 @@ const ASSET_KEY_MAPPINGS: Array<{
 
 export async function fetchReleaseManifest(signal?: AbortSignal) {
   try {
-    const [cpuManifest, gpuManifest] = await Promise.all([
-      fetchChannelManifest(CPU_LATEST_MANIFEST_URL, signal),
-      fetchChannelManifest(GPU_LATEST_MANIFEST_URL, signal),
-    ]);
+    const [cpuManifest, gpuManifest] =
+      typeof window === "undefined"
+        ? await Promise.all([
+            fetchChannelManifest(CPU_LATEST_MANIFEST_URL, signal),
+            fetchChannelManifest(GPU_LATEST_MANIFEST_URL, signal),
+          ])
+        : [undefined, undefined];
 
-    let finalCpuManifest = cpuManifest;
-    let finalGpuManifest = gpuManifest;
-
-    if (!finalCpuManifest || !finalGpuManifest) {
-      const [cpuTaggedManifest, gpuTaggedManifest] = await Promise.all([
-        finalCpuManifest
-          ? Promise.resolve(undefined)
-          : fetchTaggedChannelManifest("desktop-prod", signal),
-        finalGpuManifest
-          ? Promise.resolve(undefined)
-          : fetchTaggedChannelManifest("desktop-gpu-prod", signal),
-      ]);
-
-      finalCpuManifest = finalCpuManifest ?? cpuTaggedManifest;
-      finalGpuManifest = finalGpuManifest ?? gpuTaggedManifest;
-    }
-
-    if (finalCpuManifest || finalGpuManifest) {
+    if (cpuManifest || gpuManifest) {
       const merged: ReleaseManifest = {
-        version:
-          finalCpuManifest?.version ?? finalGpuManifest?.version ?? "latest",
-        notes: finalCpuManifest?.notes ?? finalGpuManifest?.notes ?? "",
+        version: cpuManifest?.version ?? gpuManifest?.version ?? "latest",
+        notes: cpuManifest?.notes ?? gpuManifest?.notes ?? "",
         pub_date:
-          finalCpuManifest?.pub_date ??
-          finalGpuManifest?.pub_date ??
+          cpuManifest?.pub_date ??
+          gpuManifest?.pub_date ??
           new Date().toISOString(),
         platforms: {
-          ...(finalCpuManifest?.platforms ?? {}),
-          ...(finalGpuManifest?.platforms ?? {}),
+          ...(cpuManifest?.platforms ?? {}),
+          ...(gpuManifest?.platforms ?? {}),
         },
       };
 
@@ -367,59 +349,6 @@ async function fetchChannelManifest(url: string, signal?: AbortSignal) {
     }
 
     const manifest = (await response.json()) as ReleaseManifest;
-    if (!manifest || typeof manifest !== "object") {
-      return undefined;
-    }
-
-    if (!manifest.platforms || Object.keys(manifest.platforms).length === 0) {
-      return undefined;
-    }
-
-    return manifest;
-  } catch {
-    return undefined;
-  }
-}
-
-async function fetchTaggedChannelManifest(
-  tag: ReleaseChannelTag,
-  signal?: AbortSignal,
-) {
-  try {
-    const tagResponse = await fetch(`${RELEASES_TAG_API_URL}/${tag}`, {
-      signal,
-      headers: {
-        Accept: "application/vnd.github+json",
-      },
-      cache: "no-store",
-    });
-
-    if (!tagResponse.ok) {
-      return undefined;
-    }
-
-    const release = (await tagResponse.json()) as GithubRelease;
-    const manifestAsset = release.assets?.find(
-      (asset) => asset.name.toLowerCase() === "latest.json",
-    );
-
-    if (!manifestAsset?.url) {
-      return undefined;
-    }
-
-    const manifestResponse = await fetch(manifestAsset.url, {
-      signal,
-      headers: {
-        Accept: "application/octet-stream",
-      },
-      cache: "no-store",
-    });
-
-    if (!manifestResponse.ok) {
-      return undefined;
-    }
-
-    const manifest = (await manifestResponse.json()) as ReleaseManifest;
     if (!manifest || typeof manifest !== "object") {
       return undefined;
     }

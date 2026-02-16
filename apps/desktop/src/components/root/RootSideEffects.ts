@@ -138,6 +138,11 @@ export const RootSideEffects = () => {
         "dictation",
         () => startDictationRef.current?.(),
         () => stopDictationRef.current?.(),
+        (locked) => {
+          produceAppState((draft) => {
+            draft.isDictationLocked = locked;
+          });
+        },
       ),
     [],
   );

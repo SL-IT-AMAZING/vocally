@@ -20,6 +20,7 @@ const buildFullSyncPayload = (state: AppState): OverlaySyncPayload => ({
   auth: state.auth,
   memberById: state.memberById,
   onboarding: state.onboarding,
+  isDictationLocked: state.isDictationLocked,
 });
 
 const useOverlaySync = <T>(
@@ -100,6 +101,11 @@ export const OverlaySyncSideEffects = () => {
     OVERLAY_TARGETS,
     (s) => s.onboarding,
     (onboarding) => ({ onboarding }),
+  );
+  useOverlaySync(
+    OVERLAY_TARGETS,
+    (s) => s.isDictationLocked,
+    (isDictationLocked) => ({ isDictationLocked }),
   );
 
   return null;

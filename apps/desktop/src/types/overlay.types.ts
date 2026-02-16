@@ -12,5 +12,6 @@ export type OverlaySyncPayload = Partial<
     | "auth"
     | "memberById"
     | "onboarding"
+    | "isDictationLocked"
   >
 >;

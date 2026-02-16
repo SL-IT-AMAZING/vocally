@@ -1,4 +1,5 @@
 import { Box, LinearProgress, Typography } from "@mui/material";
+import { LockOutlined } from "@mui/icons-material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { invoke } from "@tauri-apps/api/core";
 import { emitTo } from "@tauri-apps/api/event";
@@ -52,10 +53,12 @@ export const PillOverlayRoot = () => {
   const hotkeyKeys = combos.length > 0 ? combos[0] : ["?"];
   const phase = useAppStore((state) => state.overlayPhase);
   const levels = useAppStore((state) => state.audioLevels);
+  const isDictationLocked = useAppStore((state) => state.isDictationLocked);
 
   const isIdle = phase === "idle";
   const isListening = phase === "recording";
   const isProcessing = phase === "loading";
+  const waveformColor = isDictationLocked ? "#81C784" : "#90CAF9";
 
   useEffect(() => {
     document.body.style.margin = "0";
@@ -285,10 +288,34 @@ export const PillOverlayRoot = () => {
                 levels={levels}
                 active={isListening}
                 processing={isProcessing}
-                strokeColor="#90CAF9"
+                strokeColor={waveformColor}
                 width={EXPANDED_PILL_WIDTH}
                 height={EXPANDED_PILL_HEIGHT}
                 baselineOffset={0}
+              />
+            </Box>
+
+            {/* Lock indicator for toggle mode */}
+            <Box
+              sx={{
+                position: "absolute",
+                right: 4,
+                top: "50%",
+                transform: "translateY(-50%)",
+                opacity: isDictationLocked && isListening ? 1 : 0,
+                transition: "opacity 150ms ease-out",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                pointerEvents: "none",
+                zIndex: 1,
+              }}
+            >
+              <LockOutlined
+                sx={{
+                  fontSize: 12,
+                  color: alpha(theme.palette.common.white, 0.7),
+                }}
               />
             </Box>
 
