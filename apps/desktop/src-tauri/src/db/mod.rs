@@ -91,6 +91,7 @@ pub const USER_SCOPED_DATA_MIGRATION_SQL: &str =
     include_str!("migrations/048_user_scoped_data.sql");
 pub const PILL_VISIBILITY_PERSISTENT_DEFAULT_MIGRATION_SQL: &str =
     include_str!("migrations/049_pill_visibility_persistent_default.sql");
+pub const USER_TIMESTAMPS_MIGRATION_SQL: &str = include_str!("migrations/050_user_timestamps.sql");
 
 pub fn migrations() -> Vec<tauri_plugin_sql::Migration> {
     vec![
@@ -386,6 +387,12 @@ pub fn migrations() -> Vec<tauri_plugin_sql::Migration> {
             version: 49,
             description: "set_pill_visibility_persistent_default",
             sql: PILL_VISIBILITY_PERSISTENT_DEFAULT_MIGRATION_SQL,
+            kind: tauri_plugin_sql::MigrationKind::Up,
+        },
+        tauri_plugin_sql::Migration {
+            version: 50,
+            description: "add_user_timestamps",
+            sql: USER_TIMESTAMPS_MIGRATION_SQL,
             kind: tauri_plugin_sql::MigrationKind::Up,
         },
     ]

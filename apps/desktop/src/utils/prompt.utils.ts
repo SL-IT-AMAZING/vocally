@@ -180,7 +180,7 @@ RULES (must follow):
 6. Output must be plain text with no quotes, labels, or extra commentary.
 7. Convert spoken symbol cues to actual symbols: "hashtag [word]" or "pound sign [word]" becomes "#[word]", and "at [name]" or "at sign [name]" becomes "@[name]".
 
-Your response MUST be in ${languageName}.${ifNotEnglish(dictationLanguage, "DO NOT translate to English or any other language.")} Return only the replacement text.`;
+LANGUAGE: Your response MUST be in ${languageName}.${ifNotEnglish(dictationLanguage, ` DO NOT translate to English or any other language. Output ${languageName} only.`)} Return only the replacement text.`;
   } else if (hasContext) {
     // Inserting at cursor without selection
     base = `You are cleaning dictated text that will be inserted into an existing document.
@@ -202,7 +202,7 @@ INSTRUCTIONS:
 
 CRITICAL: Your output must contain ONLY the cleaned transcript. Never include the "text before cursor" or "text after cursor" in your output. Those are provided solely for capitalization context.
 
-Return ONLY the cleaned transcript in ${languageName}.${ifNotEnglish(dictationLanguage, "Do not translate to English.")}`;
+LANGUAGE: Return ONLY the cleaned transcript in ${languageName}.${ifNotEnglish(dictationLanguage, ` Do not translate to English or any other language. Output ${languageName} only.`)}`;
   } else {
     // No context - just clean the transcript
     base = `Clean and format the ${languageName} transcript below.
@@ -219,7 +219,7 @@ Here is the transcript:
 ${transcript}
 -------
 
-Your response MUST be in ${languageName}.${ifNotEnglish(dictationLanguage, "Do not translate to English.")}`;
+LANGUAGE: Your response MUST be in ${languageName}.${ifNotEnglish(dictationLanguage, ` Do not translate to English or any other language. Output ${languageName} only.`)}`;
   }
 
   return base;

@@ -19,6 +19,9 @@ type LocalUser = {
   wordsTotal: number;
   playInteractionChime?: boolean;
   hasFinishedTutorial?: boolean;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  hasMigratedPreferredMicrophone?: boolean;
   cohort?: string | null;
 };
 
@@ -32,8 +35,8 @@ const fromLocalUser = (localUser: LocalUser): User => {
 
   return {
     id: localUser.id,
-    createdAt: nowIso(),
-    updatedAt: nowIso(),
+    createdAt: localUser.createdAt || nowIso(),
+    updatedAt: localUser.updatedAt || nowIso(),
     name: localUser.name,
     bio: bio.length > 0 ? bio : null,
     company: localUser.company ?? null,
@@ -48,6 +51,8 @@ const fromLocalUser = (localUser: LocalUser): User => {
     wordsTotal: localUser.wordsTotal ?? 0,
     playInteractionChime,
     hasFinishedTutorial: localUser.hasFinishedTutorial ?? false,
+    hasMigratedPreferredMicrophone:
+      localUser.hasMigratedPreferredMicrophone ?? false,
     cohort: localUser.cohort ?? null,
   };
 };
@@ -66,6 +71,9 @@ const toLocalUser = (user: User): LocalUser => ({
   wordsTotal: user.wordsTotal,
   playInteractionChime: user.playInteractionChime,
   hasFinishedTutorial: user.hasFinishedTutorial,
+  createdAt: user.createdAt ?? null,
+  updatedAt: user.updatedAt ?? null,
+  hasMigratedPreferredMicrophone: user.hasMigratedPreferredMicrophone ?? false,
   cohort: user.cohort ?? null,
 });
 
@@ -92,11 +100,11 @@ export class LocalUserRepo extends BaseUserRepo {
 
 export class CloudUserRepo extends BaseUserRepo {
   async setUser(user: User): Promise<User> {
-    const { error } = await supabase.functions.invoke("user-set", {
+    const { data, error } = await supabase.functions.invoke("user-set", {
       body: { value: user },
     });
     if (error) throw error;
-    return user;
+    return data?.user ?? user;
   }
 
   async getUser(): Promise<Nullable<User>> {

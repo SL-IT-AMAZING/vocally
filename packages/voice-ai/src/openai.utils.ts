@@ -90,7 +90,7 @@ export const openaiTranscribeAudio = async ({
         file,
         model,
         prompt,
-        language: language ?? "en",
+        language: language || "en",
       });
 
       if (!response.text) {
