@@ -79,6 +79,8 @@ pub fn build() -> tauri::Builder<tauri::Wry> {
                             }
                         }
                     }
+                } else if let Some(main_window) = app.get_webview_window("main") {
+                    let _ = crate::platform::window::surface_main_window(&main_window);
                 }
 
                 crate::system::tray::setup_tray(app)

@@ -55,6 +55,9 @@ import {
 import {
   trackAgentStart,
   trackAppUsed,
+  trackDictationCompleted,
+  trackDictationEmpty,
+  trackDictationError,
   trackDictationStart,
 } from "../../utils/analytics.utils";
 import { playAlertSound, tryPlayAudioChime } from "../../utils/audio.utils";
@@ -423,8 +426,9 @@ export const RootSideEffects = () => {
 
         audio = outAudio;
         a11yInfo = outA11yInfo;
-      } catch (error) {
-        console.error("Failed to stop recording via hotkey", error);
+      } catch (err) {
+        console.error("Failed to stop recording via hotkey", err);
+        trackDictationError({ stage: "transcription", error: String(err) });
         showErrorSnackbar("Unable to stop recording. Please try again.");
         suppressUntilRef.current = Date.now() + 700;
       } finally {
@@ -482,6 +486,7 @@ export const RootSideEffects = () => {
             });
           }
         } else {
+          trackDictationEmpty();
           if (loadingToken && overlayLoadingTokenRef.current === loadingToken) {
             overlayLoadingTokenRef.current = null;
             await invoke<void>("set_phase", { phase: "idle" });
@@ -503,6 +508,17 @@ export const RootSideEffects = () => {
             transcriptionMetadata: transcribeResult.metadata,
             postProcessMetadata,
             warnings: [...transcribeResult.warnings, ...postProcessWarnings],
+          });
+
+          trackDictationCompleted({
+            durationMs:
+              transcribeResult.metadata?.transcriptionDurationMs ?? null,
+            wordCount: rawTranscript
+              ? rawTranscript.split(/\s+/).filter(Boolean).length
+              : 0,
+            appName: currentApp?.name ?? null,
+            mode: getAppState().activeRecordingMode ?? "dictate",
+            toneApplied: !!currentApp?.toneId,
           });
         }
       }

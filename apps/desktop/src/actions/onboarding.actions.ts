@@ -8,7 +8,10 @@ import {
 } from "../state/onboarding.state";
 import { getAppState, produceAppState } from "../store";
 import { DEFAULT_TRANSCRIPTION_MODE } from "../types/ai.types";
-import { CURRENT_COHORT } from "../utils/analytics.utils";
+import {
+  CURRENT_COHORT,
+  trackOnboardingCompleted,
+} from "../utils/analytics.utils";
 import { CURRENT_FEATURE } from "../utils/feature.utils";
 import {
   GenerativePrefs,
@@ -227,6 +230,8 @@ export const finishOnboarding = async () => {
     });
 
     await setAutoLaunchEnabled(true);
+
+    trackOnboardingCompleted();
 
     return savedUser;
   } catch (err) {

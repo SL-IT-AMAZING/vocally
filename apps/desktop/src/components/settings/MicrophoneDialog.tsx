@@ -13,6 +13,7 @@ import { Nullable } from "@repo/types";
 import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { setPreferredMicrophone } from "../../actions/user.actions";
+import { trackSettingChanged } from "../../utils/analytics.utils";
 import { useMyPreferredMicrophone } from "../../hooks/user.hooks";
 import { produceAppState, useAppStore } from "../../store";
 import { SettingSection } from "../common/SettingSection";
@@ -60,6 +61,7 @@ export const MicrophoneDialog = () => {
 
     try {
       await setPreferredMicrophone(selected ?? null);
+      trackSettingChanged("microphone");
       setHasChanges(false);
       setSaveSuccess(true);
     } catch {

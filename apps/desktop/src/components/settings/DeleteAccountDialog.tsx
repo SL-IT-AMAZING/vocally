@@ -13,6 +13,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { showSnackbar } from "../../actions/app.actions";
+import { trackAccountDeleted } from "../../utils/analytics.utils";
 import { getAuthRepo } from "../../repos";
 import { produceAppState, useAppStore } from "../../store";
 
@@ -36,6 +37,7 @@ export const DeleteAccountDialog = () => {
     }
 
     try {
+      trackAccountDeleted();
       await getAuthRepo().deleteMyAccount();
       await invoke("clear_local_data");
       setConfirmationEmail("");

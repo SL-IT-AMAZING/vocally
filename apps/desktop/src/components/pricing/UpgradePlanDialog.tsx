@@ -21,7 +21,10 @@ import { PricingPlan } from "../../utils/price.utils";
 import { LoginForm } from "../login/LoginForm";
 import { FormContainer } from "../onboarding/OnboardingShared";
 import { PlanList } from "./PlanList";
-import { trackButtonClick } from "../../utils/analytics.utils";
+import {
+  trackButtonClick,
+  trackPlanSelected,
+} from "../../utils/analytics.utils";
 
 export const UpgradePlanDialog = () => {
   const intl = useIntl();
@@ -52,6 +55,7 @@ export const UpgradePlanDialog = () => {
 
   const handleClickPlan = (plan: PricingPlan) => {
     trackButtonClick("select_plan_in_upgrade_dialog", { desiredPlan: plan });
+    trackPlanSelected(plan);
     selectUpgradePlan(plan);
   };
 

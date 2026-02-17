@@ -2,6 +2,7 @@ import { ApiKey } from "@repo/types";
 import { getApiKeyRepo } from "../repos";
 import { getAppState, produceAppState } from "../store";
 import { registerApiKeys } from "../utils/app.utils";
+import { trackApiKeyAdded, trackApiKeyDeleted } from "../utils/analytics.utils";
 import { showErrorSnackbar } from "./app.actions";
 import {
   DEFAULT_POST_PROCESSING_MODE,
@@ -74,6 +75,7 @@ export const createApiKey = async (
       draft.settings.apiKeys = sortApiKeys(merged);
       draft.settings.apiKeysStatus = "success";
     });
+    trackApiKeyAdded();
 
     return created;
   } catch (error) {
@@ -88,6 +90,7 @@ export const createApiKey = async (
 export const deleteApiKey = async (id: string): Promise<void> => {
   try {
     await getApiKeyRepo().deleteApiKey(id);
+    trackApiKeyDeleted();
 
     produceAppState((draft) => {
       delete draft.apiKeyById[id];

@@ -3,6 +3,7 @@ import { getRec } from "@repo/utilities";
 import { getTranscriptionRepo } from "../repos";
 import { getAppState, produceAppState } from "../store";
 import { postProcessTranscript, transcribeAudio } from "./transcribe.actions";
+import { trackTranscriptionRetried } from "../utils/analytics.utils";
 
 export const openTranscriptionDetailsDialog = (transcriptionId: string) => {
   produceAppState((draft) => {
@@ -32,6 +33,8 @@ export const retranscribeTranscription = async ({
   if (!transcription) {
     throw new Error("Transcription not found.");
   }
+
+  trackTranscriptionRetried();
 
   const repo = getTranscriptionRepo();
   const audioData = await repo.loadTranscriptionAudio(transcriptionId);

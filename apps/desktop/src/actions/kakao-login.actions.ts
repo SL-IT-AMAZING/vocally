@@ -5,6 +5,10 @@ import { supabase } from "../supabase";
 import { produceAppState } from "../store";
 import { registerMembers } from "../utils/app.utils";
 import { listify } from "@repo/utilities";
+import {
+  trackSignInSuccess,
+  trackSignInFailed,
+} from "../utils/analytics.utils";
 
 interface KakaoAuthCodePayload {
   code: string;
@@ -78,6 +82,7 @@ export const submitSignInWithKakao = async (): Promise<void> => {
     produceAppState((state) => {
       state.login.status = "success";
     });
+    trackSignInSuccess("kakao");
   } catch (error) {
     console.error("Kakao auth error:", error);
     produceAppState((state) => {
@@ -85,5 +90,6 @@ export const submitSignInWithKakao = async (): Promise<void> => {
         "An error occurred while signing in with Kakao.";
       state.login.status = "idle";
     });
+    trackSignInFailed("kakao");
   }
 };

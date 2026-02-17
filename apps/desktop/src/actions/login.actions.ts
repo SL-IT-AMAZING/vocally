@@ -13,6 +13,13 @@ import {
 import { registerMembers } from "../utils/app.utils";
 import { listify } from "@repo/utilities";
 import { createDefaultPreferences } from "./user.actions";
+import {
+  trackSignInSuccess,
+  trackSignUpSuccess,
+  trackSignInFailed,
+  trackSignOut,
+  trackPasswordResetRequested,
+} from "../utils/analytics.utils";
 
 const tryInit = async () => {
   try {
@@ -46,11 +53,13 @@ export const submitSignIn = async (): Promise<void> => {
     produceAppState((state) => {
       state.login.status = "success";
     });
+    trackSignInSuccess("email");
   } catch {
     produceAppState((state) => {
       state.login.errorMessage = "An error occurred while signing in.";
       state.login.status = "idle";
     });
+    trackSignInFailed("email");
   }
 };
 
@@ -66,6 +75,7 @@ export const submitSignInWithGoogle = async (): Promise<void> => {
       state.login.errorMessage = "An error occurred while signing in.";
       state.login.status = "idle";
     });
+    trackSignInFailed("google");
   }
 };
 
@@ -85,6 +95,7 @@ export const handleGoogleAuthPayload = async (
     produceAppState((state) => {
       state.login.status = "success";
     });
+    trackSignInSuccess("google");
   } catch (error) {
     console.error("Google auth error:", error);
     produceAppState((state) => {
@@ -92,6 +103,7 @@ export const handleGoogleAuthPayload = async (
         "An error occurred while signing in with Google.";
       state.login.status = "idle";
     });
+    trackSignInFailed("google");
   }
 };
 
@@ -124,11 +136,13 @@ export const submitSignUp = async (): Promise<void> => {
     produceAppState((state) => {
       state.login.status = "success";
     });
+    trackSignUpSuccess();
   } catch {
     produceAppState((state) => {
       state.login.errorMessage = "An error occurred while signing up.";
       state.login.status = "idle";
     });
+    trackSignInFailed("signup");
   }
 };
 
@@ -146,6 +160,7 @@ export const submitResetPassword = async (): Promise<void> => {
   } catch {
     // noop
   } finally {
+    trackPasswordResetRequested();
     setMode("passwordResetSent");
   }
 };
@@ -173,4 +188,5 @@ export const signOut = async (): Promise<void> => {
   }
 
   await getAuthRepo().signOut();
+  trackSignOut();
 };

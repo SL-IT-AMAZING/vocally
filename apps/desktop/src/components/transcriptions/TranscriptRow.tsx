@@ -24,6 +24,10 @@ import {
 } from "../../actions/transcriptions.actions";
 import { getTranscriptionRepo } from "../../repos";
 import { produceAppState, useAppStore } from "../../store";
+import {
+  trackTranscriptDeleted,
+  trackTranscriptViewed,
+} from "../../utils/analytics.utils";
 import { TypographyWithMore } from "../common/TypographyWithMore";
 import { TranscriptionToneMenu } from "./TranscriptionToneMenu";
 
@@ -126,6 +130,7 @@ export const TranscriptionRow = ({ id }: TranscriptionRowProps) => {
   const waveformContainerRef = useRef<HTMLDivElement | null>(null);
   const handleDetailsOpen = useCallback(() => {
     openTranscriptionDetailsDialog(id);
+    trackTranscriptViewed();
   }, [id]);
 
   const desiredWaveformBarCount = useMemo(() => {
@@ -271,6 +276,7 @@ export const TranscriptionRow = ({ id }: TranscriptionRowProps) => {
             );
         });
         await getTranscriptionRepo().deleteTranscription(id);
+        trackTranscriptDeleted();
         showSnackbar(
           intl.formatMessage({ defaultMessage: "Delete successful" }),
           { mode: "success" },

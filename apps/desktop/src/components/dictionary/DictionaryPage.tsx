@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { useCallback } from "react";
 import { FormattedMessage } from "react-intl";
 import { showErrorSnackbar } from "../../actions/app.actions";
+import { trackTermCreated } from "../../utils/analytics.utils";
 import { getTermRepo } from "../../repos";
 import { produceAppState, useAppStore } from "../../store";
 import { createId } from "../../utils/id.utils";
@@ -35,6 +36,7 @@ export default function DictionaryPage() {
       produceAppState((draft) => {
         draft.termById[created.id] = created;
       });
+      trackTermCreated();
     } catch (error) {
       produceAppState((draft) => {
         delete draft.termById[newTerm.id];

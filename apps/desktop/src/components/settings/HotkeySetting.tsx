@@ -9,6 +9,7 @@ import { produceAppState, useAppStore } from "../../store";
 import { registerHotkeys } from "../../utils/app.utils";
 import { createId } from "../../utils/id.utils";
 import { getDefaultHotkeyCombosForAction } from "../../utils/keyboard.utils";
+import { trackSettingChanged } from "../../utils/analytics.utils";
 import { HotKey } from "../common/HotKey";
 
 export type HotkeySettingProps = {
@@ -60,6 +61,7 @@ export const HotkeySetting = ({
         draft.settings.hotkeysStatus = "success";
       });
       await getHotkeyRepo().saveHotkey(newValue);
+      trackSettingChanged("hotkey");
     } catch (error) {
       console.error("Failed to save hotkey", error);
       showErrorSnackbar("Failed to save hotkey. Please try again.");
@@ -75,6 +77,7 @@ export const HotkeySetting = ({
         );
       });
       await getHotkeyRepo().deleteHotkey(id);
+      trackSettingChanged("hotkey_deleted");
     } catch (error) {
       console.error("Failed to delete hotkey", error);
       showErrorSnackbar("Failed to delete hotkey. Please try again.");

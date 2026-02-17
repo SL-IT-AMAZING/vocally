@@ -21,6 +21,7 @@ import {
   setCurrentUser,
   setUserPreferences,
 } from "../utils/user.utils";
+import { trackSettingChanged } from "../utils/analytics.utils";
 import { showErrorSnackbar } from "./app.actions";
 
 const updateUser = async (
@@ -273,6 +274,7 @@ export const setPreferredTranscriptionMode = async (
   });
 
   await persistAiPreferences();
+  trackSettingChanged("transcription_mode", mode);
 };
 
 export const setAllModesToCloud = async (): Promise<void> => {
@@ -333,6 +335,7 @@ export const setPreferredPostProcessingMode = async (
   });
 
   await persistAiPreferences();
+  trackSettingChanged("post_processing_mode", mode);
 };
 
 export const setPreferredPostProcessingApiKeyId = async (
@@ -353,6 +356,7 @@ export const setPreferredAgentMode = async (
   });
 
   await persistAiPreferences();
+  trackSettingChanged("agent_mode", mode);
 };
 
 export const setPreferredAgentModeApiKeyId = async (
@@ -507,6 +511,7 @@ export const setIncognitoModeEnabled = async (
       preferences.incognitoModeIncludeInStats = false;
     }
   }, "Failed to save incognito mode preference. Please try again.");
+  trackSettingChanged("incognito_mode", enabled);
 };
 
 export const setIncognitoModeIncludeInStats = async (
@@ -523,6 +528,7 @@ export const setDictationPillVisibility = async (
   await updateUserPreferences((preferences) => {
     preferences.dictationPillVisibility = visibility;
   }, "Failed to save dictation pill visibility preference. Please try again.");
+  trackSettingChanged("pill_visibility", visibility);
 };
 
 export const markUpgradeDialogSeen = async (): Promise<void> => {

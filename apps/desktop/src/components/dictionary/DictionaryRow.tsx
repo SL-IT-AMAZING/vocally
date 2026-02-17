@@ -7,6 +7,7 @@ import { useIntl } from "react-intl";
 import { showErrorSnackbar } from "../../actions/app.actions";
 import { getTermRepo } from "../../repos";
 import { getAppState, produceAppState, useAppStore } from "../../store";
+import { trackTermDeleted } from "../../utils/analytics.utils";
 
 export type DictionaryRowProps = {
   id: string;
@@ -88,6 +89,7 @@ export const DictionaryRow = ({ id }: DictionaryRowProps) => {
 
     try {
       await getTermRepo().deleteTerm(id);
+      trackTermDeleted();
     } catch (error) {
       produceAppState((draft) => {
         draft.termById[id] = previousTerm;

@@ -1,5 +1,6 @@
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { produceAppState, getAppState } from "../store";
+import { trackSettingChanged } from "../utils/analytics.utils";
 import { showErrorSnackbar } from "./app.actions";
 
 const isTauriEnvironment = (): boolean => {
@@ -73,6 +74,7 @@ export const setAutoLaunchEnabled = async (enabled: boolean): Promise<void> => {
     produceAppState((draft) => {
       draft.settings.autoLaunchStatus = "success";
     });
+    trackSettingChanged("auto_launch", enabled);
   } catch (error) {
     console.error("Failed to update auto-start preference", error);
     produceAppState((draft) => {

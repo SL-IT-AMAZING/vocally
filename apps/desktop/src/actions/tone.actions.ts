@@ -3,6 +3,7 @@ import { getToneRepo, getUserPreferencesRepo } from "../repos";
 import { ToneEditorMode } from "../state/tone-editor.state";
 import { getAppState, produceAppState } from "../store";
 import { registerTones } from "../utils/app.utils";
+import { trackToneSelected } from "../utils/analytics.utils";
 import { showErrorSnackbar, showSnackbar } from "./app.actions";
 
 let loadTonesPromise: Promise<void> | null = null;
@@ -105,6 +106,7 @@ export const setActiveTone = async (toneId: string | null): Promise<void> => {
     produceAppState((draft) => {
       draft.userPrefs = updatedPrefs;
     });
+    trackToneSelected(toneId);
 
     showSnackbar(toneId ? "Default tone set" : "Default tone cleared", {
       mode: "success",

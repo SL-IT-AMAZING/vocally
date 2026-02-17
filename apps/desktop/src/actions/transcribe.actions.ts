@@ -34,6 +34,7 @@ import {
   getMyDictationLanguage,
   getMyEffectiveUserId,
 } from "../utils/user.utils";
+import { trackPostProcessingCompleted } from "../utils/analytics.utils";
 import { showErrorSnackbar } from "./app.actions";
 import { addWordsToCurrentUser } from "./user.actions";
 
@@ -238,6 +239,10 @@ export const postProcessTranscript = async ({
     processedTranscript = processedTranscript.trim();
   }
 
+  trackPostProcessingCompleted({
+    durationMs: metadata.postprocessDurationMs ?? null,
+  });
+
   return {
     transcript: processedTranscript,
     warnings: dedup(warnings),
@@ -271,7 +276,10 @@ export const storeTranscription = async (
       return samples.length;
     }
 
-    if (samples && typeof (samples as { length?: number }).length === "number") {
+    if (
+      samples &&
+      typeof (samples as { length?: number }).length === "number"
+    ) {
       return (samples as { length: number }).length;
     }
 

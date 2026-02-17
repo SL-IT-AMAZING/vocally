@@ -14,6 +14,11 @@ import { useOnExit } from "../../hooks/helper.hooks";
 import { getAppState, produceAppState, useAppStore } from "../../store";
 import { supabase } from "../../supabase";
 import { refreshMember } from "../../actions/member.actions";
+import {
+  trackPaymentComplete,
+  trackPaymentSubscribeClicked,
+  trackPaymentCheckoutOpened,
+} from "../../utils/analytics.utils";
 
 const POLAR_PRODUCT_MONTHLY = "25bf6350-bebc-4b9f-b896-66767ce9304a";
 const POLAR_PRODUCT_YEARLY = "d73b4531-65c2-4eb8-976d-b6fcc1ae99e5";
@@ -47,6 +52,7 @@ export const PaymentDialog = () => {
     if (member?.plan === "pro") {
       stopPolling();
       setDialogState("success");
+      trackPaymentComplete();
     }
   };
 
@@ -82,6 +88,7 @@ export const PaymentDialog = () => {
 
   const handlePayment = async () => {
     setDialogState("creating");
+    trackPaymentSubscribeClicked(selectedPlan);
     setError(null);
 
     try {
@@ -112,6 +119,7 @@ export const PaymentDialog = () => {
       }
 
       await openUrl(data.checkoutUrl);
+      trackPaymentCheckoutOpened(selectedPlan);
       setDialogState("waiting");
       startPolling();
     } catch (err) {

@@ -57,6 +57,11 @@ import {
 } from "../../utils/language.utils";
 import { getPlatform } from "../../utils/platform.utils";
 import {
+  trackSettingChanged,
+  trackHelpAction,
+  trackBillingPortalOpened,
+} from "../../utils/analytics.utils";
+import {
   getDetectedSystemLocale,
   getHasEmailProvider,
   getIsSignedIn,
@@ -88,6 +93,7 @@ export default function SettingsPage() {
   const handleLocaleToggle = () => {
     const next: Locale = appLocale === "ko" ? "en" : "ko";
     setStoredLocale(next);
+    trackSettingChanged("app_language", next);
     setAppLocale(next);
     window.location.reload();
   };
@@ -125,6 +131,7 @@ export default function SettingsPage() {
     void setPreferredLanguage(nextValue).then(() => {
       loadTones();
     });
+    trackSettingChanged("dictation_language", nextValue);
   };
 
   const handleSecondaryLanguageChange = (event: SelectChangeEvent<string>) => {
@@ -206,6 +213,7 @@ export default function SettingsPage() {
       return;
     }
 
+    trackBillingPortalOpened();
     setOpeningSubscriptionPortal(true);
     try {
       const currentLocale = detectLocale();
@@ -524,6 +532,7 @@ export default function SettingsPage() {
         leading={<BugReportOutlined />}
         trailing={<ArrowOutwardRounded />}
         onClick={() => {
+          trackHelpAction("bug_report");
           const platform = getPlatform();
           const subject = encodeURIComponent(
             intl.formatMessage(
@@ -553,6 +562,7 @@ export default function SettingsPage() {
         leading={<FeedbackOutlined />}
         trailing={<ArrowOutwardRounded />}
         onClick={() => {
+          trackHelpAction("feedback");
           const subject = encodeURIComponent(
             intl.formatMessage(
               { defaultMessage: "Feedback - Vocally v{version}" },

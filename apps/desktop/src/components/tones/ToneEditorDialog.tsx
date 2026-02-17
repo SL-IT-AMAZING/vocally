@@ -22,6 +22,10 @@ import {
 } from "../../actions/tone.actions";
 import { useAppStore } from "../../store";
 import { createId } from "../../utils/id.utils";
+import {
+  trackToneCreated,
+  trackToneDeleted,
+} from "../../utils/analytics.utils";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 
 const MAX_PROMPT_LEN = 1000;
@@ -62,6 +66,7 @@ export const ToneEditorDialog = () => {
       };
 
       await upsertTone(newTone);
+      trackToneCreated();
 
       if (toneEditor.targetId) {
         await setAppTargetTone(toneEditor.targetId, newTone.id);
@@ -149,6 +154,7 @@ export const ToneEditorDialog = () => {
     setIsDeleting(true);
     try {
       await handleDelete(tone.id);
+      trackToneDeleted();
       handleClose();
     } finally {
       setIsDeleting(false);
