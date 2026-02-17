@@ -55,24 +55,26 @@ const RELEASE_TAG_PATTERNS = {
 export function getPlatformConfig(
   intl = getIntl(),
 ): Record<Platform, PlatformConfig> {
+  const isKorean = intl.locale.startsWith("ko");
+
   return {
     mac: {
       id: "mac",
-      name: "macOS",
+      name: isKorean ? "맥" : "macOS",
       label: intl.formatMessage({ defaultMessage: "Download for free" }),
       shortLabel: intl.formatMessage({ defaultMessage: "Download" }),
       Icon: createMaskIcon("/apple.svg"),
     },
     windows: {
       id: "windows",
-      name: "Windows",
+      name: isKorean ? "윈도우" : "Windows",
       label: intl.formatMessage({ defaultMessage: "Download for free" }),
       shortLabel: intl.formatMessage({ defaultMessage: "Download" }),
       Icon: createMaskIcon("/windows.svg"),
     },
     linux: {
       id: "linux",
-      name: "Linux",
+      name: isKorean ? "리눅스" : "Linux",
       label: intl.formatMessage({ defaultMessage: "Download for free" }),
       shortLabel: intl.formatMessage({ defaultMessage: "Download" }),
       Icon: createMaskIcon("/ubuntu.svg"),

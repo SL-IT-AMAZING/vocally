@@ -9,8 +9,8 @@ import type {
 } from "@repo/types";
 
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
-export const OPENROUTER_APP_NAME = "Voquill";
-export const OPENROUTER_APP_URL = "https://voquill.com";
+export const OPENROUTER_APP_NAME = "Vocally";
+export const OPENROUTER_APP_URL = "https://vocally.com";
 
 /**
  * Pre-set favorite models for quick access.

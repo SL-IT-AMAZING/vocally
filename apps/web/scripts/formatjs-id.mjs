@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 const NON_LETTER_NUMBER = /[^a-z0-9]+/gi;
 const EDGE_UNDERSCORES = /^_+|_+$/g;
 
@@ -21,12 +23,25 @@ const truncate = (value, maxLength = 60) => {
 };
 
 export const createMessageId = (defaultMessage = "") => {
-  const sanitized = sanitize(defaultMessage);
-  const truncated = truncate(sanitized);
-  return truncated || "message";
+  const normalized = defaultMessage.trim();
+  if (!normalized) {
+    return "message";
+  }
+
+  const sanitized = sanitize(normalized);
+  const truncated = truncate(sanitized, 60);
+  return (
+    truncated ||
+    `message_${createHash("sha1").update(normalized.normalize("NFKC")).digest("hex").slice(0, 6)}`
+  );
 };
 
-export const formatjsOverrideIdFn = (id, defaultMessage, _description, _filePath) => {
+export const formatjsOverrideIdFn = (
+  id,
+  defaultMessage,
+  _description,
+  _filePath,
+) => {
   if (id || !defaultMessage) {
     return id;
   }

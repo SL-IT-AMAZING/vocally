@@ -13,7 +13,7 @@ import {
 } from "../common/SegmentedControl";
 import { ApiKeyList } from "./ApiKeyList";
 import { maybeArrayElements } from "./AIPostProcessingConfiguration";
-import { VoquillCloudSetting } from "./VoquillCloudSetting";
+import { VocallyCloudSetting } from "./VocallyCloudSetting";
 
 type AIAgentModeConfigurationProps = {
   hideCloudOption?: boolean;
@@ -67,7 +67,7 @@ export const AIAgentModeConfiguration = ({
         />
       )}
 
-      {agentMode.mode === "cloud" && <VoquillCloudSetting />}
+      {agentMode.mode === "cloud" && <VocallyCloudSetting />}
     </Stack>
   );
 };

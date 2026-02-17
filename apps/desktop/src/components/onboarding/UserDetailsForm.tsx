@@ -103,7 +103,7 @@ export const UserDetailsForm = () => {
             slotProps={{
               inputLabel: { shrink: true },
               htmlInput: {
-                "data-voquill-ignore": "true",
+                "data-vocally-ignore": "true",
               },
             }}
           />
@@ -122,7 +122,7 @@ export const UserDetailsForm = () => {
             slotProps={{
               inputLabel: { shrink: true },
               htmlInput: {
-                "data-voquill-ignore": "true",
+                "data-vocally-ignore": "true",
               },
             }}
           />
@@ -139,7 +139,7 @@ export const UserDetailsForm = () => {
             slotProps={{
               inputLabel: { shrink: true },
               htmlInput: {
-                "data-voquill-ignore": "true",
+                "data-vocally-ignore": "true",
               },
             }}
           />

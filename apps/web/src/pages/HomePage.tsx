@@ -1,4 +1,5 @@
 import { AppsCarousel } from "../components/apps-carousel";
+import { FadeInSection } from "../components/common/fade-in-section";
 import { HeroSection } from "../components/hero";
 import OfflineShowcase from "../components/offline-showcase";
 import PricingSection from "../components/pricing-section";
@@ -15,12 +16,24 @@ function HomePage() {
       <PageLayout>
         <HeroSection />
 
-        <AppsCarousel />
-        <SpeedShowcase />
-        <PrivacyShowcase />
-        <TextCleanupShowcase />
-        <OfflineShowcase />
-        <PricingSection />
+        <FadeInSection>
+          <AppsCarousel />
+        </FadeInSection>
+        <FadeInSection>
+          <SpeedShowcase />
+        </FadeInSection>
+        <FadeInSection>
+          <PrivacyShowcase />
+        </FadeInSection>
+        <FadeInSection>
+          <TextCleanupShowcase />
+        </FadeInSection>
+        <FadeInSection>
+          <OfflineShowcase />
+        </FadeInSection>
+        <FadeInSection>
+          <PricingSection />
+        </FadeInSection>
       </PageLayout>
     </BaseLayout>
   );

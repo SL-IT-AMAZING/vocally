@@ -1,0 +1,12 @@
+{
+  "src/components/hero/hero-section.tsx": "src/components/hero/hero-section-poc.stories.tsx",
+  "src/components/site-header.tsx": "src/components/site-header-poc.stories.tsx",
+  "src/components/site-footer.tsx": "src/components/site-footer-poc.stories.tsx",
+  "src/components/download-button.tsx": "src/components/download-button-poc.stories.tsx",
+  "src/components/apps-carousel/apps-carousel.tsx": "src/components/apps-carousel/apps-carousel-poc.stories.tsx",
+  "src/components/speed-showcase/index.tsx": "src/components/speed-showcase/speed-showcase-poc.stories.tsx",
+  "src/components/privacy-showcase/index.tsx": "src/components/privacy-showcase/privacy-showcase-poc.stories.tsx",
+  "src/components/offline-showcase/index.tsx": "src/components/offline-showcase/offline-showcase-poc.stories.tsx",
+  "src/components/text-cleanup-showcase/index.tsx": "src/components/text-cleanup-showcase/text-cleanup-showcase-poc.stories.tsx",
+  "src/components/pricing-section/index.tsx": "src/components/pricing-section/pricing-section-poc.stories.tsx"
+}

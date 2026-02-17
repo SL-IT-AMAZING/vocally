@@ -29,7 +29,7 @@ pub fn setup_tray(app: &mut tauri::App) -> tauri::Result<()> {
         true,
         None::<&str>,
     )?;
-    let quit_item = MenuItem::with_id(app, "quit-voquill", "Quit Vocally", true, None::<&str>)?;
+    let quit_item = MenuItem::with_id(app, "quit-vocally", "Quit Vocally", true, None::<&str>)?;
 
     let menu = MenuBuilder::new(app)
         .item(&open_item)
@@ -62,7 +62,7 @@ pub fn setup_tray(app: &mut tauri::App) -> tauri::Result<()> {
                     eprintln!("Failed to emit toggle-floating-bar event: {err}");
                 }
             }
-            "quit-voquill" => app.exit(0),
+            "quit-vocally" => app.exit(0),
             _ => {}
         });
 

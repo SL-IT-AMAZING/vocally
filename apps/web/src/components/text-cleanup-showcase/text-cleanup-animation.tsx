@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useIntl } from "react-intl";
 import styles from "./text-cleanup-animation.module.css";
 
 type CleanupType = "filler" | "typo" | "hesitation";
@@ -20,27 +21,46 @@ interface WordState {
   charIndex: number;
 }
 
-const TOKENS: WordToken[] = [
+const EN_TOKENS: WordToken[] = [
   {
     id: 1,
-    text: "I was...",
+    text: "Let's...",
     cleanup: { type: "filler", label: "False start" },
   },
-  { id: 2, text: "I" },
-  { id: 3, text: "was" },
-  { id: 4, text: "thinking," },
+  { id: 2, text: "Let's" },
+  { id: 3, text: "sync" },
+  { id: 4, text: "with" },
   { id: 5, text: "um,", cleanup: { type: "hesitation", label: "Hesitation" } },
-  { id: 6, text: "we" },
-  { id: 7, text: "should" },
-  { id: 8, text: "meet" },
-  { id: 9, text: "with" },
+  { id: 6, text: "Minji" },
+  { id: 7, text: "tomorrow" },
+  { id: 8, text: "morning" },
+  { id: 9, text: "at" },
   {
     id: 10,
-    text: "Tomas",
-    cleanup: { type: "typo", label: "Spelling", replacement: "Thomas" },
+    text: "10a.m.",
+    cleanup: { type: "typo", label: "Spelling", replacement: "10am." },
   },
-  { id: 11, text: "at" },
-  { id: 12, text: "3pm." },
+  { id: 11, text: "the" },
+  { id: 12, text: "cafe." },
+];
+
+const KO_TOKENS: WordToken[] = [
+  {
+    id: 1,
+    text: "아니...",
+    cleanup: { type: "filler", label: "헛시작" },
+  },
+  { id: 2, text: "내일" },
+  { id: 3, text: "오전" },
+  { id: 4, text: "음,", cleanup: { type: "hesitation", label: "머뭇거림" } },
+  {
+    id: 5,
+    text: "10시요.",
+    cleanup: { type: "typo", label: "맞춤법", replacement: "10시." },
+  },
+  { id: 6, text: "민지랑" },
+  { id: 7, text: "카페에서" },
+  { id: 8, text: "만나자." },
 ];
 
 // Timing constants (ms)
@@ -50,12 +70,16 @@ const FLAG_DELAY = 500;
 const CLEAN_DELAY = 700;
 const RESTART_DELAY = 3000;
 
-const createInitialStates = (): WordState[] =>
-  TOKENS.map(() => ({ phase: "hidden" as const, charIndex: 0 }));
+const createInitialStates = (tokens: WordToken[]): WordState[] =>
+  tokens.map(() => ({ phase: "hidden" as const, charIndex: 0 }));
 
 export default function TextCleanupAnimation() {
-  const [wordStates, setWordStates] =
-    useState<WordState[]>(createInitialStates);
+  const intl = useIntl();
+  const isKorean = intl.locale.startsWith("ko");
+  const tokens = isKorean ? KO_TOKENS : EN_TOKENS;
+  const [wordStates, setWordStates] = useState<WordState[]>(() =>
+    createInitialStates(tokens),
+  );
   const [isComplete, setIsComplete] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const animationRef = useRef({ wordIndex: 0, isRunning: true });
@@ -82,18 +106,18 @@ export default function TextCleanupAnimation() {
       const { wordIndex } = animationRef.current;
 
       // Animation complete - schedule restart
-      if (wordIndex >= TOKENS.length) {
+      if (wordIndex >= tokens.length) {
         setIsComplete(true);
         scheduleNext(() => {
           animationRef.current.wordIndex = 0;
           setIsComplete(false);
-          setWordStates(createInitialStates());
+          setWordStates(createInitialStates(tokens));
           scheduleNext(tick, 100);
         }, RESTART_DELAY);
         return prevStates;
       }
 
-      const token = TOKENS[wordIndex]!;
+      const token = tokens[wordIndex]!;
       const state = prevStates[wordIndex]!;
       const newStates = [...prevStates];
 
@@ -158,18 +182,21 @@ export default function TextCleanupAnimation() {
 
       return newStates;
     });
-  }, [scheduleNext]);
+  }, [scheduleNext, tokens]);
 
   // Start animation on mount
   useEffect(() => {
     animationRef.current.isRunning = true;
+    animationRef.current.wordIndex = 0;
+    setWordStates(createInitialStates(tokens));
+    setIsComplete(false);
     scheduleNext(tick, 500); // Initial delay before starting
 
     return () => {
       animationRef.current.isRunning = false;
       clearTimer();
     };
-  }, [tick, scheduleNext, clearTimer]);
+  }, [tick, scheduleNext, clearTimer, tokens]);
 
   const renderWord = (token: WordToken, state: WordState) => {
     const { phase, charIndex } = state;
@@ -216,13 +243,15 @@ export default function TextCleanupAnimation() {
     );
   };
 
-  const cleanedText = "I was thinking we should meet with Thomas at 3pm.";
+  const cleanedText = isKorean
+    ? "내일 오전 10시, 민지랑 카페에서 만나자."
+    : "Let's sync with Minji tomorrow morning at 10am at the cafe.";
 
   return (
     <div className={styles.container}>
       <div className={styles.transcriptBox}>
         <div className={styles.transcript}>
-          {TOKENS.map((token, i) => {
+          {tokens.map((token, i) => {
             const state = wordStates[i];
             if (!state) return null;
             return renderWord(token, state);

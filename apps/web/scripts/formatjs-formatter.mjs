@@ -19,7 +19,15 @@ export function format(messages) {
   const sorted = sortEntries(nextEntries);
 
   return sorted.reduce((acc, [id, descriptor]) => {
-    acc[id] = descriptor.defaultMessage ?? "";
+    const value = descriptor.defaultMessage ?? "";
+
+    if (Object.prototype.hasOwnProperty.call(acc, id) && acc[id] !== value) {
+      throw new Error(
+        `[formatjs] ID collision detected for "${id}". Use a unique defaultMessage.`,
+      );
+    }
+
+    acc[id] = value;
     return acc;
   }, {});
 }

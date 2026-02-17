@@ -1,7 +1,7 @@
 {
   "name": "@repo/functions",
   "version": "0.1.0",
-  "description": "Shared callable function helpers for Voquill apps.",
+  "description": "Shared callable function helpers for Vocally apps.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

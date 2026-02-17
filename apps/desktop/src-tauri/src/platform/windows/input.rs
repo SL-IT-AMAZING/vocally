@@ -19,7 +19,7 @@ pub(crate) fn paste_text_into_focused_field(
     let override_text = env::var("VOQUILL_DEBUG_PASTE_TEXT").ok();
     let target = override_text.as_deref().unwrap_or(text);
     eprintln!(
-        "[voquill] attempting to inject text ({} chars)",
+        "[vocally] attempting to inject text ({} chars)",
         target.chars().count()
     );
 
@@ -48,7 +48,7 @@ fn is_console_window() -> bool {
         }
 
         let class_str = String::from_utf16_lossy(&class_name[..len as usize]);
-        eprintln!("[voquill] foreground window class: {}", class_str);
+        eprintln!("[vocally] foreground window class: {}", class_str);
 
         class_str == "ConsoleWindowClass"
     }
@@ -155,7 +155,7 @@ fn send_paste_keys(keybind: Option<&str>) {
 
     let use_shift = keybind == Some("ctrl+shift+v");
     if is_console && !use_shift {
-        eprintln!("[voquill] detected console window, using right-click to paste");
+        eprintln!("[vocally] detected console window, using right-click to paste");
         send_right_click();
     } else {
         send_key_down(VK_CONTROL);

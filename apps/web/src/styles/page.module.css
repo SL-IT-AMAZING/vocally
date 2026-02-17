@@ -12,14 +12,14 @@
   --primary-button-hover: var(--brand-hover);
   --primary-button-active: var(--brand-active);
   --primary-button-fg: #ffffff;
-  --primary-button-border: rgba(10, 132, 255, 0.4);
+  --primary-button-border: rgba(37, 99, 235, 0.4);
 
   min-height: 100vh;
   background: var(--level0);
   color: var(--text-strong);
   display: flex;
   flex-direction: column;
-  gap: 64px;
+  gap: var(--section-gap-md);
   padding: 16px 24px 72px;
 }
 
@@ -36,15 +36,15 @@
   left: 0;
   right: 0;
   z-index: 50;
-  padding: 16px 24px;
+  padding: 12px 24px;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 14px 20px;
-  border-radius: 18px;
+  gap: 20px;
+  padding: 12px 18px;
+  border-radius: 14px;
   background: rgba(28, 28, 28, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -71,7 +71,7 @@
   width: 28px;
   height: 28px;
   display: block;
-  color: #0a84ff;
+  color: var(--brand);
   background-color: currentColor;
   mask: url("/app-logo.svg") center/contain no-repeat;
   -webkit-mask: url("/app-logo.svg") center/contain no-repeat;
@@ -93,13 +93,17 @@
 
 .navLink {
   font-size: 0.875rem;
-  font-weight: 500;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+  font-weight: 600;
+  opacity: 0.8;
+  color: inherit;
+  transition:
+    opacity var(--duration-fast) var(--ease-out-expo),
+    color var(--duration-fast) var(--ease-out-expo);
 }
 
 .navLink:hover {
   opacity: 1;
+  color: #f7fbff;
 }
 
 .headerActions {
@@ -135,7 +139,7 @@
   gap: 16px;
   margin-top: 8px;
   padding: 20px;
-  border-radius: 18px;
+  border-radius: 12px;
   background: rgba(28, 28, 28, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -194,11 +198,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: 10px;
   padding: 12px 22px;
   font-size: 0.95rem;
   font-weight: 600;
-  border: 1px solid transparent;
   border: 1px solid var(--border);
   transition:
     transform 0.2s ease,
@@ -222,7 +225,7 @@
   color: var(--primary-button-fg);
   border-color: var(--brand-active);
   box-shadow:
-    0 8px 24px rgba(10, 132, 255, 0.25),
+    0 8px 24px rgba(37, 99, 235, 0.25),
     var(--shadow);
 }
 
@@ -269,7 +272,7 @@
 
 .langToggle {
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-muted);
@@ -277,14 +280,16 @@
   font-weight: 600;
   cursor: pointer;
   transition:
-    color 0.2s ease,
-    border-color 0.2s ease;
+    color var(--duration-fast) var(--ease-out-expo),
+    border-color var(--duration-fast) var(--ease-out-expo),
+    background-color var(--duration-fast) var(--ease-out-expo);
   letter-spacing: 0.02em;
 }
 
 .langToggle:hover {
   color: var(--text-strong);
   border-color: var(--text-muted);
+  background: transparent;
 }
 
 .headerCta {
@@ -335,13 +340,13 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: 120px;
+  gap: var(--section-gap-lg);
 }
 
 .badge {
   align-self: flex-start;
-  padding: 6px 16px;
-  border-radius: 999px;
+  padding: 6px 14px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--level1);
   font-size: 0.75rem;
@@ -412,10 +417,10 @@
   flex-direction: column;
   gap: 16px;
   padding: 24px;
-  border-radius: 24px;
+  border-radius: 14px;
   background: var(--level1);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   min-height: 220px;
 }
 
@@ -513,7 +518,7 @@
 
 .videoFrame {
   position: relative;
-  border-radius: 28px;
+  border-radius: 14px;
   padding: 160px 24px;
   background: var(--level1);
   color: var(--text-muted);
@@ -532,7 +537,7 @@
   width: 100%;
   height: 100%;
   display: block;
-  border-radius: 28px;
+  border-radius: 14px;
   object-fit: cover;
 }
 
@@ -540,7 +545,7 @@
   align-self: flex-end;
   max-width: 320px;
   padding: 20px 24px;
-  border-radius: 20px;
+  border-radius: 14px;
   background: var(--level1);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-soft);
@@ -676,14 +681,14 @@
 
 .featureCard {
   padding: 28px;
-  border-radius: 24px;
+  border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--level1);
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-height: 240px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .featureCard h3 {
@@ -706,62 +711,6 @@
   color: var(--text-muted);
 }
 
-.splitSection {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 56px;
-  align-items: center;
-}
-
-.splitContent {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  max-width: 58ch;
-}
-
-.splitContent h2 {
-  font-size: clamp(1.8rem, 2.5vw, 2.2rem);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-
-.splitContent p {
-  font-size: 1.05rem;
-  line-height: 1.75;
-  color: var(--text-muted);
-}
-
-.inlineButton {
-  align-self: flex-start;
-}
-
-.bulletList {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-left: 0;
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-.bulletList li {
-  position: relative;
-  padding-left: 26px;
-}
-
-.bulletList li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 8px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--brand);
-}
-
 .inlineLink {
   font-weight: 600;
   color: var(--text-strong);
@@ -774,56 +723,6 @@
   opacity: 1;
 }
 
-.splitMedia {
-  position: relative;
-  border-radius: 32px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  min-height: 420px;
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-}
-
-.iconShowcaseMedia {
-  border: none;
-  box-shadow: none;
-  overflow: visible;
-  background: transparent;
-}
-
-.carouselMedia {
-  border: none;
-  box-shadow: none;
-  overflow: hidden;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.privacyMedia {
-  border: none;
-  box-shadow: none;
-  background: transparent;
-  overflow: visible;
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.offlineMedia {
-  border: none;
-  box-shadow: none;
-  background: transparent;
-  overflow: visible;
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .offlineVisual {
   width: 280px;
   height: 280px;
@@ -833,54 +732,7 @@
   border-radius: 50%;
   background: linear-gradient(
     135deg,
-    rgba(34, 197, 94, 0.15),
-    rgba(22, 163, 74, 0.08)
-  );
-  border: 1px solid rgba(34, 197, 94, 0.25);
-}
-
-.carouselMedia {
-  border: none;
-  box-shadow: none;
-  overflow: hidden;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.privacyMedia {
-  border: none;
-  box-shadow: none;
-  background: transparent;
-  overflow: visible;
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.offlineMedia {
-  border: none;
-  box-shadow: none;
-  background: transparent;
-  overflow: visible;
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.offlineVisual {
-  width: 280px;
-  height: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    rgba(34, 197, 94, 0.15),
+    var(--accent-green-pale),
     rgba(22, 163, 74, 0.08)
   );
   border: 1px solid rgba(34, 197, 94, 0.25);
@@ -889,7 +741,7 @@
 .offlineIcon {
   width: 160px;
   height: 160px;
-  color: #4ade80;
+  color: var(--accent-green-light);
 }
 
 .mediaOverlay {
@@ -932,14 +784,14 @@
 }
 
 .workflowCard {
-  border-radius: 24px;
+  border-radius: 14px;
   padding: 26px;
   background: var(--level1);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .workflowCard h3 {
@@ -955,7 +807,7 @@
 
 .workflowMedia {
   position: relative;
-  border-radius: 28px;
+  border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--border);
   background: var(--level1);
@@ -977,10 +829,10 @@
 .testimonialCard {
   width: min(760px, 100%);
   padding: 40px;
-  border-radius: 32px;
+  border-radius: 14px;
   background: var(--level1);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -1021,30 +873,35 @@
 .footer {
   display: flex;
   flex-direction: column;
-  gap: 40px;
-  padding: 48px;
-  margin-top: 120px;
-  border-radius: 32px;
-  background: var(--level1);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  gap: 28px;
+  padding: 42px 34px;
+  margin-top: 96px;
+  border-radius: 18px;
+  background: linear-gradient(
+    150deg,
+    rgba(15, 30, 56, 0.9) 0%,
+    rgba(9, 16, 30, 0.94) 46%,
+    rgba(5, 10, 20, 0.96) 100%
+  );
+  border: 1px solid rgba(126, 170, 233, 0.26);
+  box-shadow: 0 24px 60px rgba(1, 8, 24, 0.58);
 }
 
 .footerInner {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
   max-width: 60ch;
-  align-items: center;
-  text-align: center;
-  margin: 0 auto;
+  align-items: flex-start;
+  text-align: left;
+  margin: 0;
 }
 
 .footerInner h2 {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
   line-height: 1.1;
-  letter-spacing: -0.035em;
-  padding-bottom: 16px;
+  letter-spacing: -0.03em;
+  padding-bottom: 8px;
 }
 
 .footerActions {
@@ -1054,8 +911,8 @@
 }
 
 .pageMeta {
-  width: min(1120px, 100%);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1068,6 +925,7 @@
 .pageLinks {
   display: flex;
   gap: 16px;
+  align-items: center;
 }
 
 .pageLinks a {
@@ -1085,10 +943,6 @@
     display: none;
   }
 
-  .splitSection {
-    grid-template-columns: 1fr;
-  }
-
   .calloutCard {
     align-self: stretch;
   }
@@ -1102,7 +956,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .splitMedia,
   .workflowMedia {
     min-height: 360px;
   }
@@ -1150,7 +1003,6 @@
     padding: 36px 24px;
   }
 
-  .splitMedia,
   .workflowMedia {
     min-height: 300px;
   }

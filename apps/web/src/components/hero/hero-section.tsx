@@ -18,17 +18,17 @@ export function HeroSection() {
       <div className={styles.heroOverlay} />
       <div className={styles.heroContent}>
         <h1 className={styles.heroTitle}>
-          <FormattedMessage defaultMessage="Your keyboard is holding you back." />
+          <FormattedMessage defaultMessage="Stop typing. Start talking." />
         </h1>
         <p className={styles.heroSubtitle}>
-          <FormattedMessage defaultMessage="Make voice your new keyboard. Type four times faster by using your voice." />
+          <FormattedMessage defaultMessage="Vocally turns your voice into text — instantly, privately, on any app. Four times faster than typing." />
         </p>
         <div className={styles.heroActions}>
           <DownloadButton trackingId="download-hero" />
         </div>
         <div className={styles.heroMeta}>
           <p className={styles.heroNote}>
-            <FormattedMessage defaultMessage="Free to use. No credit card required." />
+            <FormattedMessage defaultMessage="Free forever. No credit card needed." />
           </p>
           <div
             className={styles.heroPlatformList}
@@ -52,7 +52,7 @@ export function HeroSection() {
             })}
           </div>
           <Link to="/download" className={styles.heroMoreLink}>
-            <FormattedMessage defaultMessage="More download options" />
+            <FormattedMessage defaultMessage="See all platforms" />
           </Link>
         </div>
       </div>

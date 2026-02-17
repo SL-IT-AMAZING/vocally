@@ -11,7 +11,7 @@ export function SiteFooter() {
     <footer className={styles.footer} id="cta">
       <div className={styles.footerInner}>
         <h2>
-          <FormattedMessage defaultMessage="Ready to stop typing?" />
+          <FormattedMessage defaultMessage="Your keyboard is optional." />
         </h2>
         <div className={styles.footerActions}>
           <DownloadButton />

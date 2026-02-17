@@ -5,7 +5,7 @@ import { openUpgradePlanDialog } from "../../actions/pricing.actions";
 import { useAppStore } from "../../store";
 import { getIsPaying } from "../../utils/member.utils";
 
-export const VoquillCloudSetting = () => {
+export const VocallyCloudSetting = () => {
   const isPro = useAppStore(getIsPaying);
 
   return (

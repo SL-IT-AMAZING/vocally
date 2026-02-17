@@ -38,7 +38,7 @@ const createClient = (apiKey: string) => {
   return new OpenAI({
     apiKey: apiKey.trim(),
     baseURL: DEEPSEEK_BASE_URL,
-    dangerouslyAllowBrowser: true, // This is safe because Voquill natively on desktop
+    dangerouslyAllowBrowser: true, // This is safe because Vocally natively on desktop
   });
 };
 

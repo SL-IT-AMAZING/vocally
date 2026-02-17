@@ -92,10 +92,10 @@ export function DownloadPageContent() {
     <section className={styles.downloadMain}>
       <header className={styles.downloadHero}>
         <h1>
-          <FormattedMessage defaultMessage="Make voice your new keyboard." />
+          <FormattedMessage defaultMessage="Download Vocally" />
         </h1>
         <p>
-          <FormattedMessage defaultMessage="Dictate four times faster using your voice." />
+          <FormattedMessage defaultMessage="Pick your platform. Install in seconds. Start talking." />
         </p>
         <div className={styles.downloadPrimary}>
           <DownloadButton

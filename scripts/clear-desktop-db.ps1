@@ -29,5 +29,5 @@ foreach ($Suffix in "", "-wal", "-shm") {
 if (-not $Removed) {
     Write-Host "No database files found under $ConfigDir"
 } else {
-    Write-Host "Voquill desktop SQLite data cleared."
+     Write-Host "Vocally desktop SQLite data cleared."
 }

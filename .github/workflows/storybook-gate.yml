@@ -1,0 +1,54 @@
+name: Storybook-First Gate
+
+on:
+  pull_request:
+
+jobs:
+  storybook-gate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check relevance
+        id: relevance
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.sha }}"
+          WEB_CHANGES=$(git diff --name-only "$BASE_SHA"..."$HEAD_SHA" -- \
+            'apps/web/src/components/' \
+            'apps/web/src/styles/' \
+            | wc -l | tr -d ' ')
+          echo "web_changed=$WEB_CHANGES" >> "$GITHUB_OUTPUT"
+        working-directory: .
+
+      - uses: actions/setup-node@v4
+        if: steps.relevance.outputs.web_changed != '0'
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.relevance.outputs.web_changed != '0'
+        run: npm ci
+
+      - name: Build Storybook
+        if: steps.relevance.outputs.web_changed != '0'
+        run: npm run build-storybook
+
+      - name: Enforce Storybook-first
+        if: steps.relevance.outputs.web_changed != '0'
+        run: node ./scripts/enforce-storybook-first.mjs
+        env:
+          SB_BUILD_DIR: ${{ github.workspace }}/apps/web/storybook-static
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.sha }}
+          GITHUB_PR_TITLE: ${{ github.event.pull_request.title }}
+
+      - name: Run denylist checks
+        if: steps.relevance.outputs.web_changed != '0'
+        run: bash ./scripts/denylist-check.sh

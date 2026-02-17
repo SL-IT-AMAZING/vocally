@@ -1,25 +1,23 @@
 import { FormattedMessage } from "react-intl";
-import DownloadButton from "../download-button";
 import TextCleanupAnimation from "./text-cleanup-animation";
-import styles from "../../styles/page.module.css";
+import styles from "./text-cleanup-showcase.module.css";
 
 export default function TextCleanupShowcase() {
   return (
-    <section className={styles.splitSection} id="demo">
-      <div className={styles.splitMedia}>
-        <TextCleanupAnimation />
-      </div>
-      <div className={styles.splitContent}>
+    <section className={styles.section} id="demo">
+      <div className={styles.header}>
         <span className={styles.badge}>
-          <FormattedMessage defaultMessage="Smart text cleanup" />
+          <FormattedMessage defaultMessage="Intelligent editing" />
         </span>
-        <h2>
-          <FormattedMessage defaultMessage="Auto-correct with AI" />
+        <h2 className={styles.title}>
+          <FormattedMessage defaultMessage="Talk naturally. Get polished text." />
         </h2>
-        <p>
-          <FormattedMessage defaultMessage="Vocally uses AI to clean up your transcripts. It removes filler words, hesitations, false starts, etc. Speak naturally, Vocally will handle the rest." />
+        <p className={styles.subtitle}>
+          <FormattedMessage defaultMessage="Vocally's AI silently removes the verbal clutter — filler words, false starts, and misspellings vanish before the text reaches your document." />
         </p>
-        <DownloadButton className={styles.inlineButton} />
+      </div>
+      <div className={styles.animationWrap}>
+        <TextCleanupAnimation />
       </div>
     </section>
   );

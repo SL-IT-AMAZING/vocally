@@ -13,6 +13,7 @@ export function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [locale, setLocale] = useState(() => detectLocale());
+  const logoAlt = locale === "ko" ? "보컬리" : "Vocally";
 
   const handleLocaleToggle = () => {
     const next = locale === "ko" ? "en" : "ko";
@@ -28,11 +29,11 @@ export function SiteHeader() {
     },
     {
       href: "/#speed",
-      label: intl.formatMessage({ defaultMessage: "Purpose" }),
+      label: intl.formatMessage({ defaultMessage: "Speed" }),
     },
     {
       href: "/#privacy",
-      label: intl.formatMessage({ defaultMessage: "Security" }),
+      label: intl.formatMessage({ defaultMessage: "Privacy" }),
     },
     {
       href: "/#pricing",
@@ -46,7 +47,7 @@ export function SiteHeader() {
         <Link to="/" className={styles.logo}>
           <img
             src="/vocally-logo.png"
-            alt="Vocally"
+            alt={logoAlt}
             className={styles.headerLogo}
             draggable={false}
           />

@@ -14,10 +14,11 @@ export function BaseLayout({ children, title, description }: BaseLayoutProps) {
   const location = useLocation();
 
   const DEFAULT_TITLE = intl.formatMessage({
-    defaultMessage: "Vocally | Your keyboard is holding you back",
+    defaultMessage: "Vocally | Stop typing. Start talking.",
   });
   const DEFAULT_DESCRIPTION = intl.formatMessage({
-    defaultMessage: "Type four times faster with a voice-first keyboard.",
+    defaultMessage:
+      "AI-powered voice-to-text that works everywhere. Local-first, private, and 4× faster than typing.",
   });
   const FALLBACK_CANONICAL_ORIGIN = "https://vocally-web.vercel.app";
 

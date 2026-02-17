@@ -12,7 +12,7 @@ import {
   SegmentedControlOption,
 } from "../common/SegmentedControl";
 import { ApiKeyList } from "./ApiKeyList";
-import { VoquillCloudSetting } from "./VoquillCloudSetting";
+import { VocallyCloudSetting } from "./VocallyCloudSetting";
 
 type AIPostProcessingConfigurationProps = {
   hideCloudOption?: boolean;
@@ -72,7 +72,7 @@ export const AIPostProcessingConfiguration = ({
         />
       )}
 
-      {postProcessing.mode === "cloud" && <VoquillCloudSetting />}
+      {postProcessing.mode === "cloud" && <VocallyCloudSetting />}
     </Stack>
   );
 };

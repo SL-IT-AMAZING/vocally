@@ -60,7 +60,7 @@ main() {
   if [ "${removed}" -eq 0 ]; then
     echo "No database files found under ${config_dir}"
   else
-    echo "Voquill desktop SQLite data cleared."
+     echo "Vocally desktop SQLite data cleared."
   fi
 }
 

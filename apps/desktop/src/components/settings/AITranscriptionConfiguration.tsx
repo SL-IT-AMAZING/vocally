@@ -30,7 +30,7 @@ import {
 } from "../common/SegmentedControl";
 import { maybeArrayElements } from "./AIPostProcessingConfiguration";
 import { ApiKeyList } from "./ApiKeyList";
-import { VoquillCloudSetting } from "./VoquillCloudSetting";
+import { VocallyCloudSetting } from "./VocallyCloudSetting";
 
 type ModelOption = {
   value: string;
@@ -260,7 +260,7 @@ export const AITranscriptionConfiguration = ({
         />
       )}
 
-      {transcription.mode === "cloud" && <VoquillCloudSetting />}
+      {transcription.mode === "cloud" && <VocallyCloudSetting />}
     </Stack>
   );
 };

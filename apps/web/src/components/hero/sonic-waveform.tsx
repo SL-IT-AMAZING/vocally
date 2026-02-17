@@ -24,7 +24,7 @@ export function SonicWaveform() {
     };
 
     const draw = () => {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.fillStyle = "rgba(2, 6, 13, 0.18)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const lineCount = 60;
@@ -35,7 +35,7 @@ export function SonicWaveform() {
         ctx.beginPath();
         const progress = i / lineCount;
         const colorIntensity = Math.sin(progress * Math.PI);
-        ctx.strokeStyle = `rgba(10, 132, 255, ${colorIntensity * 0.5})`;
+        ctx.strokeStyle = `rgba(18, 122, 255, ${colorIntensity * 0.52})`;
         ctx.lineWidth = 1.5;
 
         for (let j = 0; j < segmentCount + 1; j++) {
@@ -89,7 +89,7 @@ export function SonicWaveform() {
         inset: 0,
         width: "100%",
         height: "100%",
-        background: "#000",
+        background: "#02060d",
         zIndex: 0,
       }}
     />

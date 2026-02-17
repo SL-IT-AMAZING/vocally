@@ -90,7 +90,7 @@ pub async fn start_google_oauth(
         .map_err(|err| format!("OAuth listener failed: {err}"))?;
 
     let client = Client::builder()
-        .user_agent("voquill-desktop")
+        .user_agent("vocally-desktop")
         .build()
         .map_err(|err| format!("Failed to build HTTP client: {err}"))?;
 

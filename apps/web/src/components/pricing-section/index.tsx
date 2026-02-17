@@ -196,10 +196,10 @@ export default function PricingSection() {
             <FormattedMessage defaultMessage="Pricing" />
           </span>
           <h2>
-            <FormattedMessage defaultMessage="Simple, transparent pricing" />
+            <FormattedMessage defaultMessage="Pay for power. Start for free." />
           </h2>
           <p>
-            <FormattedMessage defaultMessage="Choose the plan that works for you. No hidden fees." />
+            <FormattedMessage defaultMessage="Everything you need to ditch the keyboard — free. Upgrade for cloud sync and unlimited transcription." />
           </p>
         </div>
 
@@ -238,16 +238,16 @@ export default function PricingSection() {
               key={plan.name}
               className={`${styles.card} ${plan.popular ? styles.popular : ""}`}
             >
-              {/* Popular Badge */}
-              {plan.popular && (
-                <span className={styles.popularBadge}>
-                  <FormattedMessage defaultMessage="Best value" />
-                </span>
-              )}
-
               {/* Card Header */}
               <div className={styles.cardHeader}>
-                <h3 className={styles.planName}>{plan.name}</h3>
+                <h3 className={styles.planName}>
+                  {plan.name}
+                  {plan.popular && (
+                    <span className={styles.popularBadge}>
+                      <FormattedMessage defaultMessage="Best value" />
+                    </span>
+                  )}
+                </h3>
                 <p className={styles.planDescription}>{plan.description}</p>
               </div>
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Translation script for Voquill locale files.
+Translation script for Vocally locale files.
 
 Usage:
     python translate.py desktop
@@ -26,7 +26,12 @@ load_dotenv(SCRIPT_DIR / ".env")
 APP_CONFIGS = {
     "desktop": {
         "app_dir": SCRIPT_DIR.parent / "apps" / "desktop",
-        "locales_dir": SCRIPT_DIR.parent / "apps" / "desktop" / "src" / "i18n" / "locales",
+        "locales_dir": SCRIPT_DIR.parent
+        / "apps"
+        / "desktop"
+        / "src"
+        / "i18n"
+        / "locales",
         "i18n_command": ["npm", "run", "i18n"],
     },
     "web": {
@@ -68,7 +73,9 @@ def read_en_file(locales_dir: Path) -> dict:
         return json.load(f)
 
 
-def find_changed_keys(old_locales: dict[str, dict], new_locales: dict[str, dict], en_messages: dict) -> dict[str, list[str]]:
+def find_changed_keys(
+    old_locales: dict[str, dict], new_locales: dict[str, dict], en_messages: dict
+) -> dict[str, list[str]]:
     """Find keys that have changed values between old and new locales."""
     changed = {}
 
@@ -88,7 +95,9 @@ def find_changed_keys(old_locales: dict[str, dict], new_locales: dict[str, dict]
     return changed
 
 
-def translate_text(client: Groq, text: str, target_language: str, max_retries: int = 3) -> str:
+def translate_text(
+    client: Groq, text: str, target_language: str, max_retries: int = 3
+) -> str:
     """Translate text to the target language using Groq with retries."""
     is_simplified_chinese = target_language == "Chinese (Simplified)"
     is_traditional_chinese = target_language == "Chinese (Traditional)"
@@ -137,9 +146,17 @@ Text to translate:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Translate locale files for Voquill apps")
-    parser.add_argument("app", choices=["desktop", "web"], help="The app to translate (desktop or web)")
-    parser.add_argument("--dry-run", action="store_true", help="Show what would be translated without making changes")
+    parser = argparse.ArgumentParser(
+        description="Translate locale files for Vocally apps"
+    )
+    parser.add_argument(
+        "app", choices=["desktop", "web"], help="The app to translate (desktop or web)"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be translated without making changes",
+    )
     args = parser.parse_args()
 
     api_key = os.getenv("GROQ_API_KEY")
@@ -212,7 +229,9 @@ def main():
             try:
                 translated = translate_text(client, en_text, lang_name)
                 locale_data[key] = translated
-                print(f"    -> {translated[:60]}{'...' if len(translated) > 60 else ''}")
+                print(
+                    f"    -> {translated[:60]}{'...' if len(translated) > 60 else ''}"
+                )
             except RuntimeError as e:
                 print(f"    Error: {e}, keeping original value")
 

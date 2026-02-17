@@ -211,7 +211,10 @@ class McpClient {
     return json.result as T;
   }
 
-  private async notify(method: string, params?: Record<string, unknown>): Promise<void> {
+  private async notify(
+    method: string,
+    params?: Record<string, unknown>,
+  ): Promise<void> {
     const request = { jsonrpc: "2.0", method, params };
 
     const response = await fetch(this.config.url, {
@@ -237,7 +240,7 @@ class McpClient {
     await this.request("initialize", {
       protocolVersion: "2024-11-05",
       capabilities: {},
-      clientInfo: { name: "voquill", version: "0.1.0" },
+      clientInfo: { name: "vocally", version: "0.1.0" },
     });
 
     await this.notify("notifications/initialized");
@@ -260,7 +263,9 @@ class McpClient {
   }
 }
 
-const getToolsForServer = async (config: McpServerConfig): Promise<BaseTool[]> => {
+const getToolsForServer = async (
+  config: McpServerConfig,
+): Promise<BaseTool[]> => {
   const client = new McpClient(config);
   await client.initialize();
   const toolDefs = await client.listTools();
@@ -278,7 +283,10 @@ export const getToolsForServers = async (
       servers.map(
         (config) => () =>
           getToolsForServer(config).catch((error) => {
-            console.error(`Failed to get tools from MCP server ${config.url}:`, error);
+            console.error(
+              `Failed to get tools from MCP server ${config.url}:`,
+              error,
+            );
             return [];
           }),
       ),

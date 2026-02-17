@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Installs Windows build prerequisites for the Voquill desktop app.
+   Installs Windows build prerequisites for the Vocally desktop app.
 
 .DESCRIPTION
   Installs the shared dependencies (LLVM/Clang and CMake) required to build the
