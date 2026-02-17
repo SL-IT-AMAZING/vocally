@@ -589,6 +589,21 @@ jobs:
             --key-id "${APPLE_API_KEY_ID}" \
             --issuer "${APPLE_API_ISSUER}"
 
+      - name: Verify Apple timestamp server reachability
+        if: matrix.os == 'macos-14'
+        run: |
+          set -euo pipefail
+          max_attempts=5
+          for i in $(seq 1 $max_attempts); do
+            if curl -sf --max-time 10 "http://timestamp.apple.com/ts01" -o /dev/null 2>&1; then
+              echo "Apple timestamp server is reachable (attempt $i)"
+              exit 0
+            fi
+            echo "Attempt $i/$max_attempts: timestamp server unreachable, retrying in 15s..."
+            sleep 15
+          done
+          echo "WARNING: Apple timestamp server may be unreachable. Build may fail during codesign."
+
       - name: Set Google OAuth credentials
         id: google-oauth
         shell: bash
@@ -646,7 +661,44 @@ jobs:
           VOQUILL_DESKTOP_PLATFORM: ${{ matrix.node_platform }}
         run: npm run build -- --filter=desktop...
 
-      - name: Build and publish
+      - name: Build and publish (attempt 1)
+        id: build_attempt_1
+        continue-on-error: true
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PLATFORM: ${{ matrix.tauri_platform }}
+          VOQUILL_DESKTOP_PLATFORM: ${{ matrix.node_platform }}
+          MACOSX_DEPLOYMENT_TARGET: "13.3"
+          CMAKE_OSX_DEPLOYMENT_TARGET: "13.3"
+          APPLE_TEAM_ID: ${{ env.APPLE_TEAM_ID }}
+          APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}
+          APPLE_API_KEY: ${{ env.APPLE_API_KEY_ID }}
+          APPLE_API_KEY_PATH: ${{ github.workspace }}/AuthKey.p8
+          APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
+          TAURI_LOG_LEVEL: ${{ env.TAURI_LOG_LEVEL }}
+          RUST_LOG: ${{ env.RUST_LOG }}
+          VOQUILL_GOOGLE_CLIENT_ID: ${{ steps.google-oauth.outputs.client_id }}
+          VOQUILL_GOOGLE_CLIENT_SECRET: ${{ steps.google-oauth.outputs.client_secret }}
+        with:
+          projectPath: apps/desktop
+          tauriScript: npm run --workspace desktop tauri
+          args: ${{ steps.tauri-cli-args.outputs.args }}
+          tagName: ${{ matrix.gpu_variant == true && needs.metadata.outputs.gpu_tag_name || needs.metadata.outputs.tag_name }}
+          releaseName: ${{ matrix.gpu_variant == true && format('desktop-gpu{0} v{1}', needs.metadata.outputs.release_suffix, needs.metadata.outputs.version) || format('desktop{0} v{1}', needs.metadata.outputs.release_suffix, needs.metadata.outputs.version) }}
+          releaseBody: ${{ needs.metadata.outputs.release_body }}
+          releaseDraft: false
+          prerelease: ${{ needs.metadata.outputs.release_env != 'prod' }}
+          includeUpdaterJson: true
+
+      - name: Wait before retry
+        if: steps.build_attempt_1.outcome == 'failure'
+        run: |
+          echo "Build attempt 1 failed (likely codesign timestamp issue). Retrying in 30s..."
+          sleep 30
+
+      - name: Build and publish (attempt 2)
+        if: steps.build_attempt_1.outcome == 'failure'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
