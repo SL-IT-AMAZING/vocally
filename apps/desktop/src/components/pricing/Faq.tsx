@@ -59,7 +59,7 @@ export const Faq = ({ sx }: FaqProps) => {
         <FaqRow
           title={<FormattedMessage defaultMessage="Is my voice data secure?" />}
         >
-          <FormattedMessage defaultMessage="Absolutely. Our code is open-source, so you can see for yourself. You can even choose to process your voice entirely on-device." />
+          <FormattedMessage defaultMessage="Absolutely. Your voice data is processed securely and never shared. You can even choose to process your voice entirely on-device for maximum privacy." />
         </FaqRow>
       </Stack>
     </Stack>
