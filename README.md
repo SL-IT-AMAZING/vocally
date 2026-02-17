@@ -126,6 +126,40 @@ See [`docs/desktop-architecture.md`](docs/desktop-architecture.md) for the full 
 | `POLAR_ACCESS_TOKEN`                  | Polar checkout sessions             |
 | `POLAR_WEBHOOK_SECRET`                | Polar webhook verification          |
 
+## Branch Strategy
+
+Trunk-based development with short-lived feature branches.
+
+### Branches
+
+| Branch      | Purpose                | Deploys to                                  |
+| ----------- | ---------------------- | ------------------------------------------- |
+| `main`      | Production-ready trunk | Web (auto), Server (auto), Desktop (manual) |
+| `feature/*` | New features           | —                                           |
+| `fix/*`     | Bug fixes              | —                                           |
+| `chore/*`   | Maintenance, CI, docs  | —                                           |
+
+### Rules
+
+1. **`main` is always deployable.** Never push broken code directly.
+2. **All changes go through PRs.** Branch off `main`, open a PR, merge back.
+3. **Keep branches short-lived.** Aim for < 1 week. Smaller PRs merge faster.
+4. **Delete branches after merge.** Keep the repo clean.
+
+### Workflow
+
+```
+main ─────────────────────────●─────── (auto-deploy web/server)
+       \                     /
+        feature/add-glossary  (PR → squash merge)
+```
+
+1. `git checkout -b feature/my-feature`
+2. Commit, push, open PR to `main`
+3. CI runs tests on the PR
+4. Squash merge into `main`
+5. Web and Server auto-deploy; Desktop releases are triggered manually
+
 ## Releases
 
 - **Desktop**: `.github/workflows/release-desktop.yml` builds all platforms and publishes assets. See [`docs/desktop-release.md`](docs/desktop-release.md).
