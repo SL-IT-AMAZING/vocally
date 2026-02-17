@@ -1,3 +1,4 @@
+import { getVersion } from "@tauri-apps/api/app";
 import { Member, Nullable, User } from "@repo/types";
 import { listify } from "@repo/utilities";
 import dayjs from "dayjs";
@@ -22,6 +23,7 @@ import { getIsDevMode } from "../../utils/env.utils";
 import { getPlatform } from "../../utils/platform.utils";
 import {
   getEffectivePillVisibility,
+  getMyDictationLanguage,
   getMyUserPreferences,
   LOCAL_USER_ID,
 } from "../../utils/user.utils";
@@ -38,6 +40,19 @@ export const AppSideEffects = () => {
   const authReadyRef = useRef(false);
   const userId = useAppStore((state) => state.auth?.id ?? "");
   const initialized = useAppStore((state) => state.initialized);
+  const transcriptionMode = useAppStore(
+    (state) => state.settings.aiTranscription.mode,
+  );
+  const dictationLanguage = useAppStore((state) =>
+    getMyDictationLanguage(state),
+  );
+
+  const appVersionRef = useRef("");
+  useEffect(() => {
+    void getVersion().then((v) => {
+      appVersionRef.current = v;
+    });
+  }, []);
   const member = useAppStore((state) => {
     const uid = state.auth?.id;
     return uid ? (state.memberById[uid] ?? null) : null;
@@ -240,6 +255,7 @@ export const AppSideEffects = () => {
       mixpanel.people.set({
         $email: auth?.email ?? undefined,
         $name: auth?.displayName ?? undefined,
+        $last_login: new Date().toISOString(),
         planStatus,
         isPro,
         isFree,
@@ -251,6 +267,9 @@ export const AppSideEffects = () => {
         activeSystemCohort: CURRENT_COHORT,
         daysSinceOnboarded,
         pillState: getEffectivePillVisibility(prefs?.dictationPillVisibility),
+        appVersion: appVersionRef.current || undefined,
+        transcriptionMode,
+        dictationLanguage,
       });
 
       mixpanel.register({
@@ -265,11 +284,23 @@ export const AppSideEffects = () => {
         daysSinceOnboarded,
         activeSystemCohort: CURRENT_COHORT,
         pillState: getEffectivePillVisibility(prefs?.dictationPillVisibility),
+        appVersion: appVersionRef.current || undefined,
+        transcriptionMode,
+        dictationLanguage,
       });
     }
 
     prevUserIdRef.current = currentUserId;
-  }, [initialized, auth, member, cloudUser, localUser, prefs]);
+  }, [
+    initialized,
+    auth,
+    member,
+    cloudUser,
+    localUser,
+    prefs,
+    transcriptionMode,
+    dictationLanguage,
+  ]);
 
   // You cannot refresh the page in Tauri, here's a hotkey to help with that
   useKeyDownHandler({

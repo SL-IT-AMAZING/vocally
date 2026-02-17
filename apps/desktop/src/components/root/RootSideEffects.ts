@@ -1,6 +1,7 @@
 import { getRec } from "@repo/utilities";
 import { invoke } from "@tauri-apps/api/core";
 import { isEqual } from "lodash-es";
+import mixpanel from "mixpanel-browser";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
 import { loadApiKeys } from "../../actions/api-key.actions";
@@ -53,6 +54,7 @@ import {
   getOrCreateController,
 } from "../../utils/activation.utils";
 import {
+  isMixpanelReady,
   trackAgentStart,
   trackAppUsed,
   trackDictationCompleted,
@@ -429,6 +431,9 @@ export const RootSideEffects = () => {
       } catch (err) {
         console.error("Failed to stop recording via hotkey", err);
         trackDictationError({ stage: "transcription", error: String(err) });
+        if (isMixpanelReady()) {
+          mixpanel.people.increment("totalErrors", 1);
+        }
         showErrorSnackbar("Unable to stop recording. Please try again.");
         suppressUntilRef.current = Date.now() + 700;
       } finally {
@@ -510,16 +515,23 @@ export const RootSideEffects = () => {
             warnings: [...transcribeResult.warnings, ...postProcessWarnings],
           });
 
+          const wordCount = rawTranscript
+            ? rawTranscript.split(/\s+/).filter(Boolean).length
+            : 0;
+
           trackDictationCompleted({
             durationMs:
               transcribeResult.metadata?.transcriptionDurationMs ?? null,
-            wordCount: rawTranscript
-              ? rawTranscript.split(/\s+/).filter(Boolean).length
-              : 0,
+            wordCount,
             appName: currentApp?.name ?? null,
             mode: getAppState().activeRecordingMode ?? "dictate",
             toneApplied: !!currentApp?.toneId,
           });
+
+          if (isMixpanelReady()) {
+            mixpanel.people.increment("totalDictations", 1);
+            mixpanel.people.increment("totalWords", wordCount);
+          }
         }
       }
     } finally {
