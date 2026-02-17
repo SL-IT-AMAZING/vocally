@@ -1,6 +1,6 @@
 # Refund Policy
 
-_Last updated: February 10, 2026_
+_Last updated: February 17, 2026_
 
 At **Vocally**, we want you to be completely satisfied with your purchase.
 
@@ -8,7 +8,7 @@ At **Vocally**, we want you to be completely satisfied with your purchase.
 
 If you are not satisfied with your purchase for any reason, you may request a full refund within **14 days** of the date of purchase. No questions asked.
 
-To request a refund, please contact us at [support@vocally.so](mailto:support@vocally.so).
+To request a refund, please contact us at [slit.amazing@gmail.com](mailto:slit.amazing@gmail.com).
 
 We will process your refund without undue delay, and no later than 14 days after we are informed of your decision to cancel. Refunds will be made using the same payment method used for the original purchase.
 
@@ -36,7 +36,7 @@ You may cancel your subscription at any time. Upon cancellation:
 
 To request a refund, please contact us at:
 
-- **Email**: [support@vocally.so](mailto:support@vocally.so)
+- **Email**: [slit.amazing@gmail.com](mailto:slit.amazing@gmail.com)
 
 Please include the following in your request:
 
@@ -51,4 +51,4 @@ We reserve the right to update this Refund Policy at any time. Changes will be p
 
 ## 7. Contact Us
 
-If you have any questions about this Refund Policy, please contact us at [support@vocally.so](mailto:support@vocally.so).
+If you have any questions about this Refund Policy, please contact us at [slit.amazing@gmail.com](mailto:slit.amazing@gmail.com).

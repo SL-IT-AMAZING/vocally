@@ -1,16 +1,28 @@
 # Terms of Service
 
-_Last updated: February 10, 2026_
+_Last updated: February 17, 2026_
 
 Welcome to **Vocally**, operated by **SL:IT** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
 
-## 1. Open Source License
+## 1. Software License
 
-Vocally is open source software. The Software's source code is available under the terms of its open source license (as specified in the repository). These Terms supplement, but do not replace, the applicable open source license.
+Vocally is licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](https://www.gnu.org/licenses/agpl-3.0.html). The source code is available under the terms of that license. Your use of the Software is subject to the AGPL-3.0 and these Terms. Third-party components included in the Software may be licensed under their own respective licenses.
 
-## 2. No Account Required
+## 2. Accounts
 
-Vocally does not require account registration. You can download and use the Software freely without providing any personal information.
+### 2.1 Optional Registration
+
+Vocally can be used without an account for local-only features. However, certain features — including cloud synchronization, subscription plans, and usage tracking — require account registration.
+
+### 2.2 Account Creation
+
+You may create an account using:
+
+- Email and password
+- Google OAuth
+- Kakao OAuth
+
+You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
 
 ## 3. Local Installation & Use
 
@@ -25,16 +37,30 @@ You are responsible for:
 
 ## 4. Third-Party Services
 
-### 4.1 Optional Groq API
+### 4.1 Cloud Transcription Providers (Optional)
 
-If you choose to use the Groq API integration:
+The Software integrates with the following optional third-party transcription services:
 
-- You are responsible for obtaining your own Groq API credentials
-- Your use of Groq services is subject to Groq's terms of service and privacy policy
-- We are not responsible for Groq's service availability, performance, or practices
-- API keys and credentials are stored locally on your device
+- **Groq** — for Whisper-based cloud transcription and AI text processing
+- **AssemblyAI** — for real-time streaming transcription
+- **Deepgram** — for real-time streaming transcription
 
-### 4.2 Your Responsibility
+If you choose to use any of these services:
+
+- You are responsible for obtaining your own API credentials
+- Your use of these services is subject to their respective terms of service and privacy policies
+- We are not responsible for their service availability, performance, or data practices
+- API keys and credentials are stored locally on your device in encrypted form
+
+### 4.2 Infrastructure Services
+
+The Software uses the following services for core functionality:
+
+- **Supabase** — for user authentication and account data storage
+- **Polar** — for subscription payment processing
+- **Mixpanel** — for anonymized usage analytics
+
+### 4.3 Your Responsibility
 
 You are solely responsible for your use of any third-party services integrated with the Software.
 
@@ -44,25 +70,42 @@ You agree to use the Software:
 
 - In compliance with all applicable laws and regulations
 - In a manner that respects the rights of others
-- Without attempting to misuse, exploit, or reverse engineer the Software for malicious purposes
+- Without attempting to circumvent subscription restrictions or usage limits
+- Without using the Software for any unlawful, harmful, or fraudulent purpose
 
 ## 6. Intellectual Property
 
-### 6.1 Open Source Software
+### 6.1 Ownership
 
-The Software is provided under an open source license. You have the rights granted by that license, including the right to use, modify, and distribute the Software as permitted.
+The Vocally name, branding, and original modifications by SL:IT are the property of SL:IT. The underlying source code is based on [voquill](https://github.com/josiahsrc/voquill) by Handaptive Software, LLC and is licensed under the AGPL-3.0. All rights not expressly granted in these Terms or the AGPL-3.0 are reserved by their respective owners.
 
 ### 6.2 Trademarks
 
-The "Vocally" name and associated trademarks remain the property of their respective owners. Use of the Software does not grant you rights to use these trademarks except as permitted by the open source license.
+The "Vocally" name, logo, and associated branding are trademarks of SL:IT. You may not use these trademarks without our prior written permission.
 
 ### 6.3 Your Content
 
-You retain all rights to any audio, transcriptions, or other content you create using the Software. The Software does not claim any ownership of your content.
+You retain all rights to any audio, transcriptions, or other content you create using the Software. We do not claim any ownership of your content.
 
-## 7. Contributions
+## 7. Payment and Subscriptions
 
-If you contribute code, documentation, or other materials to the Vocally project, you agree that your contributions will be licensed under the same open source license as the Software.
+### 7.1 Plans
+
+Vocally offers a free tier and optional paid subscription plans (Pro). Paid plans unlock additional features and higher usage limits.
+
+### 7.2 Billing
+
+Payments are processed by **Polar**, our merchant of record. By purchasing a subscription, you also agree to [Polar's Terms of Service](https://polar.sh/legal/terms). All prices are listed in USD.
+
+### 7.3 Free Trial
+
+If a free trial is offered, you will not be charged until the trial period ends. You may cancel at any time during the trial without being charged.
+
+### 7.4 Cancellation
+
+You may cancel your subscription at any time. Upon cancellation, you will retain access to Pro features until the end of your current billing period.
+
+Please refer to our [Refund Policy](/refund) for details on refunds.
 
 ## 8. Disclaimers
 
@@ -71,66 +114,54 @@ THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPL
 We do not guarantee that:
 
 - The Software will be error-free or uninterrupted
-- Defects will be corrected
+- Defects will be corrected in a timely manner
 - The Software is free from viruses or other harmful components
 - Results obtained from using the Software will be accurate or reliable
+- Third-party transcription services will be available or accurate
 
 ## 9. Limitation of Liability
 
-TO THE FULLEST EXTENT PERMITTED BY LAW, SL:IT AND ITS CONTRIBUTORS SHALL NOT BE LIABLE FOR ANY:
+TO THE FULLEST EXTENT PERMITTED BY LAW, SL:IT SHALL NOT BE LIABLE FOR ANY:
 
 - Direct, indirect, incidental, special, consequential, or punitive damages
 - Loss of profits, data, use, or other intangible losses
 - Damages resulting from your use or inability to use the Software
 - Damages resulting from unauthorized access to your data
-- Damages resulting from third-party services (including Groq API)
+- Damages resulting from third-party services (including Groq, AssemblyAI, Deepgram, or Polar)
 
 ## 10. Indemnification
 
-You agree to indemnify and hold harmless the Vocally developers and contributors from any claims, damages, losses, liabilities, and expenses arising from:
+You agree to indemnify and hold harmless SL:IT, its officers, employees, and affiliates from any claims, damages, losses, liabilities, and expenses arising from:
 
 - Your use of the Software
 - Your violation of these Terms
 - Your violation of any rights of another party
 - Your use of third-party services
 
-## 11. No Service Level Agreement
+## 11. Support
 
-Since the Software runs locally and we do not operate centralized services, there is no service level agreement, uptime guarantee, or technical support obligation.
+Support is provided at our discretion via email. There is no service level agreement, guaranteed response time, or technical support obligation.
 
-## 12. Community Support
-
-Support for the Software is provided on a voluntary, community basis through:
-
-- GitHub issues and discussions
-- Community forums and channels
-- Documentation and guides
-
-There is no guarantee of response time or resolution.
-
-## 13. Modifications to Terms
+## 12. Modifications to Terms
 
 We may update these Terms from time to time. Changes will be posted on this page with a new "Last updated" date. Continued use of the Software after changes constitutes acceptance of the revised Terms.
 
-## 14. Payment and Subscriptions
+## 13. Termination
 
-Vocally offers optional paid subscription plans. Payments are processed by **Polar**, our merchant of record. By purchasing a subscription, you also agree to Polar's terms of service. All prices are listed in USD. You may cancel your subscription at any time. Please refer to our [Refund Policy](/refund) for details on refunds.
+We reserve the right to suspend or terminate your account and access to the Software at any time, with or without cause, including for violation of these Terms. Upon termination, your right to use the Software ceases immediately.
 
-## 15. Governing Law
+## 14. Governing Law
 
 These Terms are governed by the laws of the Republic of Korea, without regard to conflicts of law principles.
 
-## 16. Severability
+## 15. Severability
 
 If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.
 
-## 17. Entire Agreement
+## 16. Entire Agreement
 
-These Terms, together with the applicable open source license, constitute the entire agreement between you and Vocally regarding the Software.
+These Terms constitute the entire agreement between you and SL:IT regarding the Software.
 
-## 18. Contact
+## 17. Contact
 
-For questions about these Terms, you can:
-
-- Open an issue on our GitHub repository
-- Contact us at [legal@vocally.so](mailto:legal@vocally.so)
+For questions about these Terms, please contact us at [slit.amazing@gmail.com](mailto:slit.amazing@gmail.com).

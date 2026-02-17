@@ -1,4 +1,5 @@
 import { FormattedMessage, useIntl } from "react-intl";
+import { Link } from "react-router-dom";
 import DownloadButton from "./download-button";
 import styles from "../styles/page.module.css";
 
@@ -22,15 +23,15 @@ export function SiteFooter() {
       >
         <span>© {currentYear} SL:IT</span>
         <div className={styles.pageLinks}>
-          <a href="https://vocally-web.vercel.app/privacy">
+          <Link to="/privacy">
             <FormattedMessage defaultMessage="Privacy Policy" />
-          </a>
-          <a href="https://vocally-web.vercel.app/terms">
+          </Link>
+          <Link to="/terms">
             <FormattedMessage defaultMessage="Terms of Service" />
-          </a>
-          <a href="https://vocally-web.vercel.app/refund">
+          </Link>
+          <Link to="/refund">
             <FormattedMessage defaultMessage="Refund Policy" />
-          </a>
+          </Link>
           <a href="mailto:slit.amazing@gmail.com">
             <FormattedMessage defaultMessage="Contact" />
           </a>

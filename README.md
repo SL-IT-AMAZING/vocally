@@ -14,7 +14,7 @@ Make voice your new keyboard. Type four times faster by using your voice.
 
 ---
 
-Vocally is an open-source, cross-platform speech-to-text app. Dictate into any desktop application, clean the transcript with AI, and keep your personal glossary in sync. The repo bundles the desktop app, marketing site, Supabase backend, and shared packages in a single Turborepo.
+Vocally is a cross-platform speech-to-text app. Dictate into any desktop application, clean the transcript with AI, and keep your personal glossary in sync. The repo bundles the desktop app, marketing site, Supabase backend, and shared packages in a single Turborepo.
 
 ## Highlights
 
@@ -167,4 +167,4 @@ main ─────────────────────────
 
 ## License
 
-AGPLv3. See [`LICENCE`](LICENCE) for details.
+Licensed under the [GNU Affero General Public License v3.0](LICENCE). Originally forked from [voquill](https://github.com/josiahsrc/voquill) by Handaptive Software, LLC.

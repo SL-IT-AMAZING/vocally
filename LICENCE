@@ -1,9 +1,11 @@
-Copyright (c) 2025-present Handaptive Software, LLC.
+Copyright (c) 2025-present Handaptive Software, LLC. (original voquill — https://github.com/josiahsrc/voquill)
+Copyright (c) 2025-present SL:IT (Vocally)
 
-Portions of this software are licensed as follows:
+Portions of this software include third-party components licensed under
+their original licenses as provided by the applicable owners.
 
-- All third party components are licensed under the original license provided by the owner of the applicable component
-- All other content not mentioned above is available under the AGPLv3 license as defined below
+All other content is available under the GNU Affero General Public License
+version 3 (AGPLv3), as defined below.
 
                     GNU AFFERO GENERAL PUBLIC LICENSE
                        Version 3, 19 November 2007
