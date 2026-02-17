@@ -117,7 +117,7 @@ export const groqTranscribeAudio = async ({
         file,
         model: resolvedModel,
         prompt,
-        language: language ?? "en",
+        language: language || "en",
       });
 
       if (!response.text) {

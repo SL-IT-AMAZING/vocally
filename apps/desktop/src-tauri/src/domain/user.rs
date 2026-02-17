@@ -28,6 +28,10 @@ pub struct User {
     #[serde(default)]
     pub has_migrated_preferred_microphone: bool,
     #[serde(default)]
+    pub created_at: Option<String>,
+    #[serde(default)]
+    pub updated_at: Option<String>,
+    #[serde(default)]
     pub cohort: Option<String>,
 }
 
