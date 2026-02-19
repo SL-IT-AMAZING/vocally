@@ -1,7 +1,7 @@
 use sqlx::sqlite::SqlitePoolOptions;
 use tauri::{Manager, WindowEvent};
 
-const AUTOSTART_HIDDEN_ARG: &str = "--voquill-autostart-hidden";
+const HIDDEN_ARG: &str = "--hidden";
 
 pub fn build() -> tauri::Builder<tauri::Wry> {
     let updater_builder = tauri_plugin_updater::Builder::new();
@@ -14,8 +14,8 @@ pub fn build() -> tauri::Builder<tauri::Wry> {
             }
         }))
         .plugin(tauri_plugin_autostart::init(
-            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            Some(vec![AUTOSTART_HIDDEN_ARG.into()]),
+            tauri_plugin_autostart::MacosLauncher::AppleScript,
+            Some(vec![HIDDEN_ARG]),
         ))
         .plugin(tauri_plugin_process::init())
         .plugin(
@@ -69,7 +69,9 @@ pub fn build() -> tauri::Builder<tauri::Wry> {
 
             #[cfg(desktop)]
             {
-                if std::env::args().any(|arg| arg == AUTOSTART_HIDDEN_ARG) {
+                let should_start_hidden = should_start_hidden(app);
+
+                if should_start_hidden {
                     if let Some(main_window) = app.get_webview_window("main") {
                         let _ = main_window.hide();
                         #[cfg(target_os = "macos")]
@@ -228,6 +230,30 @@ pub fn build() -> tauri::Builder<tauri::Wry> {
             crate::commands::get_selected_text,
             crate::commands::initialize_local_transcriber,
         ])
+}
+
+fn should_start_hidden(app: &tauri::App) -> bool {
+    // Windows/Linux: the autostart plugin passes CLI args normally.
+    if std::env::args().any(|arg| arg == HIDDEN_ARG) {
+        return true;
+    }
+
+    // macOS: AppleScript login items don't forward CLI args to the binary.
+    // Detect autostart by checking if autostart is enabled AND the app was
+    // launched in the background (not activated by the user).
+    #[cfg(target_os = "macos")]
+    {
+        use tauri_plugin_autostart::ManagerExt;
+        let autostart_enabled = app.autolaunch().is_enabled().unwrap_or(false);
+        if autostart_enabled && !crate::platform::macos::dock::is_app_active() {
+            return true;
+        }
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    let _ = app;
+
+    false
 }
 
 async fn initialize_transcriber_background(app: &tauri::AppHandle) -> Result<(), String> {
