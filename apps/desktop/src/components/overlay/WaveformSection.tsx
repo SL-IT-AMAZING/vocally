@@ -36,8 +36,12 @@ export const WaveformSection = () => {
     getEffectivePillVisibility(state.userPrefs?.dictationPillVisibility),
   );
   const isDictationUnlocked = useAppStore(getIsDictationUnlocked);
+  const isDictationLocked = useAppStore((state) => state.isDictationLocked);
   const isHoveredRef = useRef(false);
   const hotkeyKeys = combos.length > 0 ? combos[0] : ["?"];
+
+  const isIdle = overlayPhase === "idle";
+  const isListening = overlayPhase === "recording";
 
   const checkCursorInBounds = (width: number, height: number) => {
     if (!cursor) return false;
@@ -66,7 +70,7 @@ export const WaveformSection = () => {
     emitTo("main", "on-click-dictate", {}).catch(console.error);
   };
 
-  const isOverlayActive = overlayPhase !== "idle";
+  const isOverlayActive = !isIdle;
   const isVisible =
     isDictationUnlocked &&
     dictationPillVisibility !== "hidden" &&
@@ -80,7 +84,9 @@ export const WaveformSection = () => {
         position: "absolute",
         bottom: `${bottomOffsetPx}px`,
         left: "50%",
-        transform: isVisible ? "translateX(-50%)" : "translateX(-50%) translateY(8px)",
+        transform: isVisible
+          ? "translateX(-50%)"
+          : "translateX(-50%) translateY(8px)",
         opacity: isVisible ? 1 : 0,
         transition: isVisible
           ? "opacity 100ms ease-out, transform 100ms ease-out, bottom 200ms ease-out, visibility 0ms"
@@ -93,11 +99,13 @@ export const WaveformSection = () => {
         visibility: isVisible ? "visible" : "hidden",
       }}
     >
-      {/* Tooltip */}
       <Box
         sx={{
-          opacity: isHoveredRef.current ? 1 : 0,
-          transform: isHoveredRef.current ? "translateY(0)" : "translateY(4px)",
+          opacity: (isHoveredRef.current && isIdle) || isListening ? 1 : 0,
+          transform:
+            (isHoveredRef.current && isIdle) || isListening
+              ? "translateY(0)"
+              : "translateY(4px)",
           transition: "all 150ms ease-out",
           marginBottom: theme.spacing(1),
           pointerEvents: "none",
@@ -112,37 +120,73 @@ export const WaveformSection = () => {
             boxShadow: `0 4px 12px ${alpha(theme.palette.common.black, 0.3)}`,
           }}
         >
-          <Typography
-            variant="caption"
-            sx={{
-              color: theme.palette.common.white,
-              whiteSpace: "nowrap",
-              fontWeight: 500,
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-            }}
-            component="span"
-          >
-            <FormattedMessage
-              defaultMessage="You can also hold {hotkey} to dictate"
-              values={{
-                hotkey: (
-                  <HotkeyBadge
-                    keys={hotkeyKeys}
-                    sx={{
-                      bgcolor: alpha(theme.palette.common.white, 0.15),
-                      borderColor: alpha(theme.palette.common.white, 0.3),
-                      color: theme.palette.common.white,
-                      fontSize: "inherit",
-                      py: 0,
-                      px: 0.75,
-                    }}
-                  />
-                ),
+          {isListening ? (
+            <Typography
+              variant="caption"
+              sx={{
+                color: theme.palette.common.white,
+                whiteSpace: "nowrap",
+                fontWeight: 500,
               }}
-            />
-          </Typography>
+            >
+              {isDictationLocked ? (
+                <FormattedMessage defaultMessage="Tap to stop" />
+              ) : (
+                <FormattedMessage defaultMessage="Tap to stop · Double-tap to keep recording" />
+              )}
+            </Typography>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0.25,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: theme.palette.common.white,
+                  whiteSpace: "nowrap",
+                  fontWeight: 500,
+                }}
+              >
+                <FormattedMessage defaultMessage="Click to dictate · Double-tap to pin" />
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: alpha(theme.palette.common.white, 0.6),
+                  whiteSpace: "nowrap",
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                }}
+                component="span"
+              >
+                <FormattedMessage
+                  defaultMessage="You can also hold {hotkey}"
+                  values={{
+                    hotkey: (
+                      <HotkeyBadge
+                        keys={hotkeyKeys}
+                        sx={{
+                          bgcolor: alpha(theme.palette.common.white, 0.15),
+                          borderColor: alpha(theme.palette.common.white, 0.3),
+                          color: theme.palette.common.white,
+                          fontSize: "inherit",
+                          py: 0,
+                          px: 0.75,
+                        }}
+                      />
+                    ),
+                  }}
+                />
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
 

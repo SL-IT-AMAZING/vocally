@@ -145,11 +145,14 @@ export const PillOverlayRoot = () => {
         visibility: isVisible ? "visible" : "hidden",
       }}
     >
-      {/* Tooltip */}
+      {/* Contextual guide tooltip */}
       <Box
         sx={{
-          opacity: isHovered && isIdle ? 1 : 0,
-          transform: isHovered && isIdle ? "translateY(0)" : "translateY(4px)",
+          opacity: (isHovered && isIdle) || isListening ? 1 : 0,
+          transform:
+            (isHovered && isIdle) || isListening
+              ? "translateY(0)"
+              : "translateY(4px)",
           transition: "all 150ms ease-out",
           marginBottom: theme.spacing(1),
           pointerEvents: "none",
@@ -163,37 +166,73 @@ export const PillOverlayRoot = () => {
             padding: `${theme.spacing(0.75)} ${theme.spacing(1.5)}`,
           }}
         >
-          <Typography
-            variant="caption"
-            sx={{
-              color: theme.palette.common.white,
-              whiteSpace: "nowrap",
-              fontWeight: 500,
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-            }}
-            component="span"
-          >
-            <FormattedMessage
-              defaultMessage="You can also hold {hotkey} to dictate"
-              values={{
-                hotkey: (
-                  <HotkeyBadge
-                    keys={hotkeyKeys}
-                    sx={{
-                      bgcolor: alpha(theme.palette.common.white, 0.15),
-                      borderColor: alpha(theme.palette.common.white, 0.3),
-                      color: theme.palette.common.white,
-                      fontSize: "inherit",
-                      py: 0,
-                      px: 0.75,
-                    }}
-                  />
-                ),
+          {isListening ? (
+            <Typography
+              variant="caption"
+              sx={{
+                color: theme.palette.common.white,
+                whiteSpace: "nowrap",
+                fontWeight: 500,
               }}
-            />
-          </Typography>
+            >
+              {isDictationLocked ? (
+                <FormattedMessage defaultMessage="Tap to stop" />
+              ) : (
+                <FormattedMessage defaultMessage="Tap to stop · Double-tap to keep recording" />
+              )}
+            </Typography>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0.25,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: theme.palette.common.white,
+                  whiteSpace: "nowrap",
+                  fontWeight: 500,
+                }}
+              >
+                <FormattedMessage defaultMessage="Click to dictate · Double-tap to pin" />
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: alpha(theme.palette.common.white, 0.6),
+                  whiteSpace: "nowrap",
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                }}
+                component="span"
+              >
+                <FormattedMessage
+                  defaultMessage="You can also hold {hotkey}"
+                  values={{
+                    hotkey: (
+                      <HotkeyBadge
+                        keys={hotkeyKeys}
+                        sx={{
+                          bgcolor: alpha(theme.palette.common.white, 0.15),
+                          borderColor: alpha(theme.palette.common.white, 0.3),
+                          color: theme.palette.common.white,
+                          fontSize: "inherit",
+                          py: 0,
+                          px: 0.75,
+                        }}
+                      />
+                    ),
+                  }}
+                />
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
 
