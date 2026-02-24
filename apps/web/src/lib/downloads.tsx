@@ -186,6 +186,7 @@ type GithubRelease = {
   name?: string;
   body?: string;
   published_at?: string;
+  prerelease?: boolean;
   assets?: GithubReleaseAsset[];
 };
 
@@ -273,13 +274,10 @@ const ASSET_KEY_MAPPINGS: Array<{
 
 export async function fetchReleaseManifest(signal?: AbortSignal) {
   try {
-    const [cpuManifest, gpuManifest] =
-      typeof window === "undefined"
-        ? await Promise.all([
-            fetchChannelManifest(CPU_LATEST_MANIFEST_URL, signal),
-            fetchChannelManifest(GPU_LATEST_MANIFEST_URL, signal),
-          ])
-        : [undefined, undefined];
+    const [cpuManifest, gpuManifest] = await Promise.all([
+      fetchChannelManifest(CPU_LATEST_MANIFEST_URL, signal),
+      fetchChannelManifest(GPU_LATEST_MANIFEST_URL, signal),
+    ]);
 
     if (cpuManifest || gpuManifest) {
       const merged: ReleaseManifest = {
@@ -313,10 +311,12 @@ export async function fetchReleaseManifest(signal?: AbortSignal) {
 
     const latestCpu = allReleases
       .filter((r) => r.tag_name && RELEASE_TAG_PATTERNS.cpu.test(r.tag_name))
+      .filter((r) => !r.prerelease)
       .slice()
       .sort(newestReleaseFirst)[0];
     const latestGpu = allReleases
       .filter((r) => r.tag_name && RELEASE_TAG_PATTERNS.gpu.test(r.tag_name))
+      .filter((r) => !r.prerelease)
       .slice()
       .sort(newestReleaseFirst)[0];
 
