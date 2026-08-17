@@ -20,8 +20,6 @@ import {
   trackPaymentCheckoutOpened,
 } from "../../utils/analytics.utils";
 
-const POLAR_PRODUCT_MONTHLY = "25bf6350-bebc-4b9f-b896-66767ce9304a";
-const POLAR_PRODUCT_YEARLY = "d73b4531-65c2-4eb8-976d-b6fcc1ae99e5";
 const POLL_INTERVAL_MS = 5000;
 const POLL_MAX_DURATION_MS = 5 * 60 * 1000;
 
@@ -102,14 +100,9 @@ export const PaymentDialog = () => {
         return;
       }
 
-      const productId =
-        selectedPlan === "monthly"
-          ? POLAR_PRODUCT_MONTHLY
-          : POLAR_PRODUCT_YEARLY;
-
       const { data, error: invokeError } = await supabase.functions.invoke(
-        "polar-checkout",
-        { body: { productId } },
+        "toss-checkout",
+        { body: { plan: selectedPlan } },
       );
 
       if (invokeError || !data?.checkoutUrl) {
@@ -215,7 +208,7 @@ export const PaymentDialog = () => {
                   </Typography>
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  $5/mo
+                  ₩7,000/mo
                 </Typography>
               </Stack>
             </Box>
@@ -269,7 +262,7 @@ export const PaymentDialog = () => {
                   </Typography>
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  $50/yr
+                  ₩70,000/yr
                 </Typography>
               </Stack>
             </Box>

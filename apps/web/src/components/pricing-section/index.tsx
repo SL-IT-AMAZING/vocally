@@ -6,8 +6,8 @@ import pageStyles from "../../styles/page.module.css";
 import { DownloadButton } from "../download-button";
 import styles from "./pricing-section.module.css";
 
-const POLAR_PRODUCT_MONTHLY = "25bf6350-bebc-4b9f-b896-66767ce9304a";
-const POLAR_PRODUCT_YEARLY = "d73b4531-65c2-4eb8-976d-b6fcc1ae99e5";
+const TOSS_PRICE_MONTHLY_KRW = 7_000;
+const TOSS_PRICE_YEARLY_KRW = 70_000;
 
 type Feature = { text: string; deemphasized?: boolean };
 
@@ -63,8 +63,8 @@ function usePricingPlans(): PricingPlan[] {
         defaultMessage:
           "Full power with cloud transcription and advanced integrations.",
       }),
-      monthlyPrice: 5,
-      yearlyPrice: 50,
+      monthlyPrice: TOSS_PRICE_MONTHLY_KRW,
+      yearlyPrice: TOSS_PRICE_YEARLY_KRW,
       features: [
         {
           text: intl.formatMessage({
@@ -148,12 +148,11 @@ function ProSubscribeButton({
 
     setCheckoutLoading(true);
     try {
-      const productId = isYearly ? POLAR_PRODUCT_YEARLY : POLAR_PRODUCT_MONTHLY;
+      const plan = isYearly ? "yearly" : "monthly";
 
-      const { data, error } = await supabase.functions.invoke(
-        "polar-checkout",
-        { body: { productId, locale: intl.locale } },
-      );
+      const { data, error } = await supabase.functions.invoke("toss-checkout", {
+        body: { plan },
+      });
 
       if (error || !data?.checkoutUrl) {
         console.error("Checkout error:", error);
@@ -267,10 +266,15 @@ export default function PricingSection() {
                     <>
                       <div className={styles.priceRow}>
                         <span className={styles.price}>
-                          $
-                          {isYearly && plan.yearlyPrice
-                            ? plan.yearlyPrice
-                            : plan.monthlyPrice}
+                          {new Intl.NumberFormat(intl.locale, {
+                            style: "currency",
+                            currency: "KRW",
+                            maximumFractionDigits: 0,
+                          }).format(
+                            isYearly && plan.yearlyPrice
+                              ? plan.yearlyPrice
+                              : plan.monthlyPrice,
+                          )}
                         </span>
                         <span className={styles.pricePeriod}>
                           {isYearly && plan.yearlyPrice ? (

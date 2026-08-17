@@ -69,7 +69,8 @@ if (storybookDir && fs.existsSync(storybookDir)) {
 
   if (manifestPath) {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-    const stories = manifest.stories || {};
+    // Storybook 10 uses `entries`; older builds used `stories`.
+    const stories = manifest.stories || manifest.entries || {};
     const importPaths = new Set(
       Object.values(stories)
         .map((entry) => entry?.importPath)

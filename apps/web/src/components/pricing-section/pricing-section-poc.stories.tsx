@@ -386,7 +386,7 @@ function PricingSectionPOC() {
             <FormattedMessage defaultMessage="Cloud transcription, unlimited words, priority support." />
           </p>
           <div style={{ display: "flex", alignItems: "baseline" }}>
-            <span style={s.price}>${isYearly ? "50" : "5"}</span>
+            <span style={s.price}>₩{isYearly ? "70,000" : "7,000"}</span>
             <span style={s.pricePeriod}>
               {isYearly ? (
                 <FormattedMessage defaultMessage="/ year" />

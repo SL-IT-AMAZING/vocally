@@ -1,8 +1,10 @@
 # Refund Policy
 
-_Last updated: February 17, 2026_
+_Last updated: August 18, 2026_
 
-At **Vocally**, we want you to be completely satisfied with your purchase.
+At **Vocally**, operated by **주식회사 슬릿컴퍼니 (SL:IT)**, we want you to be completely satisfied with your purchase.
+
+Business registration number: **882-81-03956** · Representative: **전도현** · Contact: [slit.amazing@gmail.com](mailto:slit.amazing@gmail.com)
 
 ## 1. 14-Day Refund Policy
 
@@ -16,10 +18,10 @@ We will process your refund without undue delay, and no later than 14 days after
 
 Vocally offers the following paid subscription plans:
 
-- **Monthly Plan**: $5.00 USD per month
-- **Yearly Plan**: $50.00 USD per year
+- **Monthly Plan**: ₩7,000 per month
+- **Yearly Plan**: ₩70,000 per year
 
-All subscriptions are billed automatically at the start of each billing cycle through our payment processor, Polar.
+All subscriptions are billed automatically at the start of each billing cycle through Toss Payments, subject to the applicable Toss Payments billing agreement.
 
 ## 3. Free Trial
 

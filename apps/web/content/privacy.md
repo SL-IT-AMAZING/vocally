@@ -1,8 +1,10 @@
 # Privacy Policy
 
-_Last updated: February 17, 2026_
+_Last updated: August 18, 2026_
 
-Vocally is a privacy-conscious voice-to-text application developed by **SL:IT** ("we", "us", "our"). This Privacy Policy explains how we collect, use, and protect your information when you use the Vocally desktop application ("Software") and our website.
+Vocally is a privacy-conscious voice-to-text application developed by **주식회사 슬릿컴퍼니 (SL:IT)** ("we", "us", "our"). This Privacy Policy explains how we collect, use, and protect your information when you use the Vocally desktop application ("Software") and our website.
+
+Business information: Representative **전도현** · Business registration number **882-81-03956** · Address **서울특별시 성동구 왕십리로 222, 한양대학교 한양종합기술연구원(히트관) 지하2층 비215호 데카콘 아이 5번 테이블(사근동)(사근동, 한양대학교 한양종합기술연구원)**.
 
 ## 1. Information We Collect
 
@@ -18,12 +20,12 @@ Account creation is optional. You may use the Software without an account for lo
 
 ### 1.2 Subscription & Payment Information
 
-If you purchase a subscription, payment is processed by **Polar**, our merchant of record. We do not directly collect or store your credit card or billing details. Polar handles all payment processing. We receive and store:
+If you purchase a subscription, payment is processed through **Toss Payments**. We do not directly collect or store your credit card or billing details. Toss Payments handles payment authentication and payment details. We receive and store:
 
 - Your subscription plan and status
 - Purchase dates and billing cycle information
 
-For details on how Polar handles your payment data, please refer to [Polar's Privacy Policy](https://polar.sh/legal/privacy).
+For details on how Toss Payments handles payment data, please refer to Toss Payments' privacy policy and terms.
 
 ### 1.3 Usage Data & Analytics
 
@@ -92,7 +94,7 @@ The following data is stored on our servers via Supabase:
 | Service        | Purpose                             | Data Shared                                     |
 | -------------- | ----------------------------------- | ----------------------------------------------- |
 | **Supabase**   | Authentication & account data       | Email, display name, user ID, subscription info |
-| **Polar**      | Payment processing                  | Payment handled by Polar directly               |
+| **Toss Payments** | Payment processing               | Payment authentication and payment details     |
 | **Mixpanel**   | Usage analytics                     | Anonymized usage events (see Section 1.3)       |
 | **Groq**       | Cloud transcription & AI processing | Audio data, text (only when you opt in)         |
 | **AssemblyAI** | Real-time transcription             | Audio data (only when you opt in)               |
@@ -113,7 +115,7 @@ We use industry-standard security measures to protect your information:
 - API keys are encrypted before local storage
 - Authentication is handled through Supabase with secure token management
 - All data transmission uses HTTPS/TLS encryption
-- Payments are processed through Polar's secure infrastructure
+- Payments are processed through Toss Payments' secure infrastructure
 
 ## 8. Children's Privacy
 

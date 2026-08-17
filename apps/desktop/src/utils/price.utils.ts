@@ -18,13 +18,13 @@ export const convertPricingPlanToMemberPlan = (
   return "free";
 };
 
-export const getUSDPrices = () => ({
-  pro_monthly: { unitAmount: 5, currency: "USD" },
-  pro_yearly: { unitAmount: 50, currency: "USD" },
+export const getKRWPrices = () => ({
+  pro_monthly: { unitAmount: 7000, currency: "KRW" },
+  pro_yearly: { unitAmount: 70000, currency: "KRW" },
 });
 
-export const getDollarPriceFromKey = (_state: any, priceKey: PriceKey) => {
-  const prices = getUSDPrices();
+export const getKrwPriceFromKey = (_state: any, priceKey: PriceKey) => {
+  const prices = getKRWPrices();
   const price = prices[priceKey];
   return price?.unitAmount ?? 0;
 };

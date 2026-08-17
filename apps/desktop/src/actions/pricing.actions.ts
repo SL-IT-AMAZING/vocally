@@ -1,9 +1,9 @@
 import { getAppState, produceAppState } from "../store";
-import { getUSDPrices, PricingPlan } from "../utils/price.utils";
+import { getKRWPrices, PricingPlan } from "../utils/price.utils";
 import { setMode } from "./login.actions";
 
 export const loadPrices = () => {
-  const prices = getUSDPrices();
+  const prices = getKRWPrices();
   const mapped: Record<
     string,
     Record<

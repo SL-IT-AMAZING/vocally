@@ -39,7 +39,7 @@ import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { ChangeEvent, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { showErrorSnackbar } from "../../actions/app.actions";
+import { showErrorSnackbar, showSnackbar } from "../../actions/app.actions";
 import { setAutoLaunchEnabled } from "../../actions/settings.actions";
 import { loadTones } from "../../actions/tone.actions";
 import {
@@ -216,18 +216,19 @@ export default function SettingsPage() {
     trackBillingPortalOpened();
     setOpeningSubscriptionPortal(true);
     try {
-      const currentLocale = detectLocale();
-      const portalLocale = currentLocale === "ko" ? "ko-KR" : "en-US";
-      const { data, error } = await supabase.functions.invoke("polar-portal", {
-        body: { locale: portalLocale },
-      });
-
-      const portalUrl = (data as { portalUrl?: string } | null)?.portalUrl;
-      if (error || !portalUrl) {
-        throw error ?? new Error("Missing portal URL");
+      const { data, error } = await supabase.functions.invoke(
+        "toss-cancel-subscription",
+        { body: {} },
+      );
+      if (error || !(data as { success?: boolean } | null)?.success) {
+        throw error ?? new Error("Failed to cancel subscription");
       }
-
-      await openUrl(portalUrl);
+      showSnackbar(
+        intl.formatMessage({
+          defaultMessage:
+            "Your subscription will remain active until the end of the current billing period.",
+        }),
+      );
     } catch (error) {
       console.error("Failed to open subscription portal", error);
       showErrorSnackbar(
@@ -485,7 +486,7 @@ export default function SettingsPage() {
         <ListTile
           title={<FormattedMessage defaultMessage="Billing & subscription" />}
           subtitle={
-            <FormattedMessage defaultMessage="Cancel plan and view billing details" />
+            <FormattedMessage defaultMessage="Cancel plan at the end of the billing period" />
           }
           onClick={() => {
             void openSubscriptionPortal();
