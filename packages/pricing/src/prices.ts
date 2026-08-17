@@ -1,7 +1,6 @@
 export type PriceInfo = {
-  sandboxId: string;
-  devId: string;
-  prodId: string;
+  currency: "KRW";
+  unitAmount: number;
 };
 
 export const SUBSCRIPTION_PRICE_KEYS = [] as const;
@@ -21,18 +20,15 @@ export type PriceKey = (typeof PRICE_KEYS)[number];
 
 export const Prices: Record<PriceKey, PriceInfo> = {
   pro_monthly: {
-    sandboxId: "price_1Smx96RRNItZsxS6WXTeWby3",
-    devId: "",
-    prodId: "price_1Son5zIp7DaYKUgMEMMuBNcy",
+    currency: "KRW",
+    unitAmount: 7000,
   },
   pro_yearly: {
-    sandboxId: "price_1Smx9IRRNItZsxS6BG3XnnhL",
-    devId: "",
-    prodId: "price_1SmiviIp7DaYKUgMlbjqI23J",
+    currency: "KRW",
+    unitAmount: 70000,
   },
 };
 
-export const priceKeyById: Record<string, PriceKey> = Object.fromEntries([
-  ...Object.entries(Prices).map(([key, value]) => [value.sandboxId, key]),
-  ...Object.entries(Prices).map(([key, value]) => [value.prodId, key]),
-]) as Record<string, PriceKey>;
+// Kept as an empty compatibility map for the retired Firebase/Stripe path.
+// Current checkout resolves prices by plan on the Toss edge function.
+export const priceKeyById: Record<string, PriceKey> = {};

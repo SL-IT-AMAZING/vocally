@@ -23,7 +23,7 @@ Vocally is a cross-platform speech-to-text app. Dictate into any desktop applica
 - **AI text cleanup** &mdash; automatically remove filler words and false starts via the `@repo/voice-ai` pipeline.
 - **Personal dictionary** &mdash; glossary terms and replacement rules keep recurring names and phrases accurate.
 - **Multi-auth sign-in** &mdash; Google, Kakao, and email/password via Supabase Auth.
-- **Pro subscriptions** &mdash; monthly and yearly plans powered by Polar with webhook-driven management.
+- **Pro subscriptions** &mdash; monthly and yearly KRW plans powered by Toss Payments with server-side billing management.
 - **Works offline** &mdash; local Whisper inference means no internet required.
 
 ## Monorepo Layout
@@ -118,13 +118,19 @@ See [`docs/desktop-architecture.md`](docs/desktop-architecture.md) for the full 
 | ------------------------------------- | ----------------------------------- |
 | `VITE_SUPABASE_URL`                   | Supabase project URL                |
 | `VITE_SUPABASE_ANON_KEY`              | Supabase anonymous key              |
+| `VITE_TOSS_CLIENT_KEY`                 | Toss Payments client key            |
 | `VOQUILL_API_KEY_SECRET`              | Encrypts API keys stored on disk    |
 | `VOQUILL_WHISPER_MODEL_URL`           | Override Whisper model download URL |
 | `VOQUILL_WHISPER_DISABLE_GPU`         | Force CPU-only inference            |
 | `VOQUILL_GOOGLE_CLIENT_ID` / `SECRET` | Google OAuth credentials            |
 | `GROQ_API_KEY`                        | Groq transcription & cleanup        |
-| `POLAR_ACCESS_TOKEN`                  | Polar checkout sessions             |
-| `POLAR_WEBHOOK_SECRET`                | Polar webhook verification          |
+| `TOSS_SECRET_KEY`                     | Toss Payments server API key        |
+| `TOSS_PRICE_MONTHLY_KRW`              | Monthly price in KRW                |
+| `TOSS_PRICE_YEARLY_KRW`               | Yearly price in KRW                 |
+| `TOSS_SITE_URL`                       | Public checkout site URL            |
+| `TOSS_CRON_SECRET`                    | Secret for recurring billing job    |
+
+Toss automatic billing requires a separate billing agreement. After the agreement is active, configure the secrets above in Supabase Edge Functions, apply the Toss migration, deploy `toss-checkout`, `toss-billing-issue`, `toss-cancel-subscription`, and `toss-recurring`, and invoke `toss-recurring` at least daily with the `x-cron-secret` header. The public checkout uses `/checkout/toss`; success redirects to `/checkout/toss/success` and cancellation redirects to `/checkout/cancel`.
 
 ## Branch Strategy
 

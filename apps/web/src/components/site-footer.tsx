@@ -21,7 +21,17 @@ export function SiteFooter() {
         className={styles.pageMeta}
         aria-label={intl.formatMessage({ defaultMessage: "Legal" })}
       >
-        <span>© {currentYear} SL:IT</span>
+        <div>
+          <span>© {currentYear} 주식회사 슬릿컴퍼니 (SL:IT)</span>
+          <br />
+          <small>
+            대표 전도현 · 사업자등록번호 882-81-03956
+            <br />
+            서울특별시 성동구 왕십리로 222, 한양대학교
+            한양종합기술연구원(히트관) 지하2층 비215호 데카콘 아이 5번
+            테이블(사근동)(사근동, 한양대학교 한양종합기술연구원)
+          </small>
+        </div>
         <div className={styles.pageLinks}>
           <Link to="/privacy">
             <FormattedMessage defaultMessage="Privacy Policy" />

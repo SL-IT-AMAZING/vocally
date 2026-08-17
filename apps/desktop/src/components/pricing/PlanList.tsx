@@ -20,7 +20,7 @@ import { loadPrices } from "../../actions/pricing.actions";
 import { useOnEnter } from "../../hooks/helper.hooks";
 import { useAppStore } from "../../store";
 import { getEffectivePlan } from "../../utils/member.utils";
-import { getDollarPriceFromKey, PricingPlan } from "../../utils/price.utils";
+import { getKrwPriceFromKey, PricingPlan } from "../../utils/price.utils";
 
 const ENTERPRISE_INVITE_CODE = "5AX9G";
 
@@ -201,10 +201,10 @@ export const PlanList = ({
   const [inviteCodeError, setInviteCodeError] = useState(false);
 
   const proMonthlyPrice = useAppStore((state) =>
-    getDollarPriceFromKey(state, "pro_monthly"),
+    getKrwPriceFromKey(state, "pro_monthly"),
   );
   const proYearlyPrice = useAppStore((state) =>
-    getDollarPriceFromKey(state, "pro_yearly"),
+    getKrwPriceFromKey(state, "pro_yearly"),
   );
   const proYearlyPerMonth = proYearlyPrice
     ? Math.round(proYearlyPrice / 12)
@@ -300,7 +300,7 @@ export const PlanList = ({
           <Typography variant="h5" fontWeight={600}>
             {displayPrice
               ? intl.formatMessage(
-                  { defaultMessage: "${displayPrice}/month" },
+                  { defaultMessage: "₩{displayPrice}/month" },
                   { displayPrice },
                 )
               : "--"}
@@ -308,7 +308,7 @@ export const PlanList = ({
           <Typography variant="caption" color="text.secondary">
             {isYearly && yearlyTotal ? (
               <FormattedMessage
-                defaultMessage="Billed annually (${total}/year)"
+                defaultMessage="Billed annually (₩{total}/year)"
                 values={{ total: yearlyTotal }}
               />
             ) : (

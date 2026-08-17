@@ -12,6 +12,8 @@ import PrivacyPage from "./pages/PrivacyPage";
 import PricingPage from "./pages/PricingPage";
 import RefundPage from "./pages/RefundPage";
 import TermsPage from "./pages/TermsPage";
+import TossBillingSuccessPage from "./pages/TossBillingSuccessPage";
+import TossCheckoutPage from "./pages/TossCheckoutPage";
 
 function App() {
   const location = useLocation();
@@ -28,6 +30,11 @@ function App() {
         <Route path="/auth/confirmed" element={<AuthConfirmedPage />} />
         <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
         <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
+        <Route path="/checkout/toss" element={<TossCheckoutPage />} />
+        <Route
+          path="/checkout/toss/success"
+          element={<TossBillingSuccessPage />}
+        />
         <Route path="/download" element={<DownloadPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

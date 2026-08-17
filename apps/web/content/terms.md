@@ -1,8 +1,10 @@
 # Terms of Service
 
-_Last updated: February 17, 2026_
+_Last updated: August 18, 2026_
 
-Welcome to **Vocally**, operated by **SL:IT** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
+Welcome to **Vocally**, operated by **주식회사 슬릿컴퍼니 (SL:IT)** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
+
+Business information: Representative **전도현** · Business registration number **882-81-03956** · Address **서울특별시 성동구 왕십리로 222, 한양대학교 한양종합기술연구원(히트관) 지하2층 비215호 데카콘 아이 5번 테이블(사근동)(사근동, 한양대학교 한양종합기술연구원)**.
 
 ## 1. Software License
 
@@ -57,7 +59,7 @@ If you choose to use any of these services:
 The Software uses the following services for core functionality:
 
 - **Supabase** — for user authentication and account data storage
-- **Polar** — for subscription payment processing
+- **Toss Payments** — for subscription payment processing
 - **Mixpanel** — for anonymized usage analytics
 
 ### 4.3 Your Responsibility
@@ -95,7 +97,7 @@ Vocally offers a free tier and optional paid subscription plans (Pro). Paid plan
 
 ### 7.2 Billing
 
-Payments are processed by **Polar**, our merchant of record. By purchasing a subscription, you also agree to [Polar's Terms of Service](https://polar.sh/legal/terms). All prices are listed in USD.
+Payments are processed through **Toss Payments**. Toss Payments handles the payment authentication and card details; we receive the payment result and subscription status needed to provide Pro features. All prices are listed in KRW and include applicable taxes unless otherwise stated.
 
 ### 7.3 Free Trial
 
@@ -127,7 +129,7 @@ TO THE FULLEST EXTENT PERMITTED BY LAW, SL:IT SHALL NOT BE LIABLE FOR ANY:
 - Loss of profits, data, use, or other intangible losses
 - Damages resulting from your use or inability to use the Software
 - Damages resulting from unauthorized access to your data
-- Damages resulting from third-party services (including Groq, AssemblyAI, Deepgram, or Polar)
+  - Damages resulting from third-party services (including Groq, AssemblyAI, Deepgram, or Toss Payments)
 
 ## 10. Indemnification
 
