@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Prices } from "@repo/pricing";
 import { useAuth } from "../../context/auth-context";
 import { supabase } from "../../lib/supabase";
 import pageStyles from "../../styles/page.module.css";
 import { DownloadButton } from "../download-button";
 import styles from "./pricing-section.module.css";
 
-const TOSS_PRICE_MONTHLY_KRW = Prices.pro_monthly.unitAmount;
-const TOSS_PRICE_YEARLY_KRW = Prices.pro_yearly.unitAmount;
+const TOSS_PRICE_MONTHLY_KRW = 7_000;
+const TOSS_PRICE_YEARLY_KRW = 70_000;
 
 type Feature = { text: string; deemphasized?: boolean };
 
