@@ -136,6 +136,7 @@ function ProSubscribeButton({
 }) {
   const { user, openSignInModal } = useAuth();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const intl = useIntl();
 
   const handleSubscribe = async () => {
@@ -144,9 +145,13 @@ function ProSubscribeButton({
       return;
     }
 
-    if (!supabase) return;
+    if (!supabase) {
+      setCheckoutError("결제 서비스를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
 
     setCheckoutLoading(true);
+    setCheckoutError(null);
     try {
       const plan = isYearly ? "yearly" : "monthly";
 
@@ -156,10 +161,34 @@ function ProSubscribeButton({
 
       if (error || !data?.checkoutUrl) {
         console.error("Checkout error:", error);
+        const context = error && "context" in error ? error.context : null;
+        const response =
+          context && typeof (context as { clone?: unknown }).clone === "function"
+            ? (context as Response)
+            : null;
+        const responseBody = response
+          ? ((await response.clone().json().catch(() => null)) as {
+              error?: string;
+              message?: string;
+            } | null)
+          : null;
+        setCheckoutError(
+          responseBody?.error ??
+            responseBody?.message ??
+            error?.message ??
+            "결제 준비에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        );
         return;
       }
 
       window.location.href = data.checkoutUrl;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      setCheckoutError(
+        error instanceof Error
+          ? error.message
+          : "결제 준비에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      );
     } finally {
       setCheckoutLoading(false);
     }
@@ -170,14 +199,21 @@ function ProSubscribeButton({
     : intl.formatMessage({ defaultMessage: "Get Started" });
 
   return (
-    <button
-      type="button"
-      className={className}
-      onClick={handleSubscribe}
-      disabled={checkoutLoading}
-    >
-      {label}
-    </button>
+    <>
+      <button
+        type="button"
+        className={className}
+        onClick={handleSubscribe}
+        disabled={checkoutLoading}
+      >
+        {label}
+      </button>
+      {checkoutError && (
+        <p role="alert" className={styles.checkoutError}>
+          {checkoutError}
+        </p>
+      )}
+    </>
   );
 }
 
