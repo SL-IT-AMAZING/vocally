@@ -30,7 +30,7 @@
   },
   "bundle": {
     "active": true,
-    "publisher": "SLIT",
+    "publisher": "SLIT Co., Ltd.",
     "targets": "all",
     "createUpdaterArtifacts": true,
     "icon": [

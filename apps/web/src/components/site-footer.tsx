@@ -22,7 +22,7 @@ export function SiteFooter() {
         aria-label={intl.formatMessage({ defaultMessage: "Legal" })}
       >
         <div>
-          <span>© {currentYear} 주식회사 슬릿컴퍼니 (SLIT)</span>
+          <span>© {currentYear} 주식회사 슬릿컴퍼니 (SLIT Co., Ltd.)</span>
           <br />
           <small>
             대표 전도현 · 사업자등록번호 882-81-03956

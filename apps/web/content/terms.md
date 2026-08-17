@@ -2,7 +2,7 @@
 
 _Last updated: August 18, 2026_
 
-Welcome to **Vocally**, operated by **주식회사 슬릿컴퍼니 (SLIT)** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
+Welcome to **Vocally**, operated by **주식회사 슬릿컴퍼니 (SLIT Co., Ltd.)** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
 
 Business information: Representative **전도현** · Business registration number **882-81-03956** · Address **서울특별시 성동구 왕십리로 222, 한양대학교 한양종합기술연구원(히트관) 지하2층 비215호 데카콘 아이 5번 테이블(사근동)(사근동, 한양대학교 한양종합기술연구원)**.
 

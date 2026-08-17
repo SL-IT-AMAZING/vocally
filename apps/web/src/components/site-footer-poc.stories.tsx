@@ -63,7 +63,7 @@ function SiteFooterPOC() {
           <FormattedMessage defaultMessage="무료로 시작하기" />
         </button>
         <div style={s.meta}>
-          <span>© 2026 주식회사 슬릿컴퍼니 (SLIT)</span>
+          <span>© 2026 주식회사 슬릿컴퍼니 (SLIT Co., Ltd.)</span>
           <small>대표 전도현 · 사업자등록번호 882-81-03956</small>
           <div style={s.links}>
             <span>
