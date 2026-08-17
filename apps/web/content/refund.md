@@ -2,7 +2,7 @@
 
 _Last updated: August 18, 2026_
 
-At **Vocally**, operated by **주식회사 슬릿컴퍼니 (SL:IT)**, we want you to be completely satisfied with your purchase.
+At **Vocally**, operated by **주식회사 슬릿컴퍼니 (SLIT)**, we want you to be completely satisfied with your purchase.
 
 Business registration number: **882-81-03956** · Representative: **전도현** · Contact: [slit.amazing@gmail.com](mailto:slit.amazing@gmail.com)
 
