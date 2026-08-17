@@ -2,7 +2,7 @@
 
 _Last updated: August 18, 2026_
 
-Welcome to **Vocally**, operated by **주식회사 슬릿컴퍼니 (SL:IT)** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
+Welcome to **Vocally**, operated by **주식회사 슬릿컴퍼니 (SLIT)** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
 
 Business information: Representative **전도현** · Business registration number **882-81-03956** · Address **서울특별시 성동구 왕십리로 222, 한양대학교 한양종합기술연구원(히트관) 지하2층 비215호 데카콘 아이 5번 테이블(사근동)(사근동, 한양대학교 한양종합기술연구원)**.
 
@@ -79,11 +79,11 @@ You agree to use the Software:
 
 ### 6.1 Ownership
 
-The Vocally name, branding, and original modifications by SL:IT are the property of SL:IT. The underlying source code is based on [voquill](https://github.com/josiahsrc/voquill) by Handaptive Software, LLC and is licensed under the AGPL-3.0. All rights not expressly granted in these Terms or the AGPL-3.0 are reserved by their respective owners.
+The Vocally name, branding, and original modifications by SLIT are the property of SLIT. The underlying source code is based on [voquill](https://github.com/josiahsrc/voquill) by Handaptive Software, LLC and is licensed under the AGPL-3.0. All rights not expressly granted in these Terms or the AGPL-3.0 are reserved by their respective owners.
 
 ### 6.2 Trademarks
 
-The "Vocally" name, logo, and associated branding are trademarks of SL:IT. You may not use these trademarks without our prior written permission.
+The "Vocally" name, logo, and associated branding are trademarks of SLIT. You may not use these trademarks without our prior written permission.
 
 ### 6.3 Your Content
 
@@ -123,7 +123,7 @@ We do not guarantee that:
 
 ## 9. Limitation of Liability
 
-TO THE FULLEST EXTENT PERMITTED BY LAW, SL:IT SHALL NOT BE LIABLE FOR ANY:
+TO THE FULLEST EXTENT PERMITTED BY LAW, SLIT SHALL NOT BE LIABLE FOR ANY:
 
 - Direct, indirect, incidental, special, consequential, or punitive damages
 - Loss of profits, data, use, or other intangible losses
@@ -133,7 +133,7 @@ TO THE FULLEST EXTENT PERMITTED BY LAW, SL:IT SHALL NOT BE LIABLE FOR ANY:
 
 ## 10. Indemnification
 
-You agree to indemnify and hold harmless SL:IT, its officers, employees, and affiliates from any claims, damages, losses, liabilities, and expenses arising from:
+You agree to indemnify and hold harmless SLIT, its officers, employees, and affiliates from any claims, damages, losses, liabilities, and expenses arising from:
 
 - Your use of the Software
 - Your violation of these Terms
@@ -162,7 +162,7 @@ If any provision of these Terms is found to be unenforceable, the remaining prov
 
 ## 16. Entire Agreement
 
-These Terms constitute the entire agreement between you and SL:IT regarding the Software.
+These Terms constitute the entire agreement between you and SLIT regarding the Software.
 
 ## 17. Contact
 

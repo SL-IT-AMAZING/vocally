@@ -2,7 +2,7 @@
 
 _Last updated: August 18, 2026_
 
-Vocally is a privacy-conscious voice-to-text application developed by **주식회사 슬릿컴퍼니 (SL:IT)** ("we", "us", "our"). This Privacy Policy explains how we collect, use, and protect your information when you use the Vocally desktop application ("Software") and our website.
+Vocally is a privacy-conscious voice-to-text application developed by **주식회사 슬릿컴퍼니 (SLIT)** ("we", "us", "our"). This Privacy Policy explains how we collect, use, and protect your information when you use the Vocally desktop application ("Software") and our website.
 
 Business information: Representative **전도현** · Business registration number **882-81-03956** · Address **서울특별시 성동구 왕십리로 222, 한양대학교 한양종합기술연구원(히트관) 지하2층 비215호 데카콘 아이 5번 테이블(사근동)(사근동, 한양대학교 한양종합기술연구원)**.
 

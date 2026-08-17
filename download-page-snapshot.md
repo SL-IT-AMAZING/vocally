@@ -83,7 +83,7 @@
         - /url: /download
         - generic [ref=e63]: 무료 다운로드
     - navigation "법적 고지" [ref=e64]:
-      - generic [ref=e65]: © 2026 SL:IT
+      - generic [ref=e65]: © 2026 SLIT
       - generic [ref=e66]:
         - link "개인정보 보호정책" [ref=e67] [cursor=pointer]:
           - /url: https://vocally-web.vercel.app/privacy
