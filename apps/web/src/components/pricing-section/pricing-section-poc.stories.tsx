@@ -268,6 +268,7 @@ function ShieldIcon() {
 
 function PricingSectionPOC() {
   const [isYearly, setIsYearly] = useState(true);
+  const [checkoutError, setCheckoutError] = useState(false);
   const intl = useIntl();
 
   const personalFeatures = [
@@ -405,6 +406,7 @@ function PricingSectionPOC() {
           <button
             type="button"
             style={s.btnFilled}
+            onClick={() => setCheckoutError((visible) => !visible)}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "#3b82f6";
             }}
@@ -414,6 +416,11 @@ function PricingSectionPOC() {
           >
             <FormattedMessage defaultMessage="Upgrade to Pro" />
           </button>
+          {checkoutError && (
+            <p style={{ color: "#fca5a5", fontSize: "0.8rem", lineHeight: 1.4, margin: "10px 0 0" }}>
+              <FormattedMessage defaultMessage="Checkout preparation failed. Please try again." />
+            </p>
+          )}
           <p style={s.featuresTitle}>
             <FormattedMessage defaultMessage="Includes" />
           </p>
