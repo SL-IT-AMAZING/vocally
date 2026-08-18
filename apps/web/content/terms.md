@@ -59,7 +59,7 @@ If you choose to use any of these services:
 The Software uses the following services for core functionality:
 
 - **Supabase** — for user authentication and account data storage
-- **Toss Payments** — for subscription payment processing
+- **Toss Payments and Kakao Pay** — for subscription payment processing where available
 - **Mixpanel** — for anonymized usage analytics
 
 ### 4.3 Your Responsibility
@@ -97,7 +97,7 @@ Vocally offers a free tier and optional paid subscription plans (Pro). Paid plan
 
 ### 7.2 Billing
 
-Payments are processed through **Toss Payments**. Toss Payments handles the payment authentication and card details; we receive the payment result and subscription status needed to provide Pro features. All prices are listed in KRW and include applicable taxes unless otherwise stated.
+Payments are processed through the payment provider selected at checkout, such as **Toss Payments** or **Kakao Pay** where available. The selected provider handles payment authentication and payment details; we receive the payment result and subscription status needed to provide Pro features. All prices are listed in KRW and include applicable taxes unless otherwise stated.
 
 ### 7.3 Free Trial
 
@@ -129,7 +129,7 @@ TO THE FULLEST EXTENT PERMITTED BY LAW, SLIT SHALL NOT BE LIABLE FOR ANY:
 - Loss of profits, data, use, or other intangible losses
 - Damages resulting from your use or inability to use the Software
 - Damages resulting from unauthorized access to your data
-  - Damages resulting from third-party services (including Groq, AssemblyAI, Deepgram, or Toss Payments)
+  - Damages resulting from third-party services (including Groq, AssemblyAI, Deepgram, Toss Payments, or Kakao Pay)
 
 ## 10. Indemnification
 

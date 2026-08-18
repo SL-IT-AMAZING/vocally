@@ -20,12 +20,12 @@ Account creation is optional. You may use the Software without an account for lo
 
 ### 1.2 Subscription & Payment Information
 
-If you purchase a subscription, payment is processed through **Toss Payments**. We do not directly collect or store your credit card or billing details. Toss Payments handles payment authentication and payment details. We receive and store:
+If you purchase a subscription, payment is processed through the payment provider selected at checkout, such as **Toss Payments** or **Kakao Pay** where available. We do not directly collect or store your card, Kakao Pay, or other payment credentials. The selected provider handles payment authentication and payment details. We receive and store:
 
 - Your subscription plan and status
 - Purchase dates and billing cycle information
 
-For details on how Toss Payments handles payment data, please refer to Toss Payments' privacy policy and terms.
+For details on how payment data is handled, please refer to the privacy policy and terms of the payment provider selected at checkout.
 
 ### 1.3 Usage Data & Analytics
 
@@ -94,7 +94,7 @@ The following data is stored on our servers via Supabase:
 | Service        | Purpose                             | Data Shared                                     |
 | -------------- | ----------------------------------- | ----------------------------------------------- |
 | **Supabase**   | Authentication & account data       | Email, display name, user ID, subscription info |
-| **Toss Payments** | Payment processing               | Payment authentication and payment details     |
+| **Toss Payments / Kakao Pay** | Payment processing        | Payment authentication and payment details     |
 | **Mixpanel**   | Usage analytics                     | Anonymized usage events (see Section 1.3)       |
 | **Groq**       | Cloud transcription & AI processing | Audio data, text (only when you opt in)         |
 | **AssemblyAI** | Real-time transcription             | Audio data (only when you opt in)               |
@@ -115,7 +115,7 @@ We use industry-standard security measures to protect your information:
 - API keys are encrypted before local storage
 - Authentication is handled through Supabase with secure token management
 - All data transmission uses HTTPS/TLS encryption
-- Payments are processed through Toss Payments' secure infrastructure
+- Payments are processed through the selected payment provider's secure infrastructure
 
 ## 8. Children's Privacy
 

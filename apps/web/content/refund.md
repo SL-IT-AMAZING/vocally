@@ -21,7 +21,7 @@ Vocally offers the following paid subscription plans:
 - **Monthly Plan**: ₩7,000 per month
 - **Yearly Plan**: ₩70,000 per year
 
-All subscriptions are billed automatically at the start of each billing cycle through Toss Payments, subject to the applicable Toss Payments billing agreement.
+All subscriptions are billed automatically at the start of each billing cycle through the payment method and provider selected at checkout. Vocally may offer payments through supported providers, including Toss Payments and Kakao Pay where available; the applicable provider billing agreement applies.
 
 ## 3. Free Trial
 
