@@ -114,23 +114,32 @@ See [`docs/desktop-architecture.md`](docs/desktop-architecture.md) for the full 
 
 ## Environment Variables
 
-| Variable                              | Purpose                             |
-| ------------------------------------- | ----------------------------------- |
-| `VITE_SUPABASE_URL`                   | Supabase project URL                |
-| `VITE_SUPABASE_ANON_KEY`              | Supabase anonymous key              |
-| `VITE_TOSS_CLIENT_KEY`                 | Toss Payments client key            |
-| `VOQUILL_API_KEY_SECRET`              | Encrypts API keys stored on disk    |
-| `VOQUILL_WHISPER_MODEL_URL`           | Override Whisper model download URL |
-| `VOQUILL_WHISPER_DISABLE_GPU`         | Force CPU-only inference            |
-| `VOQUILL_GOOGLE_CLIENT_ID` / `SECRET` | Google OAuth credentials            |
-| `GROQ_API_KEY`                        | Groq transcription & cleanup        |
-| `TOSS_SECRET_KEY`                     | Toss Payments server API key        |
-| `TOSS_PRICE_MONTHLY_KRW`              | Monthly price in KRW                |
-| `TOSS_PRICE_YEARLY_KRW`               | Yearly price in KRW                 |
-| `TOSS_SITE_URL`                       | Public checkout site URL            |
-| `TOSS_CRON_SECRET`                    | Secret for recurring billing job    |
+| Variable                              | Purpose                                                          |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`                   | Supabase project URL                                             |
+| `VITE_SUPABASE_ANON_KEY`              | Supabase anonymous key                                           |
+| `VITE_TOSS_CLIENT_KEY`                | Toss Payments client key                                         |
+| `VOQUILL_API_KEY_SECRET`              | Encrypts API keys stored on disk                                 |
+| `VOQUILL_WHISPER_MODEL_URL`           | Override Whisper model download URL                              |
+| `VOQUILL_WHISPER_DISABLE_GPU`         | Force CPU-only inference                                         |
+| `VOQUILL_GOOGLE_CLIENT_ID` / `SECRET` | Google OAuth credentials                                         |
+| `GROQ_API_KEY`                        | Groq transcription & cleanup                                     |
+| `TOSS_SECRET_KEY`                     | Toss Payments server API key                                     |
+| `TOSS_PRICE_MONTHLY_KRW`              | Monthly price in KRW                                             |
+| `TOSS_PRICE_YEARLY_KRW`               | Yearly price in KRW                                              |
+| `TOSS_SITE_URL`                       | Public checkout site URL                                         |
+| `TOSS_CRON_SECRET`                    | Secret for recurring billing job                                 |
+| `KAKAOPAY_SECRET_KEY`                 | Kakao Pay server Secret key                                      |
+| `KAKAOPAY_CID_SUBSCRIPTION`           | Kakao Pay recurring-payment CID                                  |
+| `KAKAOPAY_CID_SECRET`                 | Optional Kakao Pay CID secret                                    |
+| `KAKAOPAY_SITE_URL`                   | Registered checkout site URL                                     |
+| `KAKAOPAY_CRON_SECRET`                | Secret for Kakao Pay renewal job                                 |
+| `KAKAOPAY_ADMIN_SECRET`               | Server-only refund/reconciliation secret                         |
+| `VITE_KAKAOPAY_ENABLED`               | Set to `true` only after the live Kakao Pay checkout test passes |
 
 Toss automatic billing requires a separate billing agreement. After the agreement is active, configure the secrets above in Supabase Edge Functions, apply the Toss migration, deploy `toss-checkout`, `toss-billing-issue`, `toss-cancel-subscription`, and `toss-recurring`, and invoke `toss-recurring` at least daily with the `x-cron-secret` header. The public checkout uses `/checkout/toss`; success redirects to `/checkout/toss/success` and cancellation redirects to `/checkout/cancel`.
+
+Kakao Pay recurring billing uses the same monthly/yearly plans, but a separate Kakao Pay recurring CID and Secret key. Before enabling it in production, a representative must complete Partner Center registration, business-app conversion and online-payment approval, then register `https://vocally.site` as a web platform domain. Store the server values only in Supabase Edge Function secrets. Deploy `kakaopay-ready`, `kakaopay-approve`, `kakaopay-recurring`, `subscription-cancel`, `kakaopay-cancel-payment`, and `kakaopay-reconcile`; invoke `kakaopay-recurring` daily with `x-cron-secret`. Keep `VITE_KAKAOPAY_ENABLED` unset until a developer-key checkout is confirmed, then set it to `true` in the web and desktop build environments. Kakao Pay Money receipts are issued automatically by Kakao Pay, so Vocally does not issue a duplicate cash receipt.
 
 ## Branch Strategy
 

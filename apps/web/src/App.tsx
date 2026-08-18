@@ -14,6 +14,8 @@ import RefundPage from "./pages/RefundPage";
 import TermsPage from "./pages/TermsPage";
 import TossBillingSuccessPage from "./pages/TossBillingSuccessPage";
 import TossCheckoutPage from "./pages/TossCheckoutPage";
+import KakaoPaySuccessPage from "./pages/KakaoPaySuccessPage";
+import KakaoPayCancelPage from "./pages/KakaoPayCancelPage";
 
 function App() {
   const location = useLocation();
@@ -34,6 +36,18 @@ function App() {
         <Route
           path="/checkout/toss/success"
           element={<TossBillingSuccessPage />}
+        />
+        <Route
+          path="/checkout/kakaopay/success"
+          element={<KakaoPaySuccessPage />}
+        />
+        <Route
+          path="/checkout/kakaopay/cancel"
+          element={<KakaoPayCancelPage />}
+        />
+        <Route
+          path="/checkout/kakaopay/fail"
+          element={<KakaoPayCancelPage />}
         />
         <Route path="/download" element={<DownloadPage />} />
         <Route path="/pricing" element={<PricingPage />} />

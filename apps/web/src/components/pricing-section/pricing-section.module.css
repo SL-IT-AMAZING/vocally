@@ -262,6 +262,44 @@
   transform: translateY(1px);
 }
 
+.paymentOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kakaoPayButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 24px;
+  border: 1px solid #f5c400;
+  border-radius: 10px;
+  background: #fee500;
+  color: #191919;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.kakaoPayButton:hover {
+  background: #f5dc00;
+}
+
+.kakaoPayButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.paymentMethodNotice {
+  margin: -4px 0 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .ctaButtonOutline {
   display: flex;
   align-items: center;

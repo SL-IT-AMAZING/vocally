@@ -11,6 +11,7 @@ interface ImportMetaEnv {
   readonly VITE_PADDLE_PRICE_MONTHLY?: string;
   readonly VITE_PADDLE_PRICE_YEARLY?: string;
   readonly VITE_GPU_BUILD?: string;
+  readonly VITE_KAKAOPAY_ENABLED?: string;
 }
 
 interface ImportMeta {

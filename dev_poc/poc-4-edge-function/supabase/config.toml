@@ -398,6 +398,30 @@ verify_jwt = false
 [functions.toss-recurring]
 enabled = true
 verify_jwt = false
+
+[functions.kakaopay-ready]
+enabled = true
+verify_jwt = false
+
+[functions.kakaopay-approve]
+enabled = true
+verify_jwt = false
+
+[functions.kakaopay-recurring]
+enabled = true
+verify_jwt = false
+
+[functions.subscription-cancel]
+enabled = true
+verify_jwt = false
+
+[functions.kakaopay-cancel-payment]
+enabled = true
+verify_jwt = false
+
+[functions.kakaopay-reconcile]
+enabled = true
+verify_jwt = false
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/transcribe/*.html" ]

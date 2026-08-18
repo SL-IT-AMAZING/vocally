@@ -8,8 +8,10 @@ import styles from "./pricing-section.module.css";
 
 const TOSS_PRICE_MONTHLY_KRW = 7_000;
 const TOSS_PRICE_YEARLY_KRW = 70_000;
+const KAKAOPAY_ENABLED = import.meta.env.VITE_KAKAOPAY_ENABLED === "true";
 
 type Feature = { text: string; deemphasized?: boolean };
+type PaymentProvider = "toss" | "kakaopay";
 
 type PricingPlan = {
   name: string;
@@ -129,9 +131,11 @@ function ShieldIcon({ className }: { className?: string }) {
 
 function ProSubscribeButton({
   isYearly,
+  provider,
   className,
 }: {
   isYearly: boolean;
+  provider: PaymentProvider;
   className?: string;
 }) {
   const { user, openSignInModal } = useAuth();
@@ -146,7 +150,9 @@ function ProSubscribeButton({
     }
 
     if (!supabase) {
-      setCheckoutError("결제 서비스를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+      setCheckoutError(
+        "결제 서비스를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+      );
       return;
     }
 
@@ -155,19 +161,26 @@ function ProSubscribeButton({
     try {
       const plan = isYearly ? "yearly" : "monthly";
 
-      const { data, error } = await supabase.functions.invoke("toss-checkout", {
-        body: { plan },
-      });
+      const { data, error } = await supabase.functions.invoke(
+        provider === "kakaopay" ? "kakaopay-ready" : "toss-checkout",
+        {
+          body: { plan },
+        },
+      );
 
       if (error || !data?.checkoutUrl) {
         console.error("Checkout error:", error);
         const context = error && "context" in error ? error.context : null;
         const response =
-          context && typeof (context as { clone?: unknown }).clone === "function"
+          context &&
+          typeof (context as { clone?: unknown }).clone === "function"
             ? (context as Response)
             : null;
         const responseBody = response
-          ? ((await response.clone().json().catch(() => null)) as {
+          ? ((await response
+              .clone()
+              .json()
+              .catch(() => null)) as {
               error?: string;
               message?: string;
             } | null)
@@ -181,7 +194,11 @@ function ProSubscribeButton({
         return;
       }
 
-      window.location.href = data.checkoutUrl;
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      window.location.href =
+        provider === "kakaopay" && isMobile && data.mobileCheckoutUrl
+          ? data.mobileCheckoutUrl
+          : data.checkoutUrl;
     } catch (error) {
       console.error("Checkout error:", error);
       setCheckoutError(
@@ -195,7 +212,9 @@ function ProSubscribeButton({
   };
 
   const label = user
-    ? intl.formatMessage({ defaultMessage: "Subscribe" })
+    ? provider === "kakaopay"
+      ? intl.formatMessage({ defaultMessage: "Pay with Kakao Pay" })
+      : intl.formatMessage({ defaultMessage: "Pay by card" })
     : intl.formatMessage({ defaultMessage: "Get Started" });
 
   return (
@@ -204,13 +223,20 @@ function ProSubscribeButton({
         type="button"
         className={className}
         onClick={handleSubscribe}
-        disabled={checkoutLoading}
+        disabled={
+          checkoutLoading || (provider === "kakaopay" && !KAKAOPAY_ENABLED)
+        }
       >
         {label}
       </button>
       {checkoutError && (
         <p role="alert" className={styles.checkoutError}>
           {checkoutError}
+        </p>
+      )}
+      {provider === "kakaopay" && !KAKAOPAY_ENABLED && (
+        <p className={styles.paymentMethodNotice}>
+          <FormattedMessage defaultMessage="Kakao Pay will be available after merchant approval." />
         </p>
       )}
     </>
@@ -334,10 +360,18 @@ export default function PricingSection() {
 
               {/* CTA Button */}
               {plan.popular ? (
-                <ProSubscribeButton
-                  isYearly={isYearly}
-                  className={styles.ctaButton}
-                />
+                <div className={styles.paymentOptions}>
+                  <ProSubscribeButton
+                    isYearly={isYearly}
+                    provider="kakaopay"
+                    className={styles.kakaoPayButton}
+                  />
+                  <ProSubscribeButton
+                    isYearly={isYearly}
+                    provider="toss"
+                    className={styles.ctaButton}
+                  />
+                </div>
               ) : (
                 <DownloadButton
                   className={styles.ctaButtonOutline}

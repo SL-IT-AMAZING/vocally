@@ -22,13 +22,17 @@ import {
 
 const POLL_INTERVAL_MS = 5000;
 const POLL_MAX_DURATION_MS = 5 * 60 * 1000;
+const KAKAOPAY_ENABLED = import.meta.env.VITE_KAKAOPAY_ENABLED === "true";
 
 type Plan = "monthly" | "yearly";
+type PaymentProvider = "toss" | "kakaopay";
 type DialogState = "idle" | "creating" | "waiting" | "success" | "error";
 
 export const PaymentDialog = () => {
   const isOpen = useAppStore((state) => state.payment.open);
   const [selectedPlan, setSelectedPlan] = useState<Plan>("monthly");
+  const [selectedProvider, setSelectedProvider] =
+    useState<PaymentProvider>("toss");
   const [dialogState, setDialogState] = useState<DialogState>("idle");
   const [error, setError] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -76,6 +80,7 @@ export const PaymentDialog = () => {
       draft.payment.open = false;
     });
     setSelectedPlan("monthly");
+    setSelectedProvider("toss");
     setDialogState("idle");
     setError(null);
   };
@@ -101,7 +106,7 @@ export const PaymentDialog = () => {
       }
 
       const { data, error: invokeError } = await supabase.functions.invoke(
-        "toss-checkout",
+        selectedProvider === "kakaopay" ? "kakaopay-ready" : "toss-checkout",
         { body: { plan: selectedPlan } },
       );
 
@@ -268,6 +273,31 @@ export const PaymentDialog = () => {
             </Box>
           </Stack>
 
+          <Stack spacing={1} sx={{ mb: 3 }}>
+            <Typography variant="body2" color="text.secondary">
+              <FormattedMessage defaultMessage="Payment method" />
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant={
+                  selectedProvider === "kakaopay" ? "contained" : "outlined"
+                }
+                onClick={() => setSelectedProvider("kakaopay")}
+                disabled={!KAKAOPAY_ENABLED}
+                fullWidth
+              >
+                <FormattedMessage defaultMessage="Kakao Pay" />
+              </Button>
+              <Button
+                variant={selectedProvider === "toss" ? "contained" : "outlined"}
+                onClick={() => setSelectedProvider("toss")}
+                fullWidth
+              >
+                <FormattedMessage defaultMessage="Card" />
+              </Button>
+            </Stack>
+          </Stack>
+
           {error && (
             <Typography
               variant="body2"
@@ -288,8 +318,10 @@ export const PaymentDialog = () => {
           >
             {dialogState === "creating" ? (
               <CircularProgress size={24} />
+            ) : selectedProvider === "kakaopay" ? (
+              <FormattedMessage defaultMessage="Pay with Kakao Pay" />
             ) : (
-              <FormattedMessage defaultMessage="Subscribe" />
+              <FormattedMessage defaultMessage="Pay by card" />
             )}
           </Button>
         </Box>

@@ -217,7 +217,7 @@ export default function SettingsPage() {
     setOpeningSubscriptionPortal(true);
     try {
       const { data, error } = await supabase.functions.invoke(
-        "toss-cancel-subscription",
+        "subscription-cancel",
         { body: {} },
       );
       if (error || !(data as { success?: boolean } | null)?.success) {

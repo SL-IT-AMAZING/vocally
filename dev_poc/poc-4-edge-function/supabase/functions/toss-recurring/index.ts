@@ -57,10 +57,9 @@ Deno.serve(async (req) => {
         .from("toss_subscriptions")
         .delete()
         .eq("user_id", subscription.user_id);
-      await supabase
-        .from("members")
-        .update({ plan: "free" })
-        .eq("id", subscription.user_id);
+      await supabase.rpc("recompute_member_plan", {
+        p_member_id: subscription.user_id,
+      });
       results.push({ userId: subscription.user_id, status: "canceled" });
       continue;
     }
@@ -139,10 +138,9 @@ Deno.serve(async (req) => {
         .from("toss_subscriptions")
         .delete()
         .eq("user_id", subscription.user_id);
-      await supabase
-        .from("members")
-        .update({ plan: "free" })
-        .eq("id", subscription.user_id);
+      await supabase.rpc("recompute_member_plan", {
+        p_member_id: subscription.user_id,
+      });
       results.push({
         userId: subscription.user_id,
         status: "failed_after_retries",
