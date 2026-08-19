@@ -3,13 +3,14 @@ import { hasSharedSecret } from "../_shared/auth.ts";
 import {
   getKakaoPayConfig,
   isKakaoPayPaymentEnabled,
-  kakaoPayPartnerUserId,
-  kakaoPayRequest,
+  isKakaoPayPlan,
   KAKAOPAY_ORDER_NAMES,
   KAKAOPAY_PRICES,
+  kakaoPayPartnerUserId,
+  type KakaoPayPlan,
+  kakaoPayRequest,
   newKakaoPayOrderId,
   nextKakaoPayBillingAt,
-  type KakaoPayPlan,
   withCidSecret,
 } from "../_shared/kakaopay.ts";
 import { errorResponse, jsonResponse } from "../_shared/response.ts";
@@ -18,7 +19,7 @@ import { createServiceClient } from "../_shared/supabase.ts";
 type Subscription = {
   user_id: string;
   sid: string;
-  plan: KakaoPayPlan;
+  plan: unknown;
   status: "active" | "past_due" | "cancel_requested";
   current_period_end: string;
   next_billing_at: string;
@@ -41,7 +42,7 @@ type ProviderOrder = {
 async function reconcileClaimedRenewal(
   supabase: ReturnType<typeof createServiceClient>,
   config: NonNullable<ReturnType<typeof getKakaoPayConfig>>,
-  subscription: Subscription,
+  subscription: Subscription & { plan: KakaoPayPlan },
 ): Promise<"reconciled" | "manual_reconciliation_required"> {
   const { data: order } = await supabase
     .from("kakaopay_payment_orders")
@@ -126,6 +127,13 @@ Deno.serve(async (req) => {
       results.push({ userId: subscription.user_id, status: "canceled" });
       continue;
     }
+    if (!isKakaoPayPlan(subscription.plan)) {
+      results.push({
+        userId: subscription.user_id,
+        status: "unsupported_plan",
+      });
+      continue;
+    }
 
     const orderId = newKakaoPayOrderId("vocally-kp-renewal");
     const amount = KAKAOPAY_PRICES[subscription.plan];
@@ -169,8 +177,7 @@ Deno.serve(async (req) => {
       }),
     );
     const payment = result.data;
-    const matchesOrder =
-      payment.partner_order_id === orderId &&
+    const matchesOrder = payment.partner_order_id === orderId &&
       payment.partner_user_id === partnerUserId &&
       payment.amount?.total === amount;
     if (result.ok && matchesOrder && payment.tid) {
@@ -210,8 +217,7 @@ Deno.serve(async (req) => {
       .from("kakaopay_payment_orders")
       .update({
         status: unknown ? "reconciliation_required" : "failed",
-        failure_code:
-          payment.error_code ??
+        failure_code: payment.error_code ??
           (unknown ? "KAKAOPAY_RENEWAL_UNKNOWN" : "KAKAOPAY_RENEWAL_FAILED"),
         failure_message: "Kakao Pay renewal was not confirmed",
       })

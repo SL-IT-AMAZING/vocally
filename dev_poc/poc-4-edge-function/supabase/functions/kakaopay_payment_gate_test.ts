@@ -2,6 +2,8 @@ const functionPaths = [
   "kakaopay-ready",
   "kakaopay-approve",
   "kakaopay-recurring",
+  "kakaopay-reconcile",
+  "kakaopay-cancel-payment",
 ] as const;
 
 async function waitForDisabledEndpoint(url: string): Promise<void> {
@@ -24,7 +26,8 @@ async function waitForDisabledEndpoint(url: string): Promise<void> {
 }
 
 Deno.test({
-  name: "payment-mutating Kakao Pay endpoints reject requests while disabled",
+  name:
+    "dedicated Kakao Pay provider-call endpoints reject requests while disabled",
   permissions: { env: true, net: true, read: true, run: true },
   async fn() {
     for (const functionName of functionPaths) {
@@ -48,6 +51,37 @@ Deno.test({
         child.kill("SIGTERM");
         await child.status;
       }
+    }
+  },
+});
+
+Deno.test({
+  name:
+    "subscription cancellation gates only its Kakao branch while preserving Toss cancellation",
+  permissions: { read: true },
+  async fn() {
+    const source = await Deno.readTextFile(
+      new URL("subscription-cancel/index.ts", import.meta.url),
+    );
+    const kakaoBranch = source.indexOf("if (kakaoSubscription) {");
+    const kakaoGate = source.indexOf(
+      "if (!isKakaoPayPaymentEnabled())",
+      kakaoBranch,
+    );
+    const providerConfig = source.indexOf(
+      "const config = getKakaoPayConfig()",
+      kakaoBranch,
+    );
+    const tossBranch = source.indexOf("const { data: tossSubscription");
+    if (
+      kakaoBranch < 0 ||
+      kakaoGate < kakaoBranch ||
+      providerConfig < kakaoGate ||
+      tossBranch < providerConfig
+    ) {
+      throw new Error(
+        "Kakao Pay gating must be limited to the Kakao branch before provider configuration and must not block Toss cancellation",
+      );
     }
   },
 });

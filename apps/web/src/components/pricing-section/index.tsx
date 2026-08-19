@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/auth-context";
 import { supabase } from "../../lib/supabase";
 import pageStyles from "../../styles/page.module.css";
@@ -9,8 +10,6 @@ import styles from "./pricing-section.module.css";
 const TOSS_PRICE_MONTHLY_KRW = 7_000;
 const TOSS_PRICE_SEMIANNUAL_KRW = 39_000;
 const TOSS_PRICE_YEARLY_KRW = 70_000;
-const KAKAOPAY_ENABLED = import.meta.env.VITE_KAKAOPAY_ENABLED === "true";
-
 type Feature = { text: string; deemphasized?: boolean };
 type PaymentProvider = "toss" | "kakaopay";
 
@@ -213,6 +212,7 @@ function ProSubscribeButton({
   className?: string;
 }) {
   const { user, openSignInModal } = useAuth();
+  const navigate = useNavigate();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const intl = useIntl();
@@ -220,6 +220,11 @@ function ProSubscribeButton({
   const handleSubscribe = async () => {
     if (!user) {
       openSignInModal();
+      return;
+    }
+
+    if (provider === "kakaopay") {
+      navigate("/checkout/kakaopay/review");
       return;
     }
 
@@ -234,7 +239,7 @@ function ProSubscribeButton({
     setCheckoutError(null);
     try {
       const { data, error } = await supabase.functions.invoke(
-        provider === "kakaopay" ? "kakaopay-ready" : "toss-checkout",
+        "toss-checkout",
         {
           body: { plan },
         },
@@ -266,11 +271,7 @@ function ProSubscribeButton({
         return;
       }
 
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      window.location.href =
-        provider === "kakaopay" && isMobile && data.mobileCheckoutUrl
-          ? data.mobileCheckoutUrl
-          : data.checkoutUrl;
+      window.location.href = data.checkoutUrl;
     } catch (error) {
       console.error("Checkout error:", error);
       setCheckoutError(
@@ -295,20 +296,13 @@ function ProSubscribeButton({
         type="button"
         className={className}
         onClick={handleSubscribe}
-        disabled={
-          checkoutLoading || (provider === "kakaopay" && !KAKAOPAY_ENABLED)
-        }
+        disabled={checkoutLoading}
       >
         {label}
       </button>
       {checkoutError && (
         <p role="alert" className={styles.checkoutError}>
           {checkoutError}
-        </p>
-      )}
-      {provider === "kakaopay" && !KAKAOPAY_ENABLED && (
-        <p className={styles.paymentMethodNotice}>
-          <FormattedMessage defaultMessage="Kakao Pay will be available after merchant approval." />
         </p>
       )}
     </>
@@ -396,11 +390,17 @@ export default function PricingSection() {
               {/* CTA Button */}
               {plan.paymentPlan ? (
                 <div className={styles.paymentOptions}>
-                  <ProSubscribeButton
-                    plan={plan.paymentPlan}
-                    provider="kakaopay"
-                    className={styles.kakaoPayButton}
-                  />
+                  {plan.paymentPlan === "monthly" ? (
+                    <ProSubscribeButton
+                      plan={plan.paymentPlan}
+                      provider="kakaopay"
+                      className={styles.kakaoPayButton}
+                    />
+                  ) : (
+                    <p className={styles.paymentMethodNotice}>
+                      <FormattedMessage defaultMessage="Kakao Pay is available for the monthly subscription only." />
+                    </p>
+                  )}
                   <ProSubscribeButton
                     plan={plan.paymentPlan}
                     provider="toss"

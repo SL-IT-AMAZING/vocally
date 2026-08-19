@@ -1,22 +1,18 @@
-export type KakaoPayPlan = "monthly" | "semiannual" | "yearly";
+export type KakaoPayPlan = "monthly";
 
 export const KAKAOPAY_API_BASE =
   "https://open-api.kakaopay.com/online/v1/payment";
 
 export const KAKAOPAY_PRICES: Record<KakaoPayPlan, number> = {
   monthly: 7_000,
-  semiannual: 39_000,
-  yearly: 70_000,
 };
 
 export const KAKAOPAY_ORDER_NAMES: Record<KakaoPayPlan, string> = {
   monthly: "Vocally Pro 월간 이용권",
-  semiannual: "Vocally Pro 반기 이용권",
-  yearly: "Vocally Pro 연간 이용권",
 };
 
 export function isKakaoPayPlan(value: unknown): value is KakaoPayPlan {
-  return value === "monthly" || value === "semiannual" || value === "yearly";
+  return value === "monthly";
 }
 
 export function isKakaoPayPaymentEnabled(): boolean {
@@ -28,9 +24,7 @@ export function nextKakaoPayBillingAt(
   from = new Date(),
 ): string {
   const next = new Date(from);
-  if (plan === "monthly") next.setUTCMonth(next.getUTCMonth() + 1);
-  else if (plan === "semiannual") next.setUTCMonth(next.getUTCMonth() + 6);
-  else next.setUTCFullYear(next.getUTCFullYear() + 1);
+  next.setUTCMonth(next.getUTCMonth() + 1);
   return next.toISOString();
 }
 

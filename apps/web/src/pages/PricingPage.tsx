@@ -11,7 +11,7 @@ function PricingPage() {
       title={intl.formatMessage({ defaultMessage: "Pricing | Vocally" })}
       description={intl.formatMessage({
         defaultMessage:
-          "Simple, transparent pricing for Vocally. Free personal plan, ₩7,000/month or ₩70,000/year Pro plan, and custom enterprise solutions.",
+          "Simple, transparent pricing for Vocally. Free Personal, plus Pro Monthly (₩7,000), Semiannual (₩39,000), and Annual (₩70,000) plans.",
       })}
     >
       <PageLayout>

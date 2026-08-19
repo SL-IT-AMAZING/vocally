@@ -16,6 +16,7 @@ import TossBillingSuccessPage from "./pages/TossBillingSuccessPage";
 import TossCheckoutPage from "./pages/TossCheckoutPage";
 import KakaoPaySuccessPage from "./pages/KakaoPaySuccessPage";
 import KakaoPayCancelPage from "./pages/KakaoPayCancelPage";
+import KakaoPayReviewPage from "./pages/KakaoPayReviewPage";
 
 function App() {
   const location = useLocation();
@@ -40,6 +41,10 @@ function App() {
         <Route
           path="/checkout/kakaopay/success"
           element={<KakaoPaySuccessPage />}
+        />
+        <Route
+          path="/checkout/kakaopay/review"
+          element={<KakaoPayReviewPage />}
         />
         <Route
           path="/checkout/kakaopay/cancel"

@@ -2,9 +2,11 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { hasSharedSecret } from "../_shared/auth.ts";
 import {
   getKakaoPayConfig,
+  isKakaoPayPaymentEnabled,
+  isKakaoPayPlan,
+  type KakaoPayPlan,
   kakaoPayRequest,
   nextKakaoPayBillingAt,
-  type KakaoPayPlan,
   withCidSecret,
 } from "../_shared/kakaopay.ts";
 import { errorResponse, jsonResponse } from "../_shared/response.ts";
@@ -16,7 +18,7 @@ type Order = {
   tid: string | null;
   sid: string | null;
   status: string;
-  plan: KakaoPayPlan;
+  plan: unknown;
   billing_period_start: string | null;
 };
 type ProviderOrder = {
@@ -28,14 +30,18 @@ type ProviderOrder = {
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return errorResponse("Method not allowed", 405);
+  if (!isKakaoPayPaymentEnabled()) {
+    return errorResponse("Kakao Pay is not available", 503);
+  }
   if (
     !hasSharedSecret(req, "x-kakaopay-admin-secret", "KAKAOPAY_ADMIN_SECRET")
   ) {
     return errorResponse("Unauthorized", 401);
   }
   const body = (await req.json().catch(() => ({}))) as { orderId?: unknown };
-  if (typeof body.orderId !== "string")
+  if (typeof body.orderId !== "string") {
     return errorResponse("Missing order ID", 400);
+  }
   const config = getKakaoPayConfig();
   if (!config) return errorResponse("Kakao Pay is not configured", 503);
   const supabase = createServiceClient();
@@ -44,8 +50,16 @@ Deno.serve(async (req) => {
     .select("order_id, user_id, tid, sid, status, plan, billing_period_start")
     .eq("order_id", body.orderId)
     .maybeSingle<Order>();
-  if (error || !order || !order.tid)
+  if (error || !order || !order.tid) {
     return errorResponse("Reconciliation order not found", 404);
+  }
+  if (!isKakaoPayPlan(order.plan)) {
+    return jsonResponse({
+      success: true,
+      status: "unsupported_plan",
+      action: "manual_review_required",
+    });
+  }
   const provider = await kakaoPayRequest<ProviderOrder>(
     config.secretKey,
     "/order",
@@ -54,8 +68,9 @@ Deno.serve(async (req) => {
       tid: order.tid,
     }),
   );
-  if (!provider.ok || !provider.data.status)
+  if (!provider.ok || !provider.data.status) {
     return errorResponse("Kakao Pay order lookup failed", 502);
+  }
   const status = provider.data.status;
   if (status === "SUCCESS_PAYMENT" && order.billing_period_start) {
     const paidAt = provider.data.approved_at ?? new Date().toISOString();
