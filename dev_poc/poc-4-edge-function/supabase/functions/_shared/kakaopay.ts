@@ -17,6 +17,10 @@ export function isKakaoPayPlan(value: unknown): value is KakaoPayPlan {
   return value === "monthly" || value === "yearly";
 }
 
+export function isKakaoPayPaymentEnabled(): boolean {
+  return Deno.env.get("KAKAOPAY_ENABLED") === "true";
+}
+
 export function nextKakaoPayBillingAt(
   plan: KakaoPayPlan,
   from = new Date(),
