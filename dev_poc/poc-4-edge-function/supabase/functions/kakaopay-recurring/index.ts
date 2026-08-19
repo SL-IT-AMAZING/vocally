@@ -2,6 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { hasSharedSecret } from "../_shared/auth.ts";
 import {
   getKakaoPayConfig,
+  isKakaoPayPaymentEnabled,
   kakaoPayPartnerUserId,
   kakaoPayRequest,
   KAKAOPAY_ORDER_NAMES,
@@ -90,6 +91,9 @@ async function reconcileClaimedRenewal(
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return errorResponse("Method not allowed", 405);
+  if (!isKakaoPayPaymentEnabled()) {
+    return errorResponse("Kakao Pay is not available", 503);
+  }
   if (!hasSharedSecret(req, "x-cron-secret", "KAKAOPAY_CRON_SECRET")) {
     return errorResponse("Unauthorized", 401);
   }

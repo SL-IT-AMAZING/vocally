@@ -8,6 +8,7 @@ import {
   kakaoPayRequest,
   KAKAOPAY_ORDER_NAMES,
   KAKAOPAY_PRICES,
+  isKakaoPayPaymentEnabled,
   newKakaoPayOrderId,
   withCidSecret,
 } from "../_shared/kakaopay.ts";
@@ -26,6 +27,9 @@ Deno.serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
   if (req.method !== "POST") return errorResponse("Method not allowed", 405);
+  if (!isKakaoPayPaymentEnabled()) {
+    return errorResponse("Kakao Pay is not available", 503);
+  }
 
   const user = await getUser(req);
   if (!user) return errorResponse("Unauthorized", 401);

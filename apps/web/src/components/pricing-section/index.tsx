@@ -16,12 +16,13 @@ type PaymentProvider = "toss" | "kakaopay";
 type PricingPlan = {
   name: string;
   description: string;
-  monthlyPrice: number | null;
-  yearlyPrice: number | null;
+  price: number;
+  billingPeriod?: "month" | "year";
+  billingNote?: string;
+  paymentPlan?: "monthly" | "yearly";
   features: Feature[];
   cta: string;
   popular: boolean;
-  isLifetime?: boolean;
 };
 
 function usePricingPlans(): PricingPlan[] {
@@ -32,8 +33,7 @@ function usePricingPlans(): PricingPlan[] {
       description: intl.formatMessage({
         defaultMessage: "For individuals who want fast, local dictation.",
       }),
-      monthlyPrice: 0,
-      yearlyPrice: null,
+      price: 0,
       features: [
         { text: intl.formatMessage({ defaultMessage: "AI dictation" }) },
         {
@@ -57,16 +57,19 @@ function usePricingPlans(): PricingPlan[] {
       ],
       cta: intl.formatMessage({ defaultMessage: "Download free" }),
       popular: false,
-      isLifetime: true,
     },
     {
-      name: intl.formatMessage({ defaultMessage: "Pro" }),
+      name: intl.formatMessage({ defaultMessage: "Pro Monthly" }),
       description: intl.formatMessage({
         defaultMessage:
           "Full power with cloud transcription and advanced integrations.",
       }),
-      monthlyPrice: TOSS_PRICE_MONTHLY_KRW,
-      yearlyPrice: TOSS_PRICE_YEARLY_KRW,
+      price: TOSS_PRICE_MONTHLY_KRW,
+      billingPeriod: "month",
+      billingNote: intl.formatMessage({
+        defaultMessage: "Billed monthly",
+      }),
+      paymentPlan: "monthly",
       features: [
         {
           text: intl.formatMessage({
@@ -87,7 +90,42 @@ function usePricingPlans(): PricingPlan[] {
           text: intl.formatMessage({ defaultMessage: "Priority support" }),
         },
       ],
-      cta: intl.formatMessage({ defaultMessage: "Get Pro" }),
+      cta: intl.formatMessage({ defaultMessage: "Subscribe monthly" }),
+      popular: false,
+    },
+    {
+      name: intl.formatMessage({ defaultMessage: "Pro Annual" }),
+      description: intl.formatMessage({
+        defaultMessage:
+          "Full power with cloud transcription and advanced integrations.",
+      }),
+      price: TOSS_PRICE_YEARLY_KRW,
+      billingPeriod: "year",
+      billingNote: intl.formatMessage({
+        defaultMessage: "Billed annually",
+      }),
+      paymentPlan: "yearly",
+      features: [
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Everything in Personal",
+          }),
+          deemphasized: true,
+        },
+        { text: intl.formatMessage({ defaultMessage: "AI dictation" }) },
+        {
+          text: intl.formatMessage({ defaultMessage: "Cross-device sync" }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Unlimited words per month",
+          }),
+        },
+        {
+          text: intl.formatMessage({ defaultMessage: "Priority support" }),
+        },
+      ],
+      cta: intl.formatMessage({ defaultMessage: "Subscribe annually" }),
       popular: true,
     },
   ];
@@ -130,11 +168,11 @@ function ShieldIcon({ className }: { className?: string }) {
 }
 
 function ProSubscribeButton({
-  isYearly,
+  plan,
   provider,
   className,
 }: {
-  isYearly: boolean;
+  plan: "monthly" | "yearly";
   provider: PaymentProvider;
   className?: string;
 }) {
@@ -159,8 +197,6 @@ function ProSubscribeButton({
     setCheckoutLoading(true);
     setCheckoutError(null);
     try {
-      const plan = isYearly ? "yearly" : "monthly";
-
       const { data, error } = await supabase.functions.invoke(
         provider === "kakaopay" ? "kakaopay-ready" : "toss-checkout",
         {
@@ -245,7 +281,6 @@ function ProSubscribeButton({
 
 export default function PricingSection() {
   const intl = useIntl();
-  const [isYearly, setIsYearly] = useState(true);
   const pricingPlans = usePricingPlans();
 
   return (
@@ -262,34 +297,6 @@ export default function PricingSection() {
           <p>
             <FormattedMessage defaultMessage="Everything you need to ditch the keyboard — free. Upgrade for cloud sync and unlimited transcription." />
           </p>
-        </div>
-
-        {/* Billing Toggle */}
-        <div className={styles.billingToggle}>
-          <span
-            className={`${styles.billingLabel} ${!isYearly ? styles.active : ""}`}
-          >
-            <FormattedMessage defaultMessage="Monthly" />
-          </span>
-          <button
-            className={styles.toggleButton}
-            onClick={() => setIsYearly(!isYearly)}
-            aria-label={intl.formatMessage({
-              defaultMessage: "Toggle billing period",
-            })}
-          >
-            <span
-              className={`${styles.toggleKnob} ${isYearly ? styles.active : ""}`}
-            />
-          </button>
-          <span
-            className={`${styles.billingLabel} ${isYearly ? styles.active : ""}`}
-          >
-            <FormattedMessage defaultMessage="Yearly" />
-          </span>
-          <span className={styles.saveBadge}>
-            <FormattedMessage defaultMessage="Save 17%" />
-          </span>
         </div>
 
         {/* Pricing Cards */}
@@ -314,8 +321,7 @@ export default function PricingSection() {
 
               {/* Price */}
               <div className={styles.priceContainer}>
-                {plan.monthlyPrice !== null ? (
-                  plan.monthlyPrice === 0 ? (
+                {plan.price === 0 ? (
                     <>
                       <span className={styles.price}>
                         <FormattedMessage defaultMessage="Free" />
@@ -332,14 +338,10 @@ export default function PricingSection() {
                             style: "currency",
                             currency: "KRW",
                             maximumFractionDigits: 0,
-                          }).format(
-                            isYearly && plan.yearlyPrice
-                              ? plan.yearlyPrice
-                              : plan.monthlyPrice,
-                          )}
+                          }).format(plan.price)}
                         </span>
                         <span className={styles.pricePeriod}>
-                          {isYearly && plan.yearlyPrice ? (
+                          {plan.billingPeriod === "year" ? (
                             <FormattedMessage defaultMessage="/ year" />
                           ) : (
                             <FormattedMessage defaultMessage="/ month" />
@@ -347,27 +349,22 @@ export default function PricingSection() {
                         </span>
                       </div>
                       <div className={styles.billingNote}>
-                        {isYearly && plan.yearlyPrice ? (
-                          <FormattedMessage defaultMessage="Billed annually" />
-                        ) : (
-                          <FormattedMessage defaultMessage="Billed monthly" />
-                        )}
+                        {plan.billingNote}
                       </div>
                     </>
-                  )
-                ) : null}
+                  )}
               </div>
 
               {/* CTA Button */}
-              {plan.popular ? (
+              {plan.paymentPlan ? (
                 <div className={styles.paymentOptions}>
                   <ProSubscribeButton
-                    isYearly={isYearly}
+                    plan={plan.paymentPlan}
                     provider="kakaopay"
                     className={styles.kakaoPayButton}
                   />
                   <ProSubscribeButton
-                    isYearly={isYearly}
+                    plan={plan.paymentPlan}
                     provider="toss"
                     className={styles.ctaButton}
                   />

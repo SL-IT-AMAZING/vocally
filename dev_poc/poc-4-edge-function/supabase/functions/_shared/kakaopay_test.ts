@@ -1,4 +1,5 @@
 import {
+  isKakaoPayPaymentEnabled,
   isKakaoPayPlan,
   kakaoPayPartnerUserId,
   nextKakaoPayBillingAt,
@@ -12,6 +13,27 @@ Deno.test("accepts only supported Kakao Pay subscription plans", () => {
   }
   if (isKakaoPayPlan("pro") || isKakaoPayPlan(undefined)) {
     throw new Error("unsupported plan was accepted");
+  }
+});
+
+Deno.test("keeps Kakao Pay disabled unless the managed flag is exactly true", () => {
+  const original = Deno.env.get("KAKAOPAY_ENABLED");
+  try {
+    Deno.env.delete("KAKAOPAY_ENABLED");
+    if (isKakaoPayPaymentEnabled()) {
+      throw new Error("Kakao Pay must be disabled when the flag is absent");
+    }
+    Deno.env.set("KAKAOPAY_ENABLED", "false");
+    if (isKakaoPayPaymentEnabled()) {
+      throw new Error("Kakao Pay must be disabled for a non-true value");
+    }
+    Deno.env.set("KAKAOPAY_ENABLED", "true");
+    if (!isKakaoPayPaymentEnabled()) {
+      throw new Error("Kakao Pay must be enabled for the explicit true value");
+    }
+  } finally {
+    if (original === undefined) Deno.env.delete("KAKAOPAY_ENABLED");
+    else Deno.env.set("KAKAOPAY_ENABLED", original);
   }
 });
 
