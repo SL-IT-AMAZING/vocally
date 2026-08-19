@@ -45,48 +45,9 @@ const s: Record<string, CSSProperties> = {
     color: "#98989d",
     margin: 0,
   },
-  toggleWrap: {
-    display: "flex",
-    alignItems: "center",
-    gap: 16,
-  },
-  toggleLabel: {
-    fontSize: "0.95rem",
-    fontWeight: 500,
-    transition: "color 0.2s",
-  },
-  toggleBtn: {
-    position: "relative" as const,
-    width: 48,
-    height: 24,
-    borderRadius: 12,
-    background: "#2c2c2e",
-    border: "1px solid rgba(255,255,255,0.08)",
-    cursor: "pointer",
-    transition: "background 0.2s",
-    padding: 0,
-  },
-  toggleKnob: {
-    position: "absolute" as const,
-    top: 2,
-    width: 18,
-    height: 18,
-    borderRadius: "50%",
-    background: "#f5f5f7",
-    transition: "left 0.3s cubic-bezier(0.4,0,0.2,1)",
-  },
-  saveBadge: {
-    padding: "4px 10px",
-    borderRadius: 6,
-    background: "rgba(34,197,94,0.15)",
-    border: "1px solid rgba(34,197,94,0.25)",
-    color: "#4ade80",
-    fontSize: "0.75rem",
-    fontWeight: 600,
-  },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 380px))",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
     gap: 24,
     width: "100%",
     justifyContent: "center",
@@ -267,7 +228,6 @@ function ShieldIcon() {
 }
 
 function PricingSectionPOC() {
-  const [isYearly, setIsYearly] = useState(true);
   const [checkoutError, setCheckoutError] = useState(false);
   const intl = useIntl();
 
@@ -306,29 +266,6 @@ function PricingSectionPOC() {
         <p style={s.subtitle}>
           <FormattedMessage defaultMessage="The core experience is free forever — local dictation, AI cleanup, offline mode. Go Pro for cloud-powered transcription and cross-device sync." />
         </p>
-      </div>
-
-      <div style={s.toggleWrap}>
-        <span
-          style={{ ...s.toggleLabel, color: !isYearly ? "#f5f5f7" : "#98989d" }}
-        >
-          <FormattedMessage defaultMessage="Monthly" />
-        </span>
-        <button
-          style={s.toggleBtn}
-          onClick={() => setIsYearly(!isYearly)}
-          type="button"
-        >
-          <span style={{ ...s.toggleKnob, left: isYearly ? 26 : 2 }} />
-        </button>
-        <span
-          style={{ ...s.toggleLabel, color: isYearly ? "#f5f5f7" : "#98989d" }}
-        >
-          <FormattedMessage defaultMessage="Yearly" />
-        </span>
-        <span style={s.saveBadge}>
-          <FormattedMessage defaultMessage="Save 17%" />
-        </span>
       </div>
 
       <div style={s.grid}>
@@ -374,10 +311,71 @@ function PricingSectionPOC() {
           </ul>
         </div>
 
+        <div style={s.card}>
+          <div style={s.planRow}>
+            <h3 style={s.planName}>
+              <FormattedMessage defaultMessage="Pro Monthly" />
+            </h3>
+          </div>
+          <p style={s.planDesc}>
+            <FormattedMessage defaultMessage="Cloud transcription, unlimited words, priority support." />
+          </p>
+          <div style={{ display: "flex", alignItems: "baseline" }}>
+            <span style={s.price}>₩7,000</span>
+            <span style={s.pricePeriod}>
+              <FormattedMessage defaultMessage="/ month" />
+            </span>
+          </div>
+          <span style={s.billingNote}>
+            <FormattedMessage defaultMessage="Billed each month" />
+          </span>
+          <button
+            type="button"
+            style={s.btnFilled}
+            onClick={() => setCheckoutError((visible) => !visible)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#3b82f6";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#2563eb";
+            }}
+          >
+            <FormattedMessage defaultMessage="Upgrade to Pro" />
+          </button>
+          {checkoutError && (
+            <p style={{ color: "#fca5a5", fontSize: "0.8rem", lineHeight: 1.4, margin: "10px 0 0" }}>
+              <FormattedMessage defaultMessage="Checkout preparation failed. Please try again." />
+            </p>
+          )}
+          <p style={s.featuresTitle}>
+            <FormattedMessage defaultMessage="Includes" />
+          </p>
+          <ul style={s.featureList}>
+            {proFeatures.map((f) => {
+              const text = typeof f === "string" ? f : f.text;
+              const deemphasized = typeof f === "object" && f.deemphasized;
+              return (
+                <li
+                  key={text}
+                  style={{
+                    ...s.featureItem,
+                    ...(deemphasized ? s.deemphasized : {}),
+                  }}
+                >
+                  <CheckIcon
+                    style={deemphasized ? { color: "#98989d" } : undefined}
+                  />
+                  <span>{text}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
         <div style={{ ...s.card, ...s.cardPopular }}>
           <div style={s.planRow}>
             <h3 style={s.planName}>
-              <FormattedMessage defaultMessage="Pro" />
+              <FormattedMessage defaultMessage="Pro Annual" />
             </h3>
             <span style={s.bestValue}>
               <FormattedMessage defaultMessage="BEST VALUE" />
@@ -387,21 +385,13 @@ function PricingSectionPOC() {
             <FormattedMessage defaultMessage="Cloud transcription, unlimited words, priority support." />
           </p>
           <div style={{ display: "flex", alignItems: "baseline" }}>
-            <span style={s.price}>₩{isYearly ? "70,000" : "7,000"}</span>
+            <span style={s.price}>₩70,000</span>
             <span style={s.pricePeriod}>
-              {isYearly ? (
-                <FormattedMessage defaultMessage="/ year" />
-              ) : (
-                <FormattedMessage defaultMessage="/ month" />
-              )}
+              <FormattedMessage defaultMessage="/ year" />
             </span>
           </div>
           <span style={s.billingNote}>
-            {isYearly ? (
-              <FormattedMessage defaultMessage="Billed once a year" />
-            ) : (
-              <FormattedMessage defaultMessage="Billed each month" />
-            )}
+            <FormattedMessage defaultMessage="Billed once a year" />
           </span>
           <button
             type="button"
