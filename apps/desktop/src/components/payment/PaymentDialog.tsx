@@ -24,7 +24,7 @@ const POLL_INTERVAL_MS = 5000;
 const POLL_MAX_DURATION_MS = 5 * 60 * 1000;
 const KAKAOPAY_ENABLED = import.meta.env.VITE_KAKAOPAY_ENABLED === "true";
 
-type Plan = "monthly" | "yearly";
+type Plan = "monthly" | "semiannual" | "yearly";
 type PaymentProvider = "toss" | "kakaopay";
 type DialogState = "idle" | "creating" | "waiting" | "success" | "error";
 
@@ -214,6 +214,43 @@ export const PaymentDialog = () => {
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   ₩7,000/mo
+                </Typography>
+              </Stack>
+            </Box>
+
+            <Box
+              onClick={() => setSelectedPlan("semiannual")}
+              sx={{
+                p: 2.5,
+                border: 2,
+                borderColor:
+                  selectedPlan === "semiannual" ? "primary.main" : "grey.300",
+                borderRadius: 2,
+                cursor: "pointer",
+                transition: "all 0.2s",
+                bgcolor:
+                  selectedPlan === "semiannual" ? "primary.50" : "transparent",
+                "&:hover": {
+                  borderColor:
+                    selectedPlan === "semiannual" ? "primary.main" : "grey.400",
+                },
+              }}
+            >
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Box>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    <FormattedMessage defaultMessage="6 months" />
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <FormattedMessage defaultMessage="Billed every 6 months" />
+                  </Typography>
+                </Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  ₩39,000/6 mo
                 </Typography>
               </Stack>
             </Box>

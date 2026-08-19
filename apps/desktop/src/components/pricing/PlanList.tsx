@@ -95,82 +95,41 @@ const PlanCard = ({
   );
 };
 
-type BillingToggleProps = {
-  isYearly: boolean;
-  onToggle: () => void;
+type BillingPlan = "monthly" | "semiannual" | "yearly";
+
+type BillingPlanSelectorProps = {
+  value: BillingPlan;
+  onChange: (plan: BillingPlan) => void;
 };
 
-const BillingToggle = ({ isYearly, onToggle }: BillingToggleProps) => {
+const BillingPlanSelector = ({
+  value,
+  onChange,
+}: BillingPlanSelectorProps) => {
   return (
     <Stack alignItems="center" sx={{ mb: 2 }}>
       <Stack direction="row" alignItems="center" spacing={1.5}>
-        <Typography
-          sx={{
-            fontSize: "0.85rem",
-            fontWeight: 500,
-            color: !isYearly ? "text.primary" : "text.secondary",
-            transition: "color 0.2s ease",
-          }}
+        <Button
+          size="small"
+          variant={value === "monthly" ? "contained" : "text"}
+          onClick={() => onChange("monthly")}
         >
           <FormattedMessage defaultMessage="Monthly" />
-        </Typography>
-        <Box
-          component="button"
-          onClick={onToggle}
-          sx={{
-            position: "relative",
-            width: 44,
-            height: 22,
-            borderRadius: 999,
-            backgroundColor: "level2",
-            border: "1px solid",
-            borderColor: "divider",
-            cursor: "pointer",
-            transition: "background 0.2s ease",
-            "&:hover": {
-              backgroundColor: "level3",
-            },
-          }}
+        </Button>
+        <Button
+          size="small"
+          variant={value === "semiannual" ? "contained" : "text"}
+          onClick={() => onChange("semiannual")}
         >
-          <Box
-            sx={{
-              position: "absolute",
-              top: 2,
-              left: 2,
-              width: 16,
-              height: 16,
-              borderRadius: "50%",
-              backgroundColor: "text.primary",
-              transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              transform: isYearly ? "translateX(22px)" : "translateX(0)",
-            }}
-          />
-        </Box>
-        <Typography
-          sx={{
-            fontSize: "0.85rem",
-            fontWeight: 500,
-            color: isYearly ? "text.primary" : "text.secondary",
-            transition: "color 0.2s ease",
-          }}
+          <FormattedMessage defaultMessage="6 months" />
+        </Button>
+        <Button
+          size="small"
+          variant={value === "yearly" ? "contained" : "text"}
+          onClick={() => onChange("yearly")}
         >
           <FormattedMessage defaultMessage="Yearly" />
-        </Typography>
-        <Box
-          sx={{
-            py: 0.25,
-            px: 1,
-            borderRadius: 999,
-            backgroundColor: "rgba(34, 197, 94, 0.12)",
-            border: "1px solid rgba(34, 197, 94, 0.2)",
-            color: "#22c55e",
-            fontSize: "0.7rem",
-            fontWeight: 600,
-            letterSpacing: "0.02em",
-          }}
-        >
-          <FormattedMessage defaultMessage="Save 17%" />
-        </Box>
+        </Button>
       </Stack>
     </Stack>
   );
@@ -195,7 +154,7 @@ export const PlanList = ({
 }: PlanListProps) => {
   const intl = useIntl();
   const effectivePlan = useAppStore(getEffectivePlan);
-  const [isYearly, setIsYearly] = useState(true);
+  const [billingPlan, setBillingPlan] = useState<BillingPlan>("yearly");
   const [inviteCodeDialogOpen, setInviteCodeDialogOpen] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
   const [inviteCodeError, setInviteCodeError] = useState(false);
@@ -203,14 +162,24 @@ export const PlanList = ({
   const proMonthlyPrice = useAppStore((state) =>
     getKrwPriceFromKey(state, "pro_monthly"),
   );
+  const proSemiannualPrice = useAppStore((state) =>
+    getKrwPriceFromKey(state, "pro_semiannual"),
+  );
   const proYearlyPrice = useAppStore((state) =>
     getKrwPriceFromKey(state, "pro_yearly"),
   );
-  const proYearlyPerMonth = proYearlyPrice
-    ? Math.round(proYearlyPrice / 12)
-    : null;
-  const displayPrice = isYearly ? proYearlyPerMonth : proMonthlyPrice;
-  const yearlyTotal = proYearlyPrice;
+  const displayPrice =
+    billingPlan === "monthly"
+      ? proMonthlyPrice
+      : billingPlan === "semiannual"
+        ? proSemiannualPrice
+        : proYearlyPrice;
+  const selectedPricingPlan =
+    billingPlan === "monthly"
+      ? "pro_monthly"
+      : billingPlan === "semiannual"
+        ? "pro_semiannual"
+        : "pro_yearly";
 
   useOnEnter(() => {
     loadPrices();
@@ -298,19 +267,15 @@ export const PlanList = ({
       price={
         <Stack>
           <Typography variant="h5" fontWeight={600}>
-            {displayPrice
-              ? intl.formatMessage(
-                  { defaultMessage: "₩{displayPrice}/month" },
-                  { displayPrice },
-                )
-              : "--"}
+            {displayPrice ? `₩${displayPrice.toLocaleString()}` : "--"}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {isYearly && yearlyTotal ? (
+            {billingPlan === "yearly" ? (
               <FormattedMessage
-                defaultMessage="Billed annually (₩{total}/year)"
-                values={{ total: yearlyTotal }}
+                defaultMessage="Billed annually"
               />
+            ) : billingPlan === "semiannual" ? (
+              <FormattedMessage defaultMessage="Billed every 6 months" />
             ) : (
               <FormattedMessage defaultMessage="Billed monthly" />
             )}
@@ -322,7 +287,7 @@ export const PlanList = ({
         <Button
           variant="blue"
           size="small"
-          onClick={() => onSelect(isYearly ? "pro_yearly" : "pro_monthly")}
+          onClick={() => onSelect(selectedPricingPlan)}
           disabled={getText("pro").disabled}
           fullWidth
           sx={{ py: 0.5 }}
@@ -458,9 +423,9 @@ export const PlanList = ({
           ...sx,
         }}
       >
-        <BillingToggle
-          isYearly={isYearly}
-          onToggle={() => setIsYearly(!isYearly)}
+        <BillingPlanSelector
+          value={billingPlan}
+          onChange={setBillingPlan}
         />
         <Stack
           sx={{

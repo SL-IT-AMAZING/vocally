@@ -36,7 +36,9 @@ export const UpgradePlanDialog = () => {
 
   useEffect(() => {
     const isTargPlanPro =
-      targPlan === "pro_monthly" || targPlan === "pro_yearly";
+      targPlan === "pro_monthly" ||
+      targPlan === "pro_semiannual" ||
+      targPlan === "pro_yearly";
 
     if (targPlan === "free" && currPlan === "free") {
       closeUpgradePlanDialog();

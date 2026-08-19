@@ -7,7 +7,11 @@ export const SUBSCRIPTION_PRICE_KEYS = [] as const;
 
 export type SubscriptionPriceKey = (typeof SUBSCRIPTION_PRICE_KEYS)[number];
 
-export const ONE_TIME_PRICE_KEYS = ["pro_monthly", "pro_yearly"] as const;
+export const ONE_TIME_PRICE_KEYS = [
+  "pro_monthly",
+  "pro_semiannual",
+  "pro_yearly",
+] as const;
 
 export type OneTimePriceKey = (typeof ONE_TIME_PRICE_KEYS)[number];
 
@@ -22,6 +26,10 @@ export const Prices: Record<PriceKey, PriceInfo> = {
   pro_monthly: {
     currency: "KRW",
     unitAmount: 7000,
+  },
+  pro_semiannual: {
+    currency: "KRW",
+    unitAmount: 39000,
   },
   pro_yearly: {
     currency: "KRW",
