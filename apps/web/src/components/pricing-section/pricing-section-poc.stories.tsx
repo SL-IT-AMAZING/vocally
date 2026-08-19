@@ -229,6 +229,7 @@ function ShieldIcon() {
 
 function PricingSectionPOC() {
   const [checkoutError, setCheckoutError] = useState(false);
+  const [kakaoPayReviewNotice, setKakaoPayReviewNotice] = useState(false);
   const intl = useIntl();
 
   const personalFeatures = [
@@ -332,7 +333,7 @@ function PricingSectionPOC() {
           <button
             type="button"
             style={s.btnFilled}
-            onClick={() => setCheckoutError((visible) => !visible)}
+            onClick={() => setKakaoPayReviewNotice((visible) => !visible)}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "#3b82f6";
             }}
@@ -340,10 +341,44 @@ function PricingSectionPOC() {
               e.currentTarget.style.background = "#2563eb";
             }}
           >
-            <FormattedMessage defaultMessage="Upgrade to Pro" />
+            <FormattedMessage defaultMessage="Pay with Kakao Pay" />
+          </button>
+          {kakaoPayReviewNotice && (
+            <p
+              style={{
+                color: "#fbbf24",
+                fontSize: "0.8rem",
+                lineHeight: 1.4,
+                margin: "10px 0 0",
+              }}
+            >
+              <FormattedMessage defaultMessage="Kakao Pay payment is pending merchant approval. No payment is collected yet." />
+            </p>
+          )}
+          <button
+            type="button"
+            style={{ ...s.btnOutline, marginTop: 10 }}
+            onClick={() => setCheckoutError((visible) => !visible)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#1c1c1e";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+            }}
+          >
+            <FormattedMessage defaultMessage="Pay by card" />
           </button>
           {checkoutError && (
-            <p style={{ color: "#fca5a5", fontSize: "0.8rem", lineHeight: 1.4, margin: "10px 0 0" }}>
+            <p
+              style={{
+                color: "#fca5a5",
+                fontSize: "0.8rem",
+                lineHeight: 1.4,
+                margin: "10px 0 0",
+              }}
+            >
               <FormattedMessage defaultMessage="Checkout preparation failed. Please try again." />
             </p>
           )}
@@ -390,6 +425,16 @@ function PricingSectionPOC() {
           <span style={s.billingNote}>
             <FormattedMessage defaultMessage="Billed every 6 months" />
           </span>
+          <p
+            style={{
+              color: "#98989d",
+              fontSize: "0.8rem",
+              lineHeight: 1.4,
+              margin: "0 0 10px",
+            }}
+          >
+            <FormattedMessage defaultMessage="Kakao Pay is available for the monthly subscription only." />
+          </p>
           <button
             type="button"
             style={s.btnFilled}
@@ -404,7 +449,14 @@ function PricingSectionPOC() {
             <FormattedMessage defaultMessage="Upgrade to Pro" />
           </button>
           {checkoutError && (
-            <p style={{ color: "#fca5a5", fontSize: "0.8rem", lineHeight: 1.4, margin: "10px 0 0" }}>
+            <p
+              style={{
+                color: "#fca5a5",
+                fontSize: "0.8rem",
+                lineHeight: 1.4,
+                margin: "10px 0 0",
+              }}
+            >
               <FormattedMessage defaultMessage="Checkout preparation failed. Please try again." />
             </p>
           )}
@@ -454,6 +506,16 @@ function PricingSectionPOC() {
           <span style={s.billingNote}>
             <FormattedMessage defaultMessage="Billed once a year" />
           </span>
+          <p
+            style={{
+              color: "#98989d",
+              fontSize: "0.8rem",
+              lineHeight: 1.4,
+              margin: "0 0 10px",
+            }}
+          >
+            <FormattedMessage defaultMessage="Kakao Pay is available for the monthly subscription only." />
+          </p>
           <button
             type="button"
             style={s.btnFilled}
@@ -468,7 +530,14 @@ function PricingSectionPOC() {
             <FormattedMessage defaultMessage="Upgrade to Pro" />
           </button>
           {checkoutError && (
-            <p style={{ color: "#fca5a5", fontSize: "0.8rem", lineHeight: 1.4, margin: "10px 0 0" }}>
+            <p
+              style={{
+                color: "#fca5a5",
+                fontSize: "0.8rem",
+                lineHeight: 1.4,
+                margin: "10px 0 0",
+              }}
+            >
               <FormattedMessage defaultMessage="Checkout preparation failed. Please try again." />
             </p>
           )}
