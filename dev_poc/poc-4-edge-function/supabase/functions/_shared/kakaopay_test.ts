@@ -2,17 +2,34 @@ import {
   isKakaoPayPaymentEnabled,
   isKakaoPayPlan,
   kakaoPayPartnerUserId,
+  KAKAOPAY_ORDER_NAMES,
+  KAKAOPAY_PRICES,
   nextKakaoPayBillingAt,
   withCidSecret,
   type KakaoPayConfig,
 } from "./kakaopay.ts";
 
 Deno.test("accepts only supported Kakao Pay subscription plans", () => {
-  if (!isKakaoPayPlan("monthly") || !isKakaoPayPlan("yearly")) {
+  if (
+    !isKakaoPayPlan("monthly") ||
+    !isKakaoPayPlan("semiannual") ||
+    !isKakaoPayPlan("yearly")
+  ) {
     throw new Error("supported plans were rejected");
   }
   if (isKakaoPayPlan("pro") || isKakaoPayPlan(undefined)) {
     throw new Error("unsupported plan was accepted");
+  }
+});
+
+Deno.test("keeps Kakao Pay prices and product names server-owned", () => {
+  if (
+    KAKAOPAY_PRICES.monthly !== 7_000 ||
+    KAKAOPAY_PRICES.semiannual !== 39_000 ||
+    KAKAOPAY_PRICES.yearly !== 70_000 ||
+    KAKAOPAY_ORDER_NAMES.semiannual !== "Vocally Pro 반기 이용권"
+  ) {
+    throw new Error("Kakao Pay product catalog is incorrect");
   }
 });
 
@@ -41,6 +58,12 @@ Deno.test("calculates recurring dates in UTC", () => {
   const base = new Date("2026-01-15T12:00:00.000Z");
   if (nextKakaoPayBillingAt("monthly", base) !== "2026-02-15T12:00:00.000Z") {
     throw new Error("monthly renewal date is incorrect");
+  }
+  if (
+    nextKakaoPayBillingAt("semiannual", base) !==
+    "2026-07-15T12:00:00.000Z"
+  ) {
+    throw new Error("semiannual renewal date is incorrect");
   }
   if (nextKakaoPayBillingAt("yearly", base) !== "2027-01-15T12:00:00.000Z") {
     throw new Error("yearly renewal date is incorrect");
