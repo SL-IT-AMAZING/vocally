@@ -47,8 +47,8 @@ const s: Record<string, CSSProperties> = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-    gap: 24,
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: 16,
     width: "100%",
     justifyContent: "center",
   },
@@ -328,6 +328,67 @@ function PricingSectionPOC() {
           </div>
           <span style={s.billingNote}>
             <FormattedMessage defaultMessage="Billed each month" />
+          </span>
+          <button
+            type="button"
+            style={s.btnFilled}
+            onClick={() => setCheckoutError((visible) => !visible)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#3b82f6";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#2563eb";
+            }}
+          >
+            <FormattedMessage defaultMessage="Upgrade to Pro" />
+          </button>
+          {checkoutError && (
+            <p style={{ color: "#fca5a5", fontSize: "0.8rem", lineHeight: 1.4, margin: "10px 0 0" }}>
+              <FormattedMessage defaultMessage="Checkout preparation failed. Please try again." />
+            </p>
+          )}
+          <p style={s.featuresTitle}>
+            <FormattedMessage defaultMessage="Includes" />
+          </p>
+          <ul style={s.featureList}>
+            {proFeatures.map((f) => {
+              const text = typeof f === "string" ? f : f.text;
+              const deemphasized = typeof f === "object" && f.deemphasized;
+              return (
+                <li
+                  key={text}
+                  style={{
+                    ...s.featureItem,
+                    ...(deemphasized ? s.deemphasized : {}),
+                  }}
+                >
+                  <CheckIcon
+                    style={deemphasized ? { color: "#98989d" } : undefined}
+                  />
+                  <span>{text}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        <div style={s.card}>
+          <div style={s.planRow}>
+            <h3 style={s.planName}>
+              <FormattedMessage defaultMessage="Pro Semiannual" />
+            </h3>
+          </div>
+          <p style={s.planDesc}>
+            <FormattedMessage defaultMessage="Cloud transcription, unlimited words, priority support." />
+          </p>
+          <div style={{ display: "flex", alignItems: "baseline" }}>
+            <span style={s.price}>₩39,000</span>
+            <span style={s.pricePeriod}>
+              <FormattedMessage defaultMessage="/ 6 months" />
+            </span>
+          </div>
+          <span style={s.billingNote}>
+            <FormattedMessage defaultMessage="Billed every 6 months" />
           </span>
           <button
             type="button"
