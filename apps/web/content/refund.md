@@ -19,6 +19,7 @@ We will process your refund without undue delay, and no later than 14 days after
 Vocally offers the following paid subscription plans:
 
 - **Monthly Plan**: ₩7,000 per month
+- **Semiannual Plan**: ₩39,000 every 6 months
 - **Yearly Plan**: ₩70,000 per year
 
 All subscriptions are billed automatically at the start of each billing cycle through the payment method and provider selected at checkout. Vocally may offer payments through supported providers, including Toss Payments and Kakao Pay where available; the applicable provider billing agreement applies.
@@ -32,6 +33,7 @@ If a free trial is offered, you will not be charged until the trial period ends.
 You may cancel your subscription at any time. Upon cancellation:
 
 - You will retain access to Vocally Pro features until the end of your current billing period
+- For a Semiannual or Yearly Plan, this means the end of the already-paid 6-month or 12-month period
 - No further charges will be made
 
 ## 5. How to Request a Refund

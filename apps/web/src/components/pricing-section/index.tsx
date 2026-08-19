@@ -7,6 +7,7 @@ import { DownloadButton } from "../download-button";
 import styles from "./pricing-section.module.css";
 
 const TOSS_PRICE_MONTHLY_KRW = 7_000;
+const TOSS_PRICE_SEMIANNUAL_KRW = 39_000;
 const TOSS_PRICE_YEARLY_KRW = 70_000;
 const KAKAOPAY_ENABLED = import.meta.env.VITE_KAKAOPAY_ENABLED === "true";
 
@@ -17,9 +18,9 @@ type PricingPlan = {
   name: string;
   description: string;
   price: number;
-  billingPeriod?: "month" | "year";
+  billingPeriod?: "month" | "halfYear" | "year";
   billingNote?: string;
-  paymentPlan?: "monthly" | "yearly";
+  paymentPlan?: "monthly" | "semiannual" | "yearly";
   features: Feature[];
   cta: string;
   popular: boolean;
@@ -91,6 +92,41 @@ function usePricingPlans(): PricingPlan[] {
         },
       ],
       cta: intl.formatMessage({ defaultMessage: "Subscribe monthly" }),
+      popular: false,
+    },
+    {
+      name: intl.formatMessage({ defaultMessage: "Pro Semiannual" }),
+      description: intl.formatMessage({
+        defaultMessage:
+          "Full power with cloud transcription and advanced integrations.",
+      }),
+      price: TOSS_PRICE_SEMIANNUAL_KRW,
+      billingPeriod: "halfYear",
+      billingNote: intl.formatMessage({
+        defaultMessage: "Billed every 6 months",
+      }),
+      paymentPlan: "semiannual",
+      features: [
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Everything in Personal",
+          }),
+          deemphasized: true,
+        },
+        { text: intl.formatMessage({ defaultMessage: "AI dictation" }) },
+        {
+          text: intl.formatMessage({ defaultMessage: "Cross-device sync" }),
+        },
+        {
+          text: intl.formatMessage({
+            defaultMessage: "Unlimited words per month",
+          }),
+        },
+        {
+          text: intl.formatMessage({ defaultMessage: "Priority support" }),
+        },
+      ],
+      cta: intl.formatMessage({ defaultMessage: "Subscribe every 6 months" }),
       popular: false,
     },
     {
@@ -172,7 +208,7 @@ function ProSubscribeButton({
   provider,
   className,
 }: {
-  plan: "monthly" | "yearly";
+  plan: "monthly" | "semiannual" | "yearly";
   provider: PaymentProvider;
   className?: string;
 }) {
@@ -343,6 +379,8 @@ export default function PricingSection() {
                         <span className={styles.pricePeriod}>
                           {plan.billingPeriod === "year" ? (
                             <FormattedMessage defaultMessage="/ year" />
+                          ) : plan.billingPeriod === "halfYear" ? (
+                            <FormattedMessage defaultMessage="/ 6 months" />
                           ) : (
                             <FormattedMessage defaultMessage="/ month" />
                           )}

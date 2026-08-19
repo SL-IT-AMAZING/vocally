@@ -2,12 +2,17 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { handleCors } from "../_shared/cors.ts";
 import { createServiceClient } from "../_shared/supabase.ts";
 import { errorResponse, jsonResponse } from "../_shared/response.ts";
-import { isTossPlan, nextBillingAt, tossRequest } from "../_shared/toss.ts";
+import {
+  isTossPlan,
+  nextBillingAt,
+  tossRequest,
+  type TossPlan,
+} from "../_shared/toss.ts";
 
 type PaymentOrder = {
   order_id: string;
   user_id: string;
-  plan: "monthly" | "yearly";
+  plan: TossPlan;
   amount: number;
   order_name: string;
   customer_key: string | null;
