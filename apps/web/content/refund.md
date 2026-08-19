@@ -1,6 +1,6 @@
 # Refund Policy
 
-_Last updated: August 18, 2026_
+_Last updated: August 19, 2026_
 
 At **Vocally**, operated by **주식회사 슬릿컴퍼니 (SLIT Co., Ltd.)**, we want you to be completely satisfied with your purchase.
 
@@ -22,7 +22,7 @@ Vocally offers the following paid subscription plans:
 - **Semiannual Plan**: ₩39,000 every 6 months
 - **Yearly Plan**: ₩70,000 per year
 
-All subscriptions are billed automatically at the start of each billing cycle through the payment method and provider selected at checkout. Vocally may offer payments through supported providers, including Toss Payments and Kakao Pay where available; the applicable provider billing agreement applies.
+All subscriptions are billed automatically at the start of each billing cycle through the payment method and provider selected at checkout. **Kakao Pay is available only for the Monthly Plan (₩7,000/month).** Toss Payments may be used for the Monthly, Semiannual, and Yearly Plans. The applicable provider billing agreement applies.
 
 ## 3. Free Trial
 
@@ -34,6 +34,7 @@ You may cancel your subscription at any time. Upon cancellation:
 
 - You will retain access to Vocally Pro features until the end of your current billing period
 - For a Semiannual or Yearly Plan, this means the end of the already-paid 6-month or 12-month period
+- Kakao Pay monthly subscriptions may be cancelled before the next monthly billing date
 - No further charges will be made
 
 ## 5. How to Request a Refund

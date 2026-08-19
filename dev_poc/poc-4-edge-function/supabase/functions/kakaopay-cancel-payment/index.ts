@@ -2,6 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { hasSharedSecret } from "../_shared/auth.ts";
 import {
   getKakaoPayConfig,
+  isKakaoPayPaymentEnabled,
   kakaoPayRequest,
   withCidSecret,
 } from "../_shared/kakaopay.ts";
@@ -27,14 +28,18 @@ type Cancellation = {
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return errorResponse("Method not allowed", 405);
+  if (!isKakaoPayPaymentEnabled()) {
+    return errorResponse("Kakao Pay is not available", 503);
+  }
   if (
     !hasSharedSecret(req, "x-kakaopay-admin-secret", "KAKAOPAY_ADMIN_SECRET")
   ) {
     return errorResponse("Unauthorized", 401);
   }
   const body = (await req.json().catch(() => ({}))) as { orderId?: unknown };
-  if (typeof body.orderId !== "string")
+  if (typeof body.orderId !== "string") {
     return errorResponse("Missing order ID", 400);
+  }
   const config = getKakaoPayConfig();
   if (!config) return errorResponse("Kakao Pay is not configured", 503);
   const supabase = createServiceClient();

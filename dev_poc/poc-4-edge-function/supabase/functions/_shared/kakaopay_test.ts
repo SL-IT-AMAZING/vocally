@@ -1,33 +1,32 @@
 import {
   isKakaoPayPaymentEnabled,
   isKakaoPayPlan,
-  kakaoPayPartnerUserId,
   KAKAOPAY_ORDER_NAMES,
   KAKAOPAY_PRICES,
+  type KakaoPayConfig,
+  kakaoPayPartnerUserId,
   nextKakaoPayBillingAt,
   withCidSecret,
-  type KakaoPayConfig,
 } from "./kakaopay.ts";
 
-Deno.test("accepts only supported Kakao Pay subscription plans", () => {
-  if (
-    !isKakaoPayPlan("monthly") ||
-    !isKakaoPayPlan("semiannual") ||
-    !isKakaoPayPlan("yearly")
-  ) {
-    throw new Error("supported plans were rejected");
+Deno.test("accepts only the Kakao Pay monthly subscription plan", () => {
+  if (!isKakaoPayPlan("monthly")) {
+    throw new Error("monthly plan was rejected");
   }
-  if (isKakaoPayPlan("pro") || isKakaoPayPlan(undefined)) {
-    throw new Error("unsupported plan was accepted");
+  if (
+    isKakaoPayPlan("semiannual") ||
+    isKakaoPayPlan("yearly") ||
+    isKakaoPayPlan("pro") ||
+    isKakaoPayPlan(undefined)
+  ) {
+    throw new Error("a non-monthly plan was accepted");
   }
 });
 
 Deno.test("keeps Kakao Pay prices and product names server-owned", () => {
   if (
     KAKAOPAY_PRICES.monthly !== 7_000 ||
-    KAKAOPAY_PRICES.semiannual !== 39_000 ||
-    KAKAOPAY_PRICES.yearly !== 70_000 ||
-    KAKAOPAY_ORDER_NAMES.semiannual !== "Vocally Pro 반기 이용권"
+    KAKAOPAY_ORDER_NAMES.monthly !== "Vocally Pro 월간 이용권"
   ) {
     throw new Error("Kakao Pay product catalog is incorrect");
   }
@@ -54,19 +53,10 @@ Deno.test("keeps Kakao Pay disabled unless the managed flag is exactly true", ()
   }
 });
 
-Deno.test("calculates recurring dates in UTC", () => {
+Deno.test("calculates the monthly recurring date in UTC", () => {
   const base = new Date("2026-01-15T12:00:00.000Z");
   if (nextKakaoPayBillingAt("monthly", base) !== "2026-02-15T12:00:00.000Z") {
     throw new Error("monthly renewal date is incorrect");
-  }
-  if (
-    nextKakaoPayBillingAt("semiannual", base) !==
-    "2026-07-15T12:00:00.000Z"
-  ) {
-    throw new Error("semiannual renewal date is incorrect");
-  }
-  if (nextKakaoPayBillingAt("yearly", base) !== "2027-01-15T12:00:00.000Z") {
-    throw new Error("yearly renewal date is incorrect");
   }
 });
 
@@ -74,7 +64,9 @@ Deno.test("uses a stable non-PII partner user identifier", async () => {
   const userId = "9b7b79c2-c605-4cdf-96c4-ff577b5b57e3";
   const first = await kakaoPayPartnerUserId(userId);
   const second = await kakaoPayPartnerUserId(userId);
-  if (first !== second || first.includes(userId) || !first.startsWith("vocally-")) {
+  if (
+    first !== second || first.includes(userId) || !first.startsWith("vocally-")
+  ) {
     throw new Error("partner user identifier is not private and deterministic");
   }
 });
@@ -87,6 +79,10 @@ Deno.test("adds CID secret only when one was issued", () => {
   };
   const withoutSecret = withCidSecret(config, { cid: config.subscriptionCid });
   if ("cid_secret" in withoutSecret) throw new Error("unexpected CID secret");
-  const withSecret = withCidSecret({ ...config, cidSecret: "issued-secret" }, { cid: config.subscriptionCid });
-  if (withSecret.cid_secret !== "issued-secret") throw new Error("missing CID secret");
+  const withSecret = withCidSecret({ ...config, cidSecret: "issued-secret" }, {
+    cid: config.subscriptionCid,
+  });
+  if (withSecret.cid_secret !== "issued-secret") {
+    throw new Error("missing CID secret");
+  }
 });

@@ -3,6 +3,7 @@ import { getUser } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import {
   getKakaoPayConfig,
+  isKakaoPayPaymentEnabled,
   kakaoPayRequest,
   withCidSecret,
 } from "../_shared/kakaopay.ts";
@@ -24,6 +25,9 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (kakaoError) return errorResponse("Failed to load subscription", 500);
   if (kakaoSubscription) {
+    if (!isKakaoPayPaymentEnabled()) {
+      return errorResponse("Kakao Pay is not available", 503);
+    }
     if (kakaoSubscription.cancel_at_period_end) {
       return jsonResponse({
         success: true,
@@ -41,8 +45,9 @@ Deno.serve(async (req) => {
         sid: kakaoSubscription.sid,
       }),
     );
-    if (!result.ok)
+    if (!result.ok) {
       return errorResponse("Kakao Pay could not cancel the subscription", 502);
+    }
     const { error: updateError } = await supabase
       .from("kakaopay_subscriptions")
       .update({
@@ -66,15 +71,17 @@ Deno.serve(async (req) => {
     .select("next_billing_at, cancel_at_period_end")
     .eq("user_id", user.id)
     .maybeSingle();
-  if (tossError || !tossSubscription)
+  if (tossError || !tossSubscription) {
     return errorResponse("No active subscription", 404);
+  }
   if (!tossSubscription.cancel_at_period_end) {
     const { error: tossUpdateError } = await supabase
       .from("toss_subscriptions")
       .update({ status: "canceled", cancel_at_period_end: true })
       .eq("user_id", user.id);
-    if (tossUpdateError)
+    if (tossUpdateError) {
       return errorResponse("Failed to save cancellation", 500);
+    }
   }
   return jsonResponse({
     success: true,

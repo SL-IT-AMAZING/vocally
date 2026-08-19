@@ -1,6 +1,6 @@
 # Terms of Service
 
-_Last updated: August 18, 2026_
+_Last updated: August 19, 2026_
 
 Welcome to **Vocally**, operated by **주식회사 슬릿컴퍼니 (SLIT Co., Ltd.)** ("we", "us", "our"). These Terms of Service ("Terms") govern your use of the Vocally software application ("Software") and any related services, including paid subscription plans. By downloading, installing, or using the Software, you agree to be bound by these Terms.
 
@@ -98,6 +98,8 @@ Vocally offers a free tier and optional paid subscription plans (Pro). Paid plan
 ### 7.2 Billing
 
 Payments are processed through the payment provider selected at checkout, such as **Toss Payments** or **Kakao Pay** where available. The selected provider handles payment authentication and payment details; we receive the payment result and subscription status needed to provide Pro features. All prices are listed in KRW and include applicable taxes unless otherwise stated.
+
+Kakao Pay supports the **Monthly Plan only** (₩7,000 per month). Toss Payments may support the Monthly, Semiannual (₩39,000 every 6 months), and Yearly (₩70,000 per year) plans. Vocally is a downloadable digital software service; no physical shipping or delivery address is required for a subscription purchase.
 
 ### 7.3 Free Trial
 

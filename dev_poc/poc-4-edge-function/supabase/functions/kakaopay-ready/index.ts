@@ -3,12 +3,12 @@ import { getUser } from "../_shared/auth.ts";
 import { handleCors } from "../_shared/cors.ts";
 import {
   getKakaoPayConfig,
+  isKakaoPayPaymentEnabled,
   isKakaoPayPlan,
-  kakaoPayPartnerUserId,
-  kakaoPayRequest,
   KAKAOPAY_ORDER_NAMES,
   KAKAOPAY_PRICES,
-  isKakaoPayPaymentEnabled,
+  kakaoPayPartnerUserId,
+  kakaoPayRequest,
   newKakaoPayOrderId,
   withCidSecret,
 } from "../_shared/kakaopay.ts";
@@ -45,8 +45,9 @@ Deno.serve(async (req) => {
     .eq("id", user.id)
     .maybeSingle();
   if (memberError) return errorResponse("Failed to load membership", 500);
-  if (member?.plan === "pro")
+  if (member?.plan === "pro") {
     return errorResponse("An active Pro plan already exists", 409);
+  }
 
   const orderId = newKakaoPayOrderId();
   const amount = KAKAOPAY_PRICES[body.plan];

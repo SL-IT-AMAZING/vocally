@@ -4,9 +4,10 @@ import { handleCors } from "../_shared/cors.ts";
 import {
   getKakaoPayConfig,
   isKakaoPayPaymentEnabled,
+  isKakaoPayPlan,
+  type KakaoPayPlan,
   kakaoPayRequest,
   nextKakaoPayBillingAt,
-  type KakaoPayPlan,
   withCidSecret,
 } from "../_shared/kakaopay.ts";
 import { errorResponse, jsonResponse } from "../_shared/response.ts";
@@ -15,7 +16,7 @@ import { createServiceClient } from "../_shared/supabase.ts";
 type Order = {
   order_id: string;
   user_id: string;
-  plan: KakaoPayPlan;
+  plan: unknown;
   amount: number;
   partner_user_id: string;
   tid: string | null;
@@ -35,7 +36,7 @@ type Approval = {
 
 async function ensureInitialEntitlement(
   supabase: ReturnType<typeof createServiceClient>,
-  order: Order,
+  order: Order & { plan: KakaoPayPlan },
   sid: string,
   paidAt = new Date().toISOString(),
 ): Promise<string | null> {
@@ -108,13 +109,19 @@ Deno.serve(async (req) => {
     )
     .eq("order_id", body.orderId)
     .maybeSingle<Order>();
-  if (orderError || !order)
+  if (orderError || !order) {
     return errorResponse("Payment order not found", 404);
-  if (order.user_id !== user.id)
+  }
+  if (order.user_id !== user.id) {
     return errorResponse("Payment order not found", 404);
+  }
+  if (!isKakaoPayPlan(order.plan)) {
+    return errorResponse("Payment order requires manual review", 409);
+  }
   if (order.status === "paid") {
-    if (!order.sid)
+    if (!order.sid) {
       return errorResponse("Paid order needs manual reconciliation", 409);
+    }
     const recoveryError = await ensureInitialEntitlement(
       supabase,
       order,
@@ -124,8 +131,9 @@ Deno.serve(async (req) => {
     if (recoveryError) return errorResponse(recoveryError, 500);
     return jsonResponse({ success: true, alreadyPaid: true });
   }
-  if (order.status !== "ready" || !order.tid)
+  if (order.status !== "ready" || !order.tid) {
     return errorResponse("Payment order is not payable", 409);
+  }
 
   const { data: claimed, error: claimError } = await supabase
     .from("kakaopay_payment_orders")
@@ -135,8 +143,9 @@ Deno.serve(async (req) => {
     .select("order_id")
     .maybeSingle();
   if (claimError) return errorResponse("Failed to claim payment approval", 500);
-  if (!claimed)
+  if (!claimed) {
     return errorResponse("Payment approval is already in progress", 409);
+  }
 
   const result = await kakaoPayRequest<Approval>(
     config.secretKey,
@@ -151,8 +160,7 @@ Deno.serve(async (req) => {
     }),
   );
   const approval = result.data;
-  const matchesOrder =
-    approval.tid === order.tid &&
+  const matchesOrder = approval.tid === order.tid &&
     approval.partner_order_id === order.order_id &&
     approval.partner_user_id === order.partner_user_id &&
     approval.amount?.total === order.amount;
@@ -161,8 +169,7 @@ Deno.serve(async (req) => {
       .from("kakaopay_payment_orders")
       .update({
         status: result.status === 0 ? "reconciliation_required" : "failed",
-        failure_code:
-          approval.error_code ??
+        failure_code: approval.error_code ??
           (result.status === 0
             ? "KAKAOPAY_APPROVAL_UNKNOWN"
             : "KAKAOPAY_APPROVAL_FAILED"),
