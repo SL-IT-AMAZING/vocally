@@ -18,6 +18,7 @@ import KakaoPaySuccessPage from "./pages/KakaoPaySuccessPage";
 import KakaoPayCancelPage from "./pages/KakaoPayCancelPage";
 import KakaoPayReviewPage from "./pages/KakaoPayReviewPage";
 import KakaoPayOneTimeReviewPage from "./pages/KakaoPayOneTimeReviewPage";
+import KakaoPayOneTimeSuccessPage from "./pages/KakaoPayOneTimeSuccessPage";
 
 function App() {
   const location = useLocation();
@@ -48,6 +49,9 @@ function App() {
           element={<KakaoPayReviewPage />}
         />
         <Route path="/checkout/kakaopay/one-time/review" element={<KakaoPayOneTimeReviewPage />} />
+        <Route path="/checkout/kakaopay/one-time/success" element={<KakaoPayOneTimeSuccessPage />} />
+        <Route path="/checkout/kakaopay/one-time/cancel" element={<KakaoPayCancelPage />} />
+        <Route path="/checkout/kakaopay/one-time/fail" element={<KakaoPayCancelPage />} />
         <Route
           path="/checkout/kakaopay/cancel"
           element={<KakaoPayCancelPage />}
