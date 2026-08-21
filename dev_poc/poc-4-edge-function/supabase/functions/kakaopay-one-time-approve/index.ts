@@ -144,5 +144,6 @@ Deno.serve(async (req) => {
   return jsonResponse({
     success: true,
     alreadyPaid: finalState?.already_paid === true,
+    endsAt: finalState?.ends_at ?? null,
   });
 });
