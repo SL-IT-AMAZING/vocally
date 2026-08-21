@@ -29,8 +29,11 @@ type Approval = {
   error_code?: string;
 };
 
-function hasApprovalFields(body: Record<string, unknown>) {
-  return Object.keys(body).length === 2 &&
+function hasApprovalFields(
+  body: unknown,
+): body is { orderId: string; pgToken: string } {
+  return typeof body === "object" && body !== null && !Array.isArray(body) &&
+    Object.keys(body).length === 2 &&
     typeof body.orderId === "string" &&
     typeof body.pgToken === "string";
 }
@@ -45,7 +48,7 @@ Deno.serve(async (req) => {
 
   const user = await getUser(req);
   if (!user) return errorResponse("Unauthorized", 401);
-  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const body: unknown = await req.json().catch(() => ({}));
   if (!hasApprovalFields(body)) {
     return errorResponse("Missing payment approval", 400);
   }

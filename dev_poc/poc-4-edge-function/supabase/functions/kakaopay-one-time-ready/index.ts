@@ -21,8 +21,9 @@ type ReadyResponse = {
   error_code?: string;
 };
 
-function hasOnlyProductKey(body: Record<string, unknown>) {
-  return Object.keys(body).length === 1 && "productKey" in body;
+function hasOnlyProductKey(body: unknown): body is { productKey: unknown } {
+  return typeof body === "object" && body !== null && !Array.isArray(body) &&
+    Object.keys(body).length === 1 && "productKey" in body;
 }
 
 Deno.serve(async (req) => {
@@ -35,7 +36,7 @@ Deno.serve(async (req) => {
 
   const user = await getUser(req);
   if (!user) return errorResponse("Unauthorized", 401);
-  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const body: unknown = await req.json().catch(() => ({}));
   if (
     !hasOnlyProductKey(body) || !isKakaoPayOneTimeProductKey(body.productKey)
   ) {
@@ -121,6 +122,16 @@ Deno.serve(async (req) => {
     .select("order_id")
     .maybeSingle();
   if (saveTidError || !savedTid) {
+    await supabase
+      .from("kakaopay_one_time_orders")
+      .update({
+        tid: result.data.tid,
+        status: "reconciliation_required",
+        failure_code: "KAKAOPAY_TID_PERSIST_FAILED",
+        failure_message: "Kakao Pay payment setup needs reconciliation",
+      })
+      .eq("order_id", orderId)
+      .eq("status", "ready");
     return errorResponse("Failed to save payment state", 500);
   }
 

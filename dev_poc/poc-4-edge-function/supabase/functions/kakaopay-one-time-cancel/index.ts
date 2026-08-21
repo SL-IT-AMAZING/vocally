@@ -25,8 +25,9 @@ type Cancellation = {
   error_code?: string;
 };
 
-function hasOnlyOrderId(body: Record<string, unknown>) {
-  return Object.keys(body).length === 1 && typeof body.orderId === "string";
+function hasOnlyOrderId(body: unknown): body is { orderId: string } {
+  return typeof body === "object" && body !== null && !Array.isArray(body) &&
+    Object.keys(body).length === 1 && typeof body.orderId === "string";
 }
 
 Deno.serve(async (req) => {
@@ -41,7 +42,7 @@ Deno.serve(async (req) => {
   ) {
     return errorResponse("Unauthorized", 401);
   }
-  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const body: unknown = await req.json().catch(() => ({}));
   if (!hasOnlyOrderId(body)) return errorResponse("Missing order ID", 400);
   const config = getKakaoPayOneTimeConfig();
   if (!config) {

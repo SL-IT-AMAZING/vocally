@@ -23,6 +23,25 @@ async function waitForDisabledEndpoint(url: string): Promise<void> {
   throw lastError ?? new Error("endpoint did not start");
 }
 
+async function waitForUnauthorizedEndpoint(url: string): Promise<void> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      if (response.status === 401) return;
+      lastError = new Error(`expected 401, received ${response.status}`);
+    } catch (error) {
+      lastError = error;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw lastError ?? new Error("endpoint did not start");
+}
+
 Deno.test({
   name:
     "one-time Kakao Pay provider-call endpoints reject requests while disabled",
@@ -44,6 +63,35 @@ Deno.test({
       }).spawn();
       try {
         await waitForDisabledEndpoint("http://127.0.0.1:8000");
+      } finally {
+        child.kill("SIGTERM");
+        await child.status;
+      }
+    }
+  },
+});
+
+Deno.test({
+  name:
+    "enabled one-time endpoints reject missing caller authorization before payment setup",
+  permissions: { env: true, net: true, read: true, run: true },
+  async fn() {
+    for (const functionName of functionPaths) {
+      const child = new Deno.Command(Deno.execPath(), {
+        args: [
+          "run",
+          "--allow-env",
+          "--allow-net",
+          "--allow-read",
+          "--no-prompt",
+          `dev_poc/poc-4-edge-function/supabase/functions/${functionName}/index.ts`,
+        ],
+        env: { ...Deno.env.toObject(), KAKAOPAY_ONETIME_ENABLED: "true" },
+        stdout: "null",
+        stderr: "null",
+      }).spawn();
+      try {
+        await waitForUnauthorizedEndpoint("http://127.0.0.1:8000");
       } finally {
         child.kill("SIGTERM");
         await child.status;
@@ -78,14 +126,19 @@ Deno.test({
         ready.indexOf('"claim_kakaopay_one_time_order"'),
       ready.includes("KAKAOPAY_ONE_TIME_PRODUCTS[body.productKey]"),
       !ready.includes("body.amount") && !ready.includes("body.duration"),
+      ready.includes("body !== null") &&
+      ready.includes("KAKAOPAY_TID_PERSIST_FAILED"),
       approve.indexOf("if (!isKakaoPayOneTimePaymentEnabled())") <
         approve.indexOf('"finalize_kakaopay_one_time_payment"'),
       approve.includes("approval.amount?.total === order.amount"),
+      approve.includes("body !== null"),
       cancel.includes("Object.keys(body).length === 1"),
+      cancel.includes("body !== null"),
       cancel.includes("cancellable?.total !== order.amount"),
       cancel.includes('cancellation.data.status !== "CANCEL_PAYMENT"'),
       !cancel.includes("PART_CANCEL_PAYMENT"),
       migration.includes("pg_advisory_xact_lock"),
+      migration.includes("'ready', 'approving', 'reconciliation_required'"),
       migration.includes("finalize_kakaopay_one_time_payment"),
       migration.includes("revoke_kakaopay_one_time_payment"),
       migration.includes(

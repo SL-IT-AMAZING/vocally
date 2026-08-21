@@ -38,7 +38,8 @@ BEGIN
 
   IF EXISTS (
     SELECT 1 FROM public.kakaopay_one_time_orders
-    WHERE user_id = p_user_id AND status IN ('ready', 'approving')
+    WHERE user_id = p_user_id
+      AND status IN ('ready', 'approving', 'reconciliation_required')
   ) THEN
     RAISE EXCEPTION 'A Kakao Pay one-time order is already in progress';
   END IF;
