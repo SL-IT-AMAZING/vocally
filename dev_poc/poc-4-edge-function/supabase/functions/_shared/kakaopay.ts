@@ -38,6 +38,10 @@ export function isKakaoPayPaymentEnabled(): boolean {
   return Deno.env.get("KAKAOPAY_ENABLED") === "true";
 }
 
+export function isKakaoPayOneTimePaymentEnabled(): boolean {
+  return Deno.env.get("KAKAOPAY_ONETIME_ENABLED") === "true";
+}
+
 export function nextKakaoPayBillingAt(
   plan: KakaoPayPlan,
   from = new Date(),
@@ -69,6 +73,13 @@ export type KakaoPayConfig = {
   cidSecret?: string;
 };
 
+export type KakaoPayOneTimeConfig = {
+  secretKey: string;
+  oneTimeCid: string;
+  siteUrl: string;
+  cidSecret?: string;
+};
+
 export function getKakaoPayConfig(): KakaoPayConfig | null {
   const secretKey = Deno.env.get("KAKAOPAY_SECRET_KEY");
   const subscriptionCid = Deno.env.get("KAKAOPAY_CID_SUBSCRIPTION");
@@ -79,6 +90,19 @@ export function getKakaoPayConfig(): KakaoPayConfig | null {
     subscriptionCid,
     siteUrl,
     cidSecret: Deno.env.get("KAKAOPAY_CID_SECRET") ?? undefined,
+  };
+}
+
+export function getKakaoPayOneTimeConfig(): KakaoPayOneTimeConfig | null {
+  const secretKey = Deno.env.get("KAKAOPAY_SECRET_KEY");
+  const oneTimeCid = Deno.env.get("KAKAOPAY_CID_ONETIME");
+  const siteUrl = Deno.env.get("KAKAOPAY_SITE_URL") ?? "https://vocally.site";
+  if (!secretKey || !oneTimeCid) return null;
+  return {
+    secretKey,
+    oneTimeCid,
+    siteUrl,
+    cidSecret: Deno.env.get("KAKAOPAY_CID_ONETIME_SECRET") ?? undefined,
   };
 }
 
@@ -115,7 +139,9 @@ export async function kakaoPayRequest<T>(
 }
 
 export function withCidSecret(
-  config: KakaoPayConfig,
+  config:
+    | Pick<KakaoPayConfig, "cidSecret">
+    | Pick<KakaoPayOneTimeConfig, "cidSecret">,
   values: Record<string, unknown>,
 ): Record<string, unknown> {
   return config.cidSecret
