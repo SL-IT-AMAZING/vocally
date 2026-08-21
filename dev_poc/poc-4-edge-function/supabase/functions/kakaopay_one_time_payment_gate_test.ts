@@ -51,6 +51,7 @@ Deno.test({
       const child = new Deno.Command(Deno.execPath(), {
         args: [
           "run",
+          "--no-lock",
           "--allow-env",
           "--allow-net",
           "--allow-read",
@@ -80,6 +81,7 @@ Deno.test({
       const child = new Deno.Command(Deno.execPath(), {
         args: [
           "run",
+          "--no-lock",
           "--allow-env",
           "--allow-net",
           "--allow-read",
