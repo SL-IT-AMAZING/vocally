@@ -62,7 +62,7 @@ CREATE OR REPLACE FUNCTION public.finalize_kakaopay_one_time_payment(
   p_payment_method_type TEXT,
   p_paid_at TIMESTAMPTZ
 )
-RETURNS TABLE(already_paid BOOLEAN, plan TEXT, ends_at TIMESTAMPTZ)
+RETURNS TABLE(already_paid BOOLEAN, plan TEXT)
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
@@ -70,7 +70,6 @@ AS $$
 DECLARE
   source_order public.kakaopay_one_time_orders;
   next_plan TEXT;
-  entitlement_ends_at TIMESTAMPTZ;
 BEGIN
   SELECT * INTO source_order
   FROM public.kakaopay_one_time_orders
@@ -90,9 +89,7 @@ BEGIN
     ) THEN
       RAISE EXCEPTION 'Paid Kakao Pay order needs reconciliation';
     END IF;
-    RETURN QUERY SELECT TRUE, public.recompute_member_plan(source_order.user_id), e.ends_at
-    FROM public.kakaopay_one_time_entitlements e
-    WHERE e.source_order_id = source_order.order_id;
+    RETURN QUERY SELECT TRUE, public.recompute_member_plan(source_order.user_id);
     RETURN;
   END IF;
 
@@ -114,7 +111,6 @@ BEGIN
       failure_message = NULL
   WHERE order_id = source_order.order_id;
 
-  entitlement_ends_at := p_paid_at + INTERVAL '30 days';
   INSERT INTO public.kakaopay_one_time_entitlements (
     source_order_id, user_id, product_key, starts_at, ends_at, status
   ) VALUES (
@@ -122,12 +118,12 @@ BEGIN
     source_order.user_id,
     source_order.product_key,
     p_paid_at,
-    entitlement_ends_at,
+    p_paid_at + INTERVAL '30 days',
     'active'
   );
 
   next_plan := public.recompute_member_plan(source_order.user_id);
-  RETURN QUERY SELECT FALSE, next_plan, entitlement_ends_at;
+  RETURN QUERY SELECT FALSE, next_plan;
 END;
 $$;
 

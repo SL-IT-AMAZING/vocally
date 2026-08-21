@@ -67,7 +67,19 @@ Deno.serve(async (req) => {
     return errorResponse("Payment order not found", 404);
   }
   if (order.status === "paid") {
-    return jsonResponse({ success: true, alreadyPaid: true });
+    const { data: entitlement } = await supabase
+      .from("kakaopay_one_time_entitlements")
+      .select("ends_at")
+      .eq("source_order_id", order.order_id)
+      .maybeSingle<{ ends_at: string }>();
+    if (!entitlement?.ends_at) {
+      return errorResponse("Payment requires reconciliation", 502);
+    }
+    return jsonResponse({
+      success: true,
+      alreadyPaid: true,
+      endsAt: entitlement.ends_at,
+    });
   }
   if (order.status !== "ready" || !order.tid) {
     return errorResponse("Payment order is not payable", 409);
@@ -141,9 +153,17 @@ Deno.serve(async (req) => {
     return errorResponse("Payment requires reconciliation", 502);
   }
   const finalState = Array.isArray(finalized) ? finalized[0] : finalized;
+  const { data: entitlement } = await supabase
+    .from("kakaopay_one_time_entitlements")
+    .select("ends_at")
+    .eq("source_order_id", order.order_id)
+    .maybeSingle<{ ends_at: string }>();
+  if (!entitlement?.ends_at) {
+    return errorResponse("Payment requires reconciliation", 502);
+  }
   return jsonResponse({
     success: true,
     alreadyPaid: finalState?.already_paid === true,
-    endsAt: finalState?.ends_at ?? null,
+    endsAt: entitlement.ends_at,
   });
 });
