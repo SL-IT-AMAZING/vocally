@@ -12,6 +12,10 @@ Deno.serve(async (req) => {
   if (!user) return errorResponse("Unauthorized", 401)
 
   const supabase = createServiceClient()
+  const { error: recomputeError } = await supabase.rpc("recompute_member_plan", {
+    p_member_id: user.id,
+  })
+  if (recomputeError) return errorResponse("Unable to refresh membership", 500)
 
   const { data, error } = await supabase
     .from("members")

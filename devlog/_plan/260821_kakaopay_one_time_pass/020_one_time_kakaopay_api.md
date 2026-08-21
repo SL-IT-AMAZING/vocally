@@ -9,7 +9,7 @@ Implement standard one-time `ready -> redirect -> approve` without creating an S
 | Path | Change |
 | --- | --- |
 | `dev_poc/poc-4-edge-function/supabase/functions/_shared/kakaopay.ts` | Add a separate general-payment configuration (`KAKAOPAY_CID_ONETIME`, optional matching CID secret, dedicated enable flag) and standard-CID request helpers. Preserve existing subscription configuration unchanged. |
-| `dev_poc/poc-4-edge-function/supabase/functions/kakaopay-one-time-ready/index.ts` | Authenticate user, load authoritative product, create a pending one-time order, map returned TID, and return only redirect URLs. |
+| `dev_poc/poc-4-edge-function/supabase/functions/kakaopay-one-time-ready/index.ts` | Authenticate user, load authoritative product, call the protected active-access/order-claim database function, create at most one pending one-time order, map returned TID, and return only redirect URLs. |
 | `dev_poc/poc-4-edge-function/supabase/functions/kakaopay-one-time-approve/index.ts` | Claim the order atomically, verify TID/order/user/amount, mark it paid, create entitlement exactly once, and recompute membership. |
 | `dev_poc/poc-4-edge-function/supabase/functions/kakaopay-one-time-cancel/index.ts` | Server-only refund/cancel path gated by the existing admin authorization pattern; provider result is recorded before entitlement removal. |
 | `dev_poc/poc-4-edge-function/supabase/config.toml` | Add explicit `verify_jwt = false` entries matching the existing Kakao functions; each handler, not gateway JWT verification, validates the bearer token or server-only admin secret and emits the shared CORS response. |
