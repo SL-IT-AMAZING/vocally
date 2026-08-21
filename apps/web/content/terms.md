@@ -169,3 +169,7 @@ These Terms constitute the entire agreement between you and SLIT regarding the S
 ## 17. Contact
 
 For questions about these Terms, please contact us at [slit.amazing@gmail.com](mailto:slit.amazing@gmail.com).
+
+## 18. One-time 30-Day Pass
+
+`Vocally Pro 30일 이용권` is a KRW 7,000 digital product paid once. It does not renew automatically, create a recurring billing agreement, or save a billing key. Pro access begins after payment approval, remains active for 30 days, and returns to the Free plan when the access period ends or a confirmed refund revokes the pass.

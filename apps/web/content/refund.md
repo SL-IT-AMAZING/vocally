@@ -28,6 +28,10 @@ All subscriptions are billed automatically at the start of each billing cycle th
 
 If a free trial is offered, you will not be charged until the trial period ends. You may cancel at any time during the trial without being charged.
 
+## 3.1 One-time 30-Day Pass
+
+`Vocally Pro 30일 이용권` is a KRW 7,000 one-time digital purchase. It does not renew automatically. A confirmed full refund revokes the related Pro access; partial refunds are not offered for this product. The 14-day refund policy above applies unless use of the digital service has started in a manner that limits withdrawal rights under applicable law.
+
 ## 4. Cancellation
 
 You may cancel your subscription at any time. Upon cancellation:
