@@ -315,7 +315,7 @@ function OneTimePassButton({ className }: { className?: string }) {
   return <button type="button" className={className} onClick={() => {
     if (!user) return openSignInModal();
     navigate("/checkout/kakaopay/one-time/review");
-  }}>{user ? "카카오페이 단건결제" : "시작하기"}</button>;
+  }}>{user ? "카카오페이 단건결제" : "단건 이용권 구매하기"}</button>;
 }
 
 export default function PricingSection() {

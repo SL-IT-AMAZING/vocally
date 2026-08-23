@@ -590,7 +590,7 @@ function PricingSectionPOC() {
               e.currentTarget.style.background = "#2563eb";
             }}
           >
-            카카오페이 단건결제
+            단건 이용권 구매하기
           </button>
           {oneTimePassNotice && (
             <p
