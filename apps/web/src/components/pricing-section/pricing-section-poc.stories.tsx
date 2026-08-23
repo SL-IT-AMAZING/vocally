@@ -230,6 +230,7 @@ function ShieldIcon() {
 function PricingSectionPOC() {
   const [checkoutError, setCheckoutError] = useState(false);
   const [kakaoPayReviewNotice, setKakaoPayReviewNotice] = useState(false);
+  const [oneTimePassNotice, setOneTimePassNotice] = useState(false);
   const intl = useIntl();
 
   const personalFeatures = [
@@ -564,6 +565,45 @@ function PricingSectionPOC() {
               );
             })}
           </ul>
+        </div>
+
+        <div style={s.card}>
+          <div style={s.planRow}>
+            <h3 style={s.planName}>Vocally Pro 30일 이용권</h3>
+          </div>
+          <p style={s.planDesc}>
+            카카오페이 단건결제 상품입니다. 자동으로 갱신되지 않습니다.
+          </p>
+          <div style={{ display: "flex", alignItems: "baseline" }}>
+            <span style={s.price}>₩7,000</span>
+            <span style={s.pricePeriod}>/ 결제 1회</span>
+          </div>
+          <span style={s.billingNote}>결제 완료일부터 30일간 Pro 기능 제공</span>
+          <button
+            type="button"
+            style={s.btnFilled}
+            onClick={() => setOneTimePassNotice((visible) => !visible)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#3b82f6";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#2563eb";
+            }}
+          >
+            단건 이용권 구매하기
+          </button>
+          {oneTimePassNotice && (
+            <p
+              style={{
+                color: "#fbbf24",
+                fontSize: "0.8rem",
+                lineHeight: 1.4,
+                margin: "10px 0 0",
+              }}
+            >
+              카카오페이 일반결제 심사 진행 중입니다. 현재 실제 결제는 발생하지 않습니다.
+            </p>
+          )}
         </div>
       </div>
 

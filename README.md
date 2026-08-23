@@ -133,14 +133,19 @@ See [`docs/desktop-architecture.md`](docs/desktop-architecture.md) for the full 
 | `KAKAOPAY_SECRET_KEY`                 | Kakao Pay server Secret key                                      |
 | `KAKAOPAY_CID_SUBSCRIPTION`           | Kakao Pay recurring-payment CID                                  |
 | `KAKAOPAY_CID_SECRET`                 | Optional Kakao Pay CID secret                                    |
+| `KAKAOPAY_CID_ONETIME`                | Kakao Pay general-payment CID for the 30-day one-time pass       |
+| `KAKAOPAY_CID_ONETIME_SECRET`         | Optional CID secret paired only with the general-payment CID     |
 | `KAKAOPAY_SITE_URL`                   | Registered checkout site URL                                     |
 | `KAKAOPAY_CRON_SECRET`                | Secret for Kakao Pay renewal job                                 |
 | `KAKAOPAY_ADMIN_SECRET`               | Server-only refund/reconciliation secret                         |
 | `VITE_KAKAOPAY_ENABLED`               | Set to `true` only after approval, issued credentials, and release checks |
+| `KAKAOPAY_ONETIME_ENABLED`            | Set to `true` only after separate one-time CID approval and release checks |
 
 Toss automatic billing requires a separate billing agreement. After the agreement is active, configure the secrets above in Supabase Edge Functions, apply the Toss migration, deploy `toss-checkout`, `toss-billing-issue`, `toss-cancel-subscription`, and `toss-recurring`, and invoke `toss-recurring` at least daily with the `x-cron-secret` header. The public checkout uses `/checkout/toss`; success redirects to `/checkout/toss/success` and cancellation redirects to `/checkout/cancel`.
 
 Kakao Pay recurring billing supports the Monthly (KRW 7,000), Semiannual (KRW 39,000), and Annual (KRW 70,000) plans, but requires a separate Kakao Pay recurring CID and Secret key. Before enabling it in production, a representative must complete Partner Center registration, business-app conversion and online-payment approval, then register `https://vocally.site` as a web platform domain. Store the server values only in Supabase Edge Function secrets. Deploy `kakaopay-ready`, `kakaopay-approve`, `kakaopay-recurring`, `subscription-cancel`, `kakaopay-cancel-payment`, and `kakaopay-reconcile`; invoke `kakaopay-recurring` daily with `x-cron-secret`. Keep `VITE_KAKAOPAY_ENABLED` unset until approval, issued live credentials, server-side disabled/enabled smoke checks, and explicit authorization to activate payment. Kakao Pay Money receipts are issued automatically by Kakao Pay, so Vocally does not issue a duplicate cash receipt.
+
+The separate one-time product is `Vocally Pro 30일 이용권` (KRW 7,000, one payment, no automatic renewal). It uses only `KAKAOPAY_CID_ONETIME`, never a subscription CID or SID. Keep `KAKAOPAY_ONETIME_ENABLED` unset until Kakao has approved the general-payment category, issued the separate CID, and activation is explicitly authorized. Its server-only refund route accepts no partial amount and revokes access only after Kakao confirms a full cancellation.
 
 ## Branch Strategy
 

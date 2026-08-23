@@ -1,6 +1,8 @@
 import {
   isKakaoPayPaymentEnabled,
+  isKakaoPayOneTimeProductKey,
   isKakaoPayPlan,
+  KAKAOPAY_ONE_TIME_PRODUCTS,
   KAKAOPAY_ORDER_NAMES,
   KAKAOPAY_PRICES,
   type KakaoPayConfig,
@@ -29,6 +31,21 @@ Deno.test("keeps Kakao Pay prices and product names server-owned", () => {
     KAKAOPAY_ORDER_NAMES.monthly !== "Vocally Pro 월간 이용권"
   ) {
     throw new Error("Kakao Pay product catalog is incorrect");
+  }
+});
+
+Deno.test("keeps the one-time product key, price, and duration server-owned", () => {
+  const product = KAKAOPAY_ONE_TIME_PRODUCTS.pro_30_day_once;
+  if (
+    !isKakaoPayOneTimeProductKey("pro_30_day_once") ||
+    isKakaoPayOneTimeProductKey("monthly") ||
+    isKakaoPayOneTimeProductKey(undefined) ||
+    product.amount !== 7_000 ||
+    product.currency !== "KRW" ||
+    product.durationDays !== 30 ||
+    product.orderName !== "Vocally Pro 30일 이용권"
+  ) {
+    throw new Error("one-time product catalog is incorrect");
   }
 });
 

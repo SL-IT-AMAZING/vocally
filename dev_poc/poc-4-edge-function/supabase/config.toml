@@ -407,6 +407,18 @@ verify_jwt = false
 enabled = true
 verify_jwt = false
 
+[functions.kakaopay-one-time-ready]
+enabled = true
+verify_jwt = false
+
+[functions.kakaopay-one-time-approve]
+enabled = true
+verify_jwt = false
+
+[functions.kakaopay-one-time-cancel]
+enabled = true
+verify_jwt = false
+
 [functions.kakaopay-recurring]
 enabled = true
 verify_jwt = false

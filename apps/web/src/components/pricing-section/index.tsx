@@ -309,6 +309,15 @@ function ProSubscribeButton({
   );
 }
 
+function OneTimePassButton({ className }: { className?: string }) {
+  const { user, openSignInModal } = useAuth();
+  const navigate = useNavigate();
+  return <button type="button" className={className} onClick={() => {
+    if (!user) return openSignInModal();
+    navigate("/checkout/kakaopay/one-time/review");
+  }}>{user ? "카카오페이 단건결제" : "단건 이용권 구매하기"}</button>;
+}
+
 export default function PricingSection() {
   const intl = useIntl();
   const pricingPlans = usePricingPlans();
@@ -437,6 +446,15 @@ export default function PricingSection() {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.planName}>Vocally Pro 30일 이용권</h3>
+            <p className={styles.planDescription}>카카오페이 단건결제 상품입니다. 자동으로 갱신되지 않습니다.</p>
+          </div>
+          <div className={styles.priceContainer}><div className={styles.priceRow}><span className={styles.price}>₩7,000</span><span className={styles.pricePeriod}>/ 결제 1회</span></div><div className={styles.billingNote}>결제 완료일부터 30일간 Pro 기능 제공</div></div>
+          <OneTimePassButton className={styles.kakaoPayButton} />
         </div>
 
         {/* Trust Signal */}
